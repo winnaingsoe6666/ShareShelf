@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: shareshelf
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shareshelf
+    username: shareshelf
+    password: ${DB_PASSWORD:shareshelf_dev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:shareshelf-dev-secret-key-must-be-at-least-256-bits-long-for-hs256}
+  expiration-ms: 86400000 # 24 hours
+
+# File upload (local dev)
+app:
+  upload-dir: uploads
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
