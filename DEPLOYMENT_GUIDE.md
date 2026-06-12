@@ -214,7 +214,7 @@ export default nextConfig;
 
    | Variable | Value |
    |----------|-------|
-   | `SPRING_PROFILES_ACTIVE` | `prod` |
+   | `SPRING_PROFILES_ACTIVE` | `railway` |
    | `JWT_SECRET` | *(random 64-char base64)* |
    | `PORT` | `8080` |
    | `CORS_ORIGINS` | `https://shareshelf.up.railway.app` *(update later)* |
@@ -226,16 +226,16 @@ export default nextConfig;
 
 ### 3.2 Update application.yml for Railway
 
-Railway provides `DATABASE_URL` directly, so add a profile override or update `application-prod.yml`:
+Railway provides `DATABASE_URL` directly (format: `postgresql://user:pass@host:port/db?sslmode=require`). The `application-railway.yml` profile already handles this correctly:
 
 ```yaml
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
-    # Railway injects these automatically when PostgreSQL plugin is attached
+    url: jdbc:${DATABASE_URL}
+    # Username and password are embedded in DATABASE_URL; do not set separately.
 ```
+
+The `jdbc:` prefix is required because Spring Boot expects a `jdbc:postgresql://...` URL, while Railway's `DATABASE_URL` starts with `postgresql://...`.
 
 ### 3.3 Frontend on Railway
 
@@ -453,6 +453,14 @@ jobs:
 # 3. Port mismatch — Render/Fly use PORT env var, Spring uses 8080.
 #    Set SERVER_PORT=${PORT} env var if needed.
 ```
+
+### Railway health check failure
+
+If you see the error **"deployment failed during the network process: healtcheck"** in Railway's deploy logs:
+
+1. **Wrong Spring profile** — Railway needs `SPRING_PROFILES_ACTIVE=railway`, not `prod`. The `railway` profile ships with the correct `jdbc:${DATABASE_URL}` datasource config.
+2. **Cold start timeout** — Spring Boot + JVM + DB connection can take 2-3 minutes on first deploy. The default `healthcheckTimeout: 120` in `railway.json` may be too short. Increase it to 300.
+3. **DB not ready yet** — Railway's PostgreSQL plugin starts in parallel with the app. If the health check fails immediately, wait 60s and Railway will retry (up to 5 retries with `restartPolicyMaxRetries: 5`).
 
 ### Frontend can't reach backend
 
