@@ -5,8 +5,8 @@ This guide covers deploying ShareShelf to production across different providers 
 ## Architecture
 
 ```
-Browser ──► Vercel ──► Render / Railway ──► PostgreSQL
-(frontend)    (backend API)         (database)
+Browser ──► Vercel ─── /api/* rewrite ──► Railway ──► PostgreSQL
+(frontend)         (proxied to backend)   (Spring Boot)   (database)
 ```
 
 - **Frontend**: Next.js static generation + server-side rendering on Vercel
@@ -246,6 +246,40 @@ To add frontend:
 2. Build command: `npm install && npm run build`
 3. Start command: `npm run start`
 4. Add `NEXT_PUBLIC_API_URL` pointing to your backend Railway URL
+
+### 3.4 Vercel + Railway (rewrite proxy)
+
+This is the recommended setup — frontend on Vercel, backend on Railway, with Vercel rewrites so everything lives at one domain.
+
+**Why rewrites?**
+- Frontend and backend share the same origin — **no CORS issues**
+- No need for `NEXT_PUBLIC_API_URL` in production (defaults to `/api`)
+- Clean separation: Vercel serves the Next.js app, Railway runs Spring Boot
+
+**What's already configured:**
+
+| File | Purpose |
+|------|---------|
+| `frontend/vercel.json` | Rewrites `/api/*` → `https://shareshelf-api.up.railway.app/api/*` |
+| `frontend/src/lib/api.ts` | Default baseURL is `/api` (local dev overrides with `.env.local`) |
+| `frontend/next.config.ts` | Allows Next.js Image component to load from `*.railway.app` and `*.vercel.app` |
+
+**Deploy steps:**
+
+1. **Backend** — Follow [Section 3.1](#31-deploy) to deploy the backend to Railway
+2. **Frontend** — Follow [Section 2.3](#23-frontend--vercel) to deploy to Vercel (root: `frontend`)
+3. **Update Railway CORS** — Add your Vercel domain to `CORS_ORIGINS` on Railway:
+
+   | Variable | Value |
+   |----------|-------|
+   | `CORS_ORIGINS` | `https://shareshelf.vercel.app,http://localhost:3000` |
+
+4. That's it — `/api/*` requests from the frontend are automatically proxied to Railway
+
+**Local development:** Create `frontend/.env.local`:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
 
 ---
 
