@@ -28,7 +28,7 @@ data class User(
     var avatarUrl: String? = null,
 
     @Column(name = "trust_score", nullable = false)
-    var trustScore: Double = 0.0,
+    var trustScore: java.math.BigDecimal = java.math.BigDecimal.ZERO,
 
     @Column(nullable = false)
     var enabled: Boolean = true,
