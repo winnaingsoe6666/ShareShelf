@@ -48,7 +48,7 @@ class DataSeederController(
             users.add(
                 User(
                     name = "User $i",
-                    email = "user$i@example.com",
+                    email = "user_${java.util.UUID.randomUUID().toString().substring(0, 8)}@example.com",
                     passwordHash = encodedPassword,
                     community = "Community ${random.nextInt(1, 10)}",
                     trustScore = BigDecimal.valueOf(random.nextDouble(1.0, 5.0)).setScale(2, java.math.RoundingMode.HALF_UP)

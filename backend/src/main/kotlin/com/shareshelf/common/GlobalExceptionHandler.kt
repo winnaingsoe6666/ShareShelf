@@ -44,5 +44,5 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleGeneral(ex: Exception): ResponseEntity<ApiResponse<Unit>> =
         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error("An unexpected error occurred"))
+            .body(ApiResponse.error("Error: ${ex.message} | Cause: ${ex.cause?.message}"))
 }
