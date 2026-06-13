@@ -32,6 +32,7 @@ data class Item(
     var status: String = "available",
 
     @Column(name = "image_urls", columnDefinition = "jsonb")
+    @org.hibernate.annotations.ColumnTransformer(write = "?::jsonb")
     var imageUrls: String = "[]",
 
     @Column(name = "created_at", nullable = false, updatable = false)
