@@ -1,15 +1,16 @@
 # Railway deployment profile
 # Railway injects PORT and DATABASE_URL when PostgreSQL plugin is attached.
-# DATABASE_URL format: postgresql://user:password@host:port/db?sslmode=require
+# DATABASE_URL format: postgres://user:password@host:port/db?sslmode=require
+# We use individual PG variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
+# instead of DATABASE_URL because its postgres:// scheme is not valid JDBC syntax.
 server:
   port: ${PORT:8080}
 
 spring:
   datasource:
-    # DATABASE_URL already includes user:password@host:port/db, so prepending jdbc:
-    # gives us jdbc:postgresql://user:password@host:port/db?sslmode=require
-    url: jdbc:${DATABASE_URL}
-    # Username and password are embedded in DATABASE_URL; do not set them separately.
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
