@@ -13,7 +13,9 @@ class CorsConfig {
     fun corsFilter(): CorsFilter {
         val config = CorsConfiguration().apply {
             allowCredentials = true
-            allowedOrigins = listOf("http://localhost:3000")
+            allowedOrigins = (System.getenv("CORS_ORIGINS") ?: "http://localhost:3000")
+                .split(",")
+                .map { it.trim() }
             allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             allowedHeaders = listOf("*")
             exposedHeaders = listOf("Authorization")

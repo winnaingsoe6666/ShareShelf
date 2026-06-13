@@ -23,7 +23,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/register", {
+      const res = await api.post("/auth/register", {
         name,
         email,
         password,

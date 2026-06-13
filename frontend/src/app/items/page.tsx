@@ -18,8 +18,8 @@ export default function BrowseItemsPage() {
 
   useEffect(() => {
     Promise.all([
-      api.get("/api/items").catch(() => ({ data: { data: [] } })),
-      api.get("/api/categories").catch(() => ({ data: { data: [] } })),
+      api.get("/items").catch(() => ({ data: { data: [] } })),
+      api.get("/categories").catch(() => ({ data: { data: [] } })),
     ]).then(([itemsRes, catRes]) => {
       setItems(itemsRes.data.data ?? []);
       setCategories(catRes.data.data ?? []);

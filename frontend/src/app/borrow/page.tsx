@@ -31,7 +31,7 @@ export default function BorrowPage() {
       router.push("/login");
       return;
     }
-    api.get("/api/borrow")
+    api.get("/borrow")
       .then((res) => setRequests(res.data.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
