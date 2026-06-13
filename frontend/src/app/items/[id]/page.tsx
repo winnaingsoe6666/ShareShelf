@@ -40,7 +40,7 @@ export default function ItemDetailPage() {
     setBorrowError("");
     setBorrowing(true);
     try {
-      await api.post("/api/borrow", {
+      await api.post("/borrow", {
         itemId: Number(id),
         message: borrowMsg || undefined,
       });

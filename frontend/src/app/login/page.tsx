@@ -21,7 +21,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/login", { email, password });
+      const res = await api.post("/auth/login", { email, password });
       if (res.data.success) {
         saveAuth(res.data.data);
         router.push("/items");

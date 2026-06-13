@@ -29,7 +29,7 @@ export default function NewItemPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/items", {
+      const res = await api.post("/items", {
         title,
         description: description || undefined,
         categoryId: categoryId ? Number(categoryId) : undefined,
