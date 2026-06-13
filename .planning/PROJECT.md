@@ -39,7 +39,7 @@ Users can discover and borrow tools from neighbors in their community, with a tr
 
 - [ ] **FIX-01**: Add `@Transactional` to `BorrowService.create()` to prevent item/borrow state desync
 - [ ] **FIX-02**: Fix borrow page tab filter — users should only see their own requests
-- [ ] **FIX-03**: Fix CORS configuration for production (Vercel → Railway)
+- [x] **FIX-03**: Fix CORS configuration for production (Vercel → Railway) — *fixed upstream: reads from CORS_ORIGINS env var*
 - [ ] **FIX-04**: Fix uncaught exceptions in JWT filter (return 401 instead of 500)
 - [ ] **FIX-05**: Wire `categoryName` through item create/update responses (currently hardcoded null)
 - [ ] **FIX-06**: Fix empty catch blocks in borrow page (don't swallow API errors)
