@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://shareshelf-api.up.railway.app/api/:path*"
+      "destination": "https://shareshelf-production.up.railway.app/api/:path*"
     }
   ]
 }
