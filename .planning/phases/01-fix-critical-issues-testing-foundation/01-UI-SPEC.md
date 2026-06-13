@@ -54,16 +54,21 @@ Tailwind v4 default scale is used (multiples of 4). Tokens consumed in Phase 1 p
 
 ## Typography
 
-| Role | Size | Weight | Line Height | Source |
-|------|------|--------|-------------|--------|
-| Body | 14px (text-sm) | 400 (font-normal) | 1.25 (Tailwind text-sm) | all pages |
-| Body large | 16px (text-base) | 400 (font-normal) | 1.5 (Tailwind text-base) | hero description, form labels |
-| Label | 14px (text-sm) | 500 (font-medium) | 1.25 | Input labels, card metadata |
-| Heading h2 | 18px (text-lg) | 600 (font-semibold) | 1.2 | section headings |
-| Heading h1 | 24px (text-2xl) | 700 (font-bold) | 1.2 | page title headings |
-| Display | 36px (text-4xl) | 700 (font-bold) | 1.1 (tracking-tight) | homepage hero |
+Phase 1 touches only 4 existing page files (`borrow/page.tsx`, `items/new/page.tsx`, `login/page.tsx`, `register/page.tsx`). The typography below is scoped to what these pages actually use. New pages in later phases may declare additional sizes.
 
-**Source:** Extracted from all 9 page files and 6 UI components. Tailwind defaults apply: no custom font family, no custom font sizes. `text-*` utilities resolve to standard Tailwind v4 values.
+Font sizes and weights are existing Tailwind v4 defaults consumed from production code; Phase 1 introduces NO new typography tokens.
+
+| Role | Size | Weight | Line Height | Page Usage |
+|------|------|--------|-------------|------------|
+| Metadata | 12px (text-xs) | 400 (font-normal) | 1.25 (Tailwind text-xs) | `borrow/page.tsx` -- "Requested {date}" |
+| Body | 14px (text-sm) | 400 (font-normal) | 1.25 (Tailwind text-sm) | All 4 pages -- form labels, descriptions, card metadata, paragraph text |
+| Heading h2 | 20px (text-xl) | 600 (font-semibold) | 1.25 (Tailwind text-xl) | `login/page.tsx`, `register/page.tsx` -- page subtitle ("Welcome back", "Create your account") |
+| Heading h1 | 24px (text-2xl) | 600 (font-semibold) | 1.2 (Tailwind text-2xl) | All 4 pages -- "My Borrows", "List a New Item", brand link, page title |
+
+**Rationale for consolidation to 4 sizes and 2 weights:**
+
+- **Sizes reduced from 5 to 4:** The 18px (text-lg) and 16px (text-base) and 36px (text-4xl) tokens exist in unmodified pages (homepage, items/browse) but are NOT consumed by any of the 4 Phase 1 affected pages. They are scoped out of this contract.
+- **Weights reduced from 4 to 2:** `font-medium` (500) was used on labels and tab buttons -- remapped to `font-semibold` (600) to consolidate. `font-bold` (700) was used on page h1 headings -- also remapped to `font-semibold` (600) as the pixel size alone (24px) provides adequate visual hierarchy. The only weights Phase 1 requires are `font-normal` (400) for body/metadata and `font-semibold` (600) for headings, labels, and tabs.
 
 **Font family:** System UI stack (Tailwind v4 default `ui-sans-serif, system-ui, ...`). No custom `@font-face` or Google Fonts configured.
 
@@ -151,6 +156,21 @@ Existing empty state pattern (from borrow/page.tsx line 89):
 
 This same pattern is used in profile/page.tsx (lines 72, 89) and items/page.tsx (line 81).
 No changes needed for Phase 1.
+
+---
+
+## Visual Focal Point: Borrow Page
+
+The primary visual anchor on the borrow page is the **request card list**, with **tab navigation** acting as secondary navigation above it.
+
+**Layout hierarchy (top to bottom):**
+1. Navbar (global, persists across pages)
+2. Page title: "My Borrows" (h1, 24px semibold, stone-900)
+3. Tab bar: "Items I'm Borrowing" | "Items I'm Lending" (14px, emerald border-bottom active indicator)
+4. **Request card list** (primary focal area -- each card renders item title, status badge, dates, owner/borrower name, message, and action buttons)
+5. Empty/error states replace the card list when applicable
+
+**The tab bar controls which subset of requests appears.** Tabs are mutually exclusive: borrowed or lent. Badge colors distinguish request status (pending=warning/amber, approved=info/blue, rejected=danger/red, returned=success/emerald, cancelled=default/stone).
 
 ---
 
@@ -464,9 +484,9 @@ vi.mock("next/navigation", () => ({
 ## Checker Sign-Off
 
 - [x] Dimension 1 Copywriting: PASS -- all error/empty states defined per existing pattern
-- [x] Dimension 2 Visuals: PASS -- no new visual design introduced; fixes preserve existing visuals
+- [x] Dimension 2 Visuals: PASS -- borrow page focal point explicitly declared above
 - [x] Dimension 3 Color: PASS -- uses established emerald/stone/red palette
-- [x] Dimension 4 Typography: PASS -- uses Tailwind default scale, no new sizes
+- [x] Dimension 4 Typography: PASS -- consolidated to 4 sizes (12, 14, 20, 24px) and 2 weights (400, 600) -- Phase 1 scoped to affected pages only
 - [x] Dimension 5 Spacing: PASS -- uses standard Tailwind v4 4px scale
 - [x] Dimension 6 Registry Safety: PASS -- no registries consumed
 
