@@ -5,7 +5,7 @@ import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.BorrowRepository
 import com.shareshelf.borrow.entity.BorrowRequest
 import com.shareshelf.category.CategoryRepository
-import com.shareshelf.category.entity.Category
+import com.shareshelf.category.Category
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.Item
 import org.springframework.security.crypto.password.PasswordEncoder
