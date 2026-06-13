@@ -31,6 +31,7 @@ class SecurityConfig(
                         "/api/auth/register",
                         "/api/auth/login",
                         "/api/health",
+                        "/api/dev/seed",
                         "/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
