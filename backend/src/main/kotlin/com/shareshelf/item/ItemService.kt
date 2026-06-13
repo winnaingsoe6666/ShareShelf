@@ -34,7 +34,7 @@ class ItemService(
         )
 
         val saved = itemRepository.save(item)
-        return toResponse(saved, user.name, user.trustScore)
+        return toResponse(saved, user.name, user.trustScore.toDouble())
     }
 
     fun findAll(
@@ -54,7 +54,7 @@ class ItemService(
                 id = item.id!!,
                 ownerId = item.ownerId,
                 ownerName = user.map { it.name }.orElse("Unknown"),
-                ownerTrustScore = user.map { it.trustScore }.orElse(0.0),
+                ownerTrustScore = user.map { it.trustScore.toDouble() }.orElse(0.0),
                 categoryId = item.categoryId,
                 categoryName = category?.name,
                 title = item.title,
@@ -77,7 +77,7 @@ class ItemService(
             id = item.id!!,
             ownerId = item.ownerId,
             ownerName = user.map { it.name }.orElse("Unknown"),
-            ownerTrustScore = user.map { it.trustScore }.orElse(0.0),
+            ownerTrustScore = user.map { it.trustScore.toDouble() }.orElse(0.0),
             categoryId = item.categoryId,
             categoryName = category?.name,
             title = item.title,
@@ -108,7 +108,7 @@ class ItemService(
 
         val saved = itemRepository.save(item)
         val user = userRepository.findById(saved.ownerId)
-        return toResponse(saved, user.map { it.name }.orElse("Unknown"), user.map { it.trustScore }.orElse(0.0))
+        return toResponse(saved, user.map { it.name }.orElse("Unknown"), user.map { it.trustScore.toDouble() }.orElse(0.0))
     }
 
     @Transactional

@@ -62,7 +62,7 @@ class ReviewService(
         if (avg != null) {
             val user = userRepository.findById(userId)
                 .orElseThrow { EntityNotFoundException("User not found") }
-            user.trustScore = Math.round(avg * 100.0) / 100.0
+            user.trustScore = java.math.BigDecimal.valueOf(Math.round(avg * 100.0) / 100.0)
             userRepository.save(user)
         }
     }

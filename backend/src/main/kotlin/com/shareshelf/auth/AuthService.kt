@@ -62,7 +62,7 @@ class AuthService(
         userId = user.id!!,
         name = user.name,
         email = user.email,
-        trustScore = user.trustScore,
+        trustScore = user.trustScore.toDouble(),
         community = user.community,
         avatarUrl = user.avatarUrl
     )
