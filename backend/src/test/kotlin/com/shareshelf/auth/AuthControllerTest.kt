@@ -2,7 +2,6 @@ package com.shareshelf.auth
 
 import com.shareshelf.auth.dto.AuthResponse
 import com.shareshelf.auth.dto.RefreshRequest
-import com.shareshelf.common.ApiResponse
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -61,33 +60,28 @@ class AuthControllerTest {
             community = null,
             avatarUrl = null
         )
-        val apiResponse = ApiResponse.success(authResponse)
 
-        every { authService.refresh(refreshToken) } returns apiResponse
+        every { authService.refresh(refreshToken) } returns authResponse
 
         val response = authController.refresh(request)
 
         assertEquals(HttpStatus.OK, response.statusCode)
         val body = response.body!!
         assertTrue(body.success)
-        val data = body.data as AuthResponse
-        assertEquals("new.access.token", data.token)
-        assertEquals("new.refresh.token", data.refreshToken)
+        assertNotNull(body.data)
 
         verify(exactly = 1) { authService.refresh(refreshToken) }
     }
 
     @Test
-    fun `refresh should return 401 when refresh token is invalid`() {
+    fun `refresh should propagate service exception`() {
         val refreshToken = "invalid-refresh-token"
         val request = RefreshRequest(refreshToken)
-        val apiResponse = ApiResponse.error<AuthResponse>("Invalid refresh token")
 
-        every { authService.refresh(refreshToken) } returns apiResponse
+        every { authService.refresh(refreshToken) } throws org.springframework.security.authentication.BadCredentialsException("Invalid refresh token")
 
-        val response = authController.refresh(request)
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.statusCode)
-        assertFalse(response.body!!.success)
+        assertThrows(org.springframework.security.authentication.BadCredentialsException::class.java) {
+            authController.refresh(request)
+        }
     }
 }

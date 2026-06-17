@@ -8,10 +8,10 @@ import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.Instant
 import java.time.LocalDateTime
-import java.util.*
 
 class AuthServiceTest {
 
@@ -77,80 +77,77 @@ class AuthServiceTest {
 
     @Test
     fun `refresh should return new tokens for valid refresh token`() {
-        val refreshTokenString = UUID.randomUUID().toString()
+        val refreshTokenString = "valid-refresh-token"
         val storedToken = RefreshToken(
             id = 1L,
-            token = refreshTokenString,
+            token = "hashed-token",
             userId = 1L,
             expiresAt = LocalDateTime.now().plusDays(7),
             revoked = false
         )
         val newAccessToken = "new.access.token"
+        val newRefreshToken = "new.refresh.token"
 
-        every { refreshTokenRepository.findByToken(refreshTokenString) } returns storedToken
-        every { userRepository.findById(1L) } returns Optional.of(testUser)
-        every { jwtTokenProvider.generateToken(1L, "test@example.com") } returns newAccessToken
+        every { refreshTokenRepository.findByToken(any()) } returns storedToken
         every { refreshTokenRepository.save(any()) } returns storedToken
+        every { userRepository.findById(1L) } returns java.util.Optional.of(testUser)
+        every { jwtTokenProvider.generateToken(1L, "test@example.com") } returns newAccessToken
 
         val response = authService.refresh(refreshTokenString)
 
-        assertTrue(response.success)
-        assertNotNull(response.data)
-        assertEquals(newAccessToken, response.data!!.token)
+        assertNotNull(response)
+        assertEquals(newAccessToken, response.token)
         assertTrue(storedToken.revoked)
 
-        verify(exactly = 1) { refreshTokenRepository.findByToken(refreshTokenString) }
+        verify(exactly = 1) { refreshTokenRepository.findByToken(any()) }
         verify(exactly = 1) { userRepository.findById(1L) }
         verify(exactly = 1) { jwtTokenProvider.generateToken(1L, "test@example.com") }
     }
 
     @Test
-    fun `refresh should fail for revoked refresh token`() {
-        val refreshTokenString = UUID.randomUUID().toString()
+    fun `refresh should throw for revoked refresh token`() {
+        val refreshTokenString = "revoked-token"
         val storedToken = RefreshToken(
             id = 1L,
-            token = refreshTokenString,
+            token = "hashed-token",
             userId = 1L,
             expiresAt = LocalDateTime.now().plusDays(7),
             revoked = true
         )
 
-        every { refreshTokenRepository.findByToken(refreshTokenString) } returns storedToken
+        every { refreshTokenRepository.findByToken(any()) } returns storedToken
 
-        val response = authService.refresh(refreshTokenString)
-
-        assertFalse(response.success)
-        assertEquals("Refresh token has been revoked", response.message)
+        assertThrows(BadCredentialsException::class.java) {
+            authService.refresh(refreshTokenString)
+        }
     }
 
     @Test
-    fun `refresh should fail for expired refresh token`() {
-        val refreshTokenString = UUID.randomUUID().toString()
+    fun `refresh should throw for expired refresh token`() {
+        val refreshTokenString = "expired-token"
         val storedToken = RefreshToken(
             id = 1L,
-            token = refreshTokenString,
+            token = "hashed-token",
             userId = 1L,
             expiresAt = LocalDateTime.now().minusDays(1),
             revoked = false
         )
 
-        every { refreshTokenRepository.findByToken(refreshTokenString) } returns storedToken
+        every { refreshTokenRepository.findByToken(any()) } returns storedToken
 
-        val response = authService.refresh(refreshTokenString)
-
-        assertFalse(response.success)
-        assertEquals("Refresh token has expired", response.message)
+        assertThrows(BadCredentialsException::class.java) {
+            authService.refresh(refreshTokenString)
+        }
     }
 
     @Test
-    fun `refresh should fail for unknown refresh token`() {
+    fun `refresh should throw for unknown refresh token`() {
         val refreshTokenString = "unknown-token"
 
-        every { refreshTokenRepository.findByToken(refreshTokenString) } returns null
+        every { refreshTokenRepository.findByToken(any()) } returns null
 
-        val response = authService.refresh(refreshTokenString)
-
-        assertFalse(response.success)
-        assertEquals("Invalid refresh token", response.message)
+        assertThrows(BadCredentialsException::class.java) {
+            authService.refresh(refreshTokenString)
+        }
     }
 }

@@ -1,14 +1,24 @@
 package com.shareshelf.auth
 
-import org.junit.jupiter.api.Test
+import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class JwtTokenProviderTest {
 
+    private val jtiBlacklist = mockk<JtiBlacklist>(relaxed = true)
+
     private val jwtTokenProvider = JwtTokenProvider(
         jwtSecret = "this-is-a-test-secret-key-that-is-long-enough-for-hs256-algorithm-yes",
-        expirationMs = 3600000 // 1 hour
+        expirationMs = 3600000, // 1 hour
+        jtiBlacklist = jtiBlacklist
     )
+
+    @BeforeEach
+    fun setUp() {
+        clearAllMocks()
+    }
 
     @Test
     fun `generateToken should include JTI claim`() {
