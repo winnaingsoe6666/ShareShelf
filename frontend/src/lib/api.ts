@@ -5,10 +5,11 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Request interceptor — inject JWT token
+// Request interceptor — inject JWT token from sessionStorage
+// (sessionStorage auto-clears on tab close, logging the user out)
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("shareshelf_token");
+    const token = sessionStorage.getItem("shareshelf_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,9 +22,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("shareshelf_token");
-      localStorage.removeItem("shareshelf_user");
-      // Optionally redirect to login, but only if not already there
+      sessionStorage.removeItem("shareshelf_token");
+      sessionStorage.removeItem("shareshelf_user");
       if (!window.location.pathname.startsWith("/login")) {
         window.location.href = "/login";
       }

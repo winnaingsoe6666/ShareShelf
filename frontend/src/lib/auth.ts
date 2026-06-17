@@ -3,9 +3,12 @@ import type { AuthResponse, User } from "@/types";
 const TOKEN_KEY = "shareshelf_token";
 const USER_KEY = "shareshelf_user";
 
+// sessionStorage auto-clears when the browser tab closes, logging the user out.
+// localStorage would persist the session across tab/window lifetime,
+// defeating the "logout on tab close" requirement.
 export function saveAuth(auth: AuthResponse): void {
-  localStorage.setItem(TOKEN_KEY, auth.token);
-  localStorage.setItem(USER_KEY, JSON.stringify({
+  sessionStorage.setItem(TOKEN_KEY, auth.token);
+  sessionStorage.setItem(USER_KEY, JSON.stringify({
     id: auth.userId,
     name: auth.name,
     email: auth.email,
@@ -16,18 +19,18 @@ export function saveAuth(auth: AuthResponse): void {
 }
 
 export function clearAuth(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
 }
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return sessionStorage.getItem(TOKEN_KEY);
 }
 
 export function getUser(): User | null {
   if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(USER_KEY);
+  const raw = sessionStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as User;
