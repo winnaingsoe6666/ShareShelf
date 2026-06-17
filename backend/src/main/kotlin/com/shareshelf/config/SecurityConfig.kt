@@ -17,7 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val rateLimitFilter: RateLimitFilter
 ) {
 
     @Bean
@@ -33,7 +34,6 @@ class SecurityConfig(
                         "/api/auth/login",
                         "/api/auth/refresh",
                         "/api/health",
-                        "/api/dev/seed",
                         "/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
@@ -43,6 +43,7 @@ class SecurityConfig(
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }
+            .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()

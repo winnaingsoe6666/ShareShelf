@@ -1,6 +1,10 @@
 package com.shareshelf.common
 
 import jakarta.persistence.EntityNotFoundException
+import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
@@ -10,7 +14,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler(
+    private val env: Environment
+) {
+
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(EntityNotFoundException::class)
     fun handleNotFound(ex: EntityNotFoundException): ResponseEntity<ApiResponse<Unit>> =
@@ -42,7 +50,14 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneral(ex: Exception): ResponseEntity<ApiResponse<Unit>> =
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error("Error: ${ex.message} | Cause: ${ex.cause?.message}"))
+    fun handleGeneral(ex: Exception, request: HttpServletRequest): ResponseEntity<ApiResponse<Unit>> {
+        logger.error("Unhandled exception for ${request.method} ${request.requestURI}", ex)
+        val message = if (env.acceptsProfiles(Profiles.of("dev", "default"))) {
+            "Error: ${ex.message}"
+        } else {
+            "Internal server error"
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ApiResponse.error(message))
+    }
 }
