@@ -37,5 +37,9 @@ frontend/dist
 # Uploads (dev)
 backend/uploads/
 
+# Playwright E2E
+playwright-report/
+test-results/
+
 # Logs
 *.log
