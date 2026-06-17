@@ -24,7 +24,7 @@ export default function ProfilePage() {
     }
     Promise.all([
       api.get("/items").catch(() => ({ data: { data: [] } })),
-      api.get(`/api/review/user/${user?.id}`).catch(() => ({ data: { data: [] } })),
+      api.get(`/review/user/${user?.id}`).catch(() => ({ data: { data: [] } })),
     ]).then(([itemsRes, reviewsRes]) => {
       setItems((itemsRes.data.data ?? []).filter((i: Item) => i.ownerId === user?.id));
       setReviews(reviewsRes.data.data ?? []);

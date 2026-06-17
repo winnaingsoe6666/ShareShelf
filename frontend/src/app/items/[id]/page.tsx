@@ -26,7 +26,7 @@ export default function ItemDetailPage() {
   const [borrowSuccess, setBorrowSuccess] = useState(false);
 
   useEffect(() => {
-    api.get(`/api/items/${id}`)
+    api.get(`/items/${id}`)
       .then((res) => setItem(res.data.data ?? res.data))
       .catch(() => setError("Item not found"))
       .finally(() => setLoading(false));

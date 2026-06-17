@@ -39,7 +39,7 @@ export default function BorrowPage() {
 
   const handleAction = async (id: number, action: "approve" | "reject" | "return") => {
     try {
-      await api.put(`/api/borrow/${id}/${action}`);
+      await api.put(`/borrow/${id}/${action}`);
       setRequests((prev) =>
         prev.map((r) => {
           if (r.id !== id) return r;
