@@ -33,10 +33,16 @@ data class LoginRequest(
 
 data class AuthResponse(
     val token: String,
+    val refreshToken: String,
     val userId: Long,
     val name: String,
     val email: String,
     val trustScore: Double,
     val community: String?,
     val avatarUrl: String?
+)
+
+data class RefreshRequest(
+    @field:NotBlank(message = "Refresh token is required")
+    val refreshToken: String
 )

@@ -1,6 +1,7 @@
 package com.shareshelf.auth
 
 import com.shareshelf.auth.dto.LoginRequest
+import com.shareshelf.auth.dto.RefreshRequest
 import com.shareshelf.auth.dto.RegisterRequest
 import com.shareshelf.common.ApiResponse
 import jakarta.validation.Valid
@@ -39,5 +40,22 @@ class AuthController(
     fun me(@AuthenticationPrincipal principal: UserPrincipal): ResponseEntity<ApiResponse<*>> {
         val response = authService.getCurrentUser(principal.getId())
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/logout")
+    fun logout(@RequestHeader("Authorization") authHeader: String): ResponseEntity<ApiResponse<*>> {
+        val token = authHeader.removePrefix("Bearer ")
+        authService.logout(token)
+        return ResponseEntity.ok(ApiResponse.success(Unit, message = "Logged out successfully"))
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(@RequestBody @Valid request: RefreshRequest): ResponseEntity<ApiResponse<*>> {
+        val response = authService.refresh(request.refreshToken)
+        return if (response.success) {
+            ResponseEntity.ok(response)
+        } else {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response)
+        }
     }
 }

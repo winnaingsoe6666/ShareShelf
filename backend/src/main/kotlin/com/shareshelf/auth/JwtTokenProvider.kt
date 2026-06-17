@@ -6,7 +6,9 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 import java.util.Date
+import java.util.UUID
 
 @Component
 class JwtTokenProvider(
@@ -24,6 +26,7 @@ class JwtTokenProvider(
         return Jwts.builder()
             .subject(userId.toString())
             .claim("email", email)
+            .id(UUID.randomUUID().toString())
             .issuedAt(now)
             .expiration(expiry)
             .signWith(signingKey)
@@ -33,6 +36,16 @@ class JwtTokenProvider(
     fun getUserIdFromToken(token: String): Long {
         val claims = parseClaims(token)
         return claims.subject.toLong()
+    }
+
+    fun getJtiFromToken(token: String): String {
+        val claims = parseClaims(token)
+        return claims.id
+    }
+
+    fun getExpirationFromToken(token: String): Instant {
+        val claims = parseClaims(token)
+        return claims.expiration.toInstant()
     }
 
     fun validateToken(token: String): Boolean {

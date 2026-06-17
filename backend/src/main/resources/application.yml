@@ -30,6 +30,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET:shareshelf-dev-secret-key-must-be-at-least-256-bits-long-for-hs256}
   expiration-ms: 86400000 # 24 hours
+  refresh-expiration-ms: 604800000 # 7 days
 
 # File upload (local dev)
 app:
