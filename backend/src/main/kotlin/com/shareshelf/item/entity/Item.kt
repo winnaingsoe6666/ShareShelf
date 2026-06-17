@@ -1,8 +1,12 @@
 package com.shareshelf.item.entity
 
+import com.shareshelf.auth.entity.User
+import com.shareshelf.category.Category
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
+
+enum class ItemStatus { available, borrowed, unavailable }
 
 @Entity
 @Table(name = "items")
@@ -13,8 +17,16 @@ data class Item(
     @Column(name = "owner_id", nullable = false)
     var ownerId: Long = 0,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    var owner: User? = null,
+
     @Column(name = "category_id")
     var categoryId: Long? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    var category: Category? = null,
 
     @Column(nullable = false, length = 200)
     var title: String = "",
@@ -28,8 +40,12 @@ data class Item(
     @Column(name = "deposit_amount")
     var depositAmount: BigDecimal? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    var status: String = "available",
+    var status: ItemStatus = ItemStatus.available,
+
+    @Version
+    var version: Long? = null,
 
     @Column(name = "image_urls", columnDefinition = "jsonb")
     @org.hibernate.annotations.ColumnTransformer(write = "?::jsonb")
@@ -49,6 +65,4 @@ data class Item(
         createdAt = LocalDateTime.now()
         updatedAt = LocalDateTime.now()
     }
-
-    fun ownerId() = ownerId
 }

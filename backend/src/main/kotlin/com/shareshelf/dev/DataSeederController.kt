@@ -4,10 +4,12 @@ import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.BorrowRepository
 import com.shareshelf.borrow.entity.BorrowRequest
+import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.category.CategoryRepository
 import com.shareshelf.category.Category
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.Item
+import com.shareshelf.item.entity.ItemStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -70,14 +72,14 @@ class DataSeederController(
                     description = "This is a generated dummy item $i for testing purposes.",
                     dailyPrice = BigDecimal.valueOf(random.nextDouble(5.0, 50.0)).setScale(2, java.math.RoundingMode.HALF_UP),
                     depositAmount = BigDecimal.valueOf(random.nextDouble(50.0, 200.0)).setScale(2, java.math.RoundingMode.HALF_UP),
-                    status = "available"
+                    status = ItemStatus.available
                 )
             )
         }
         val savedItems = itemRepository.saveAll(items)
 
         // 3. Generate random Borrow Requests
-        val statuses = listOf("pending", "approved", "rejected", "returned", "cancelled")
+        val statuses = listOf(BorrowStatus.pending, BorrowStatus.approved, BorrowStatus.rejected, BorrowStatus.returned, BorrowStatus.cancelled)
         val borrowRequests = mutableListOf<BorrowRequest>()
 
         for (user in savedUsers) {

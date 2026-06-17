@@ -5,6 +5,7 @@ import com.shareshelf.common.ApiResponse
 import com.shareshelf.item.dto.CreateItemRequest
 import com.shareshelf.item.dto.ItemResponse
 import com.shareshelf.item.dto.UpdateItemRequest
+import com.shareshelf.item.entity.ItemStatus
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,7 +22,7 @@ class ItemController(
     fun listItems(
         @RequestParam(required = false) search: String?,
         @RequestParam(required = false) categoryId: Long?,
-        @RequestParam(required = false) status: String?
+        @RequestParam(required = false) status: ItemStatus?
     ): ResponseEntity<ApiResponse<List<ItemResponse>>> {
         val items = itemService.findAll(search, categoryId, status)
         return ResponseEntity.ok(ApiResponse.success(items))

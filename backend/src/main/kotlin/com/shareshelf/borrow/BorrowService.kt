@@ -6,7 +6,9 @@ import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.dto.BorrowResponse
 import com.shareshelf.borrow.dto.CreateBorrowRequest
 import com.shareshelf.borrow.entity.BorrowRequest
+import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.item.ItemRepository
+import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,11 +21,12 @@ class BorrowService(
     private val objectMapper: ObjectMapper
 ) {
 
+    @Transactional
     fun create(request: CreateBorrowRequest, borrowerId: Long): BorrowResponse {
         val item = itemRepository.findById(request.itemId)
             .orElseThrow { EntityNotFoundException("Item not found") }
 
-        if (item.status != "available") {
+        if (item.status != ItemStatus.available) {
             throw IllegalStateException("Item is not available for borrowing")
         }
 
@@ -41,10 +44,6 @@ class BorrowService(
         )
 
         val saved = borrowRepository.save(borrow)
-
-        // Mark item as borrowed
-        item.status = "borrowed"
-        itemRepository.save(item)
 
         return toResponse(saved, item.title, parseFirstImage(item.imageUrls))
     }
@@ -84,11 +83,17 @@ class BorrowService(
         if (borrow.ownerId != userId) {
             throw org.springframework.security.access.AccessDeniedException("Only the owner can approve requests")
         }
-        if (borrow.status != "pending") {
+        if (borrow.status != BorrowStatus.pending) {
             throw IllegalStateException("Only pending requests can be approved")
         }
 
-        borrow.status = "approved"
+        // Mark item as borrowed only when owner approves
+        val item = itemRepository.findById(borrow.itemId)
+            .orElseThrow { EntityNotFoundException("Item not found") }
+        item.status = ItemStatus.borrowed
+        itemRepository.save(item)
+
+        borrow.status = BorrowStatus.approved
         val saved = borrowRepository.save(borrow)
         return toResponse(saved)
     }
@@ -101,17 +106,17 @@ class BorrowService(
         if (borrow.ownerId != userId) {
             throw org.springframework.security.access.AccessDeniedException("Only the owner can reject requests")
         }
-        if (borrow.status != "pending") {
+        if (borrow.status != BorrowStatus.pending) {
             throw IllegalStateException("Only pending requests can be rejected")
         }
 
-        borrow.status = "rejected"
+        borrow.status = BorrowStatus.rejected
         val saved = borrowRepository.save(borrow)
 
-        // Make item available again
+        // Make item available again (safety net in case item was borrowed by another request)
         val item = itemRepository.findById(borrow.itemId)
         item.ifPresent {
-            it.status = "available"
+            it.status = ItemStatus.available
             itemRepository.save(it)
         }
 
@@ -126,17 +131,17 @@ class BorrowService(
         if (borrow.ownerId != userId) {
             throw org.springframework.security.access.AccessDeniedException("Only the owner can mark items as returned")
         }
-        if (borrow.status != "approved") {
+        if (borrow.status != BorrowStatus.approved) {
             throw IllegalStateException("Only approved borrows can be marked as returned")
         }
 
-        borrow.status = "returned"
+        borrow.status = BorrowStatus.returned
         val saved = borrowRepository.save(borrow)
 
-        // Make item available again
+        // Make item available again after return
         val item = itemRepository.findById(borrow.itemId)
         item.ifPresent {
-            it.status = "available"
+            it.status = ItemStatus.available
             itemRepository.save(it)
         }
 

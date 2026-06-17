@@ -1,5 +1,6 @@
 package com.shareshelf.borrow.dto
 
+import com.shareshelf.borrow.entity.BorrowStatus
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +25,7 @@ data class BorrowResponse(
     val borrowerName: String,
     val ownerId: Long,
     val ownerName: String,
-    val status: String,
+    val status: BorrowStatus,
     val startDate: LocalDate?,
     val endDate: LocalDate?,
     val message: String?,

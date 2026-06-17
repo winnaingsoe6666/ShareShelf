@@ -1,13 +1,14 @@
 package com.shareshelf.item
 
 import com.shareshelf.item.entity.Item
+import com.shareshelf.item.entity.ItemStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface ItemRepository : JpaRepository<Item, Long> {
     fun findByOwnerId(ownerId: Long): List<Item>
-    fun findByStatus(status: String): List<Item>
+    fun findByStatus(status: ItemStatus): List<Item>
 
     @Query(
         """SELECT i FROM Item i WHERE
@@ -19,6 +20,6 @@ interface ItemRepository : JpaRepository<Item, Long> {
     fun search(
         @Param("search") search: String?,
         @Param("categoryId") categoryId: Long?,
-        @Param("status") status: String?
+        @Param("status") status: ItemStatus?
     ): List<Item>
 }

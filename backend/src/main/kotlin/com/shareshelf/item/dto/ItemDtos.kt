@@ -1,5 +1,6 @@
 package com.shareshelf.item.dto
 
+import com.shareshelf.item.entity.ItemStatus
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
@@ -25,7 +26,7 @@ data class UpdateItemRequest(
     val categoryId: Long? = null,
     val dailyPrice: BigDecimal? = null,
     val depositAmount: BigDecimal? = null,
-    val status: String? = null
+    val status: ItemStatus? = null
 )
 
 data class ItemResponse(
@@ -39,7 +40,7 @@ data class ItemResponse(
     val description: String?,
     val dailyPrice: BigDecimal?,
     val depositAmount: BigDecimal?,
-    val status: String,
+    val status: ItemStatus,
     val imageUrls: List<String>,
     val createdAt: LocalDateTime
 )

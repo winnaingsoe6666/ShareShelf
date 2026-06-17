@@ -2,6 +2,7 @@ package com.shareshelf.review
 
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.BorrowRepository
+import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.review.dto.CreateReviewRequest
 import com.shareshelf.review.dto.ReviewResponse
 import com.shareshelf.review.entity.Review
@@ -21,7 +22,7 @@ class ReviewService(
         val borrow = borrowRepository.findById(request.borrowRequestId)
             .orElseThrow { EntityNotFoundException("Borrow request not found") }
 
-        if (borrow.status != "returned") {
+        if (borrow.status != BorrowStatus.returned) {
             throw IllegalStateException("Can only review completed borrows")
         }
 

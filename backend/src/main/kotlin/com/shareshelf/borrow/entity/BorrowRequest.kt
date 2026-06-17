@@ -4,6 +4,8 @@ import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+enum class BorrowStatus { pending, approved, rejected, returned, cancelled }
+
 @Entity
 @Table(name = "borrow_requests")
 data class BorrowRequest(
@@ -19,8 +21,9 @@ data class BorrowRequest(
     @Column(name = "owner_id", nullable = false)
     var ownerId: Long = 0,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    var status: String = "pending",
+    var status: BorrowStatus = BorrowStatus.pending,
 
     @Column(name = "start_date")
     var startDate: LocalDate? = null,

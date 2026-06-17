@@ -2,11 +2,11 @@ package com.shareshelf.item
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shareshelf.auth.entity.UserRepository
-import com.shareshelf.category.CategoryRepository
 import com.shareshelf.item.dto.CreateItemRequest
 import com.shareshelf.item.dto.ItemResponse
 import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.Item
+import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional
 class ItemService(
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository,
-    private val categoryRepository: CategoryRepository,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -30,7 +29,7 @@ class ItemService(
             categoryId = request.categoryId,
             dailyPrice = request.dailyPrice,
             depositAmount = request.depositAmount,
-            status = "available"
+            status = ItemStatus.available
         )
 
         val saved = itemRepository.save(item)
@@ -40,7 +39,7 @@ class ItemService(
     fun findAll(
         search: String? = null,
         categoryId: Long? = null,
-        status: String? = null
+        status: ItemStatus? = null
     ): List<ItemResponse> {
         val items = if (search != null || categoryId != null || status != null) {
             itemRepository.search(search, categoryId, status)
@@ -48,15 +47,13 @@ class ItemService(
             itemRepository.findAll()
         }
         return items.map { item ->
-            val user = userRepository.findById(item.ownerId)
-            val category = item.categoryId?.let { categoryRepository.findById(it).orElse(null) }
             ItemResponse(
                 id = item.id!!,
                 ownerId = item.ownerId,
-                ownerName = user.map { it.name }.orElse("Unknown"),
-                ownerTrustScore = user.map { it.trustScore.toDouble() }.orElse(0.0),
+                ownerName = item.owner?.name ?: "Unknown",
+                ownerTrustScore = item.owner?.trustScore?.toDouble() ?: 0.0,
                 categoryId = item.categoryId,
-                categoryName = category?.name,
+                categoryName = item.category?.name,
                 title = item.title,
                 description = item.description,
                 dailyPrice = item.dailyPrice,
@@ -71,15 +68,13 @@ class ItemService(
     fun findById(id: Long): ItemResponse {
         val item = itemRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Item not found") }
-        val user = userRepository.findById(item.ownerId)
-        val category = item.categoryId?.let { categoryRepository.findById(it).orElse(null) }
         return ItemResponse(
             id = item.id!!,
             ownerId = item.ownerId,
-            ownerName = user.map { it.name }.orElse("Unknown"),
-            ownerTrustScore = user.map { it.trustScore.toDouble() }.orElse(0.0),
+            ownerName = item.owner?.name ?: "Unknown",
+            ownerTrustScore = item.owner?.trustScore?.toDouble() ?: 0.0,
             categoryId = item.categoryId,
-            categoryName = category?.name,
+            categoryName = item.category?.name,
             title = item.title,
             description = item.description,
             dailyPrice = item.dailyPrice,
@@ -127,7 +122,7 @@ class ItemService(
         ownerName = ownerName,
         ownerTrustScore = ownerTrustScore,
         categoryId = item.categoryId,
-        categoryName = null,
+        categoryName = item.category?.name,
         title = item.title,
         description = item.description,
         dailyPrice = item.dailyPrice,
