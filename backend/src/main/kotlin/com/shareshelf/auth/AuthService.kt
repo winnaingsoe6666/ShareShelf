@@ -7,9 +7,9 @@ import com.shareshelf.auth.entity.RefreshToken
 import com.shareshelf.auth.entity.RefreshTokenRepository
 import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
-import com.shareshelf.common.ApiResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,9 +26,9 @@ class AuthService(
     @Value("\${jwt.refresh-expiration-ms}") private val refreshExpirationMs: Long
 ) {
 
-    fun register(request: RegisterRequest): ApiResponse<AuthResponse> {
+    fun register(request: RegisterRequest): AuthResponse {
         if (userRepository.existsByEmail(request.email)) {
-            return ApiResponse.error("Email already registered")
+            throw IllegalArgumentException("Email already registered")
         }
 
         val user = User(
@@ -43,17 +43,17 @@ class AuthService(
         val token = jwtTokenProvider.generateToken(savedUser.id!!, savedUser.email)
         val refreshToken = createRefreshToken(savedUser.id!!)
 
-        return ApiResponse.created(toAuthResponse(savedUser, token, refreshToken))
+        return toAuthResponse(savedUser, token, refreshToken)
     }
 
     @Transactional
-    fun login(request: LoginRequest): ApiResponse<AuthResponse> {
+    fun login(request: LoginRequest): AuthResponse {
         val user = userRepository.findByEmail(request.email)
-            ?: return ApiResponse.error("Invalid email or password")
+            ?: throw BadCredentialsException("Invalid email or password")
 
         // Check if account is temporarily locked
         if (user.lockedUntil?.isAfter(LocalDateTime.now()) == true) {
-            return ApiResponse.error("Account is temporarily locked due to too many failed login attempts. Please try again later.")
+            throw BadCredentialsException("Account is temporarily locked due to too many failed login attempts. Please try again later.")
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
@@ -63,7 +63,7 @@ class AuthService(
                 user.lockedUntil = LocalDateTime.now().plusMinutes(30)
             }
             userRepository.save(user)
-            return ApiResponse.error("Invalid email or password")
+            throw BadCredentialsException("Invalid email or password")
         }
 
         // Reset failed attempts and lock status on successful login
@@ -76,7 +76,7 @@ class AuthService(
         val token = jwtTokenProvider.generateToken(user.id!!, user.email)
         val refreshToken = createRefreshToken(user.id!!)
 
-        return ApiResponse.success(toAuthResponse(user, token, refreshToken))
+        return toAuthResponse(user, token, refreshToken)
     }
 
     fun logout(token: String) {
@@ -90,17 +90,17 @@ class AuthService(
     }
 
     @Transactional
-    fun refresh(refreshTokenString: String): ApiResponse<AuthResponse> {
+    fun refresh(refreshTokenString: String): AuthResponse {
         val hashedToken = hashToken(refreshTokenString)
         val storedToken = refreshTokenRepository.findByToken(hashedToken)
-            ?: return ApiResponse.error("Invalid refresh token")
+            ?: throw BadCredentialsException("Invalid refresh token")
 
         if (storedToken.revoked) {
-            return ApiResponse.error("Refresh token has been revoked")
+            throw BadCredentialsException("Refresh token has been revoked")
         }
 
         if (storedToken.expiresAt.isBefore(LocalDateTime.now())) {
-            return ApiResponse.error("Refresh token has expired")
+            throw BadCredentialsException("Refresh token has expired")
         }
 
         // Revoke the old refresh token (single-use rotation)
@@ -113,17 +113,17 @@ class AuthService(
         val newAccessToken = jwtTokenProvider.generateToken(user.id!!, user.email)
         val newRefreshToken = createRefreshToken(user.id!!)
 
-        return ApiResponse.success(toAuthResponse(user, newAccessToken, newRefreshToken))
+        return toAuthResponse(user, newAccessToken, newRefreshToken)
     }
 
-    fun getCurrentUser(userId: Long): ApiResponse<AuthResponse> {
+    fun getCurrentUser(userId: Long): AuthResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { EntityNotFoundException("User not found") }
 
         val token = jwtTokenProvider.generateToken(user.id!!, user.email)
         val refreshToken = createRefreshToken(user.id!!)
 
-        return ApiResponse.success(toAuthResponse(user, token, refreshToken))
+        return toAuthResponse(user, token, refreshToken)
     }
 
     private fun createRefreshToken(userId: Long): String {

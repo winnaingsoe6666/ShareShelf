@@ -7,6 +7,7 @@ import com.shareshelf.review.dto.CreateReviewRequest
 import com.shareshelf.review.dto.ReviewResponse
 import com.shareshelf.review.entity.Review
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -46,7 +47,11 @@ class ReviewService(
             comment = request.comment
         )
 
-        val saved = reviewRepository.save(review)
+        val saved = try {
+            reviewRepository.save(review)
+        } catch (e: DataIntegrityViolationException) {
+            throw IllegalStateException("You have already reviewed this borrow request")
+        }
 
         // Update trust score
         updateTrustScore(revieweeId)
@@ -54,7 +59,7 @@ class ReviewService(
         return toResponse(saved)
     }
 
-    fun findByUser(userId: Long): List<ReviewResponse> {
+    fun findByReviewee(userId: Long): List<ReviewResponse> {
         return reviewRepository.findByRevieweeId(userId).map { toResponse(it) }
     }
 

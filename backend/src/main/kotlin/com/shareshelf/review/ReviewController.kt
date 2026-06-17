@@ -29,7 +29,7 @@ class ReviewController(
     fun listByUser(
         @PathVariable userId: Long
     ): ResponseEntity<ApiResponse<List<ReviewResponse>>> {
-        val result = reviewService.findByUser(userId)
+        val result = reviewService.findByReviewee(userId)
         return ResponseEntity.ok(ApiResponse.success(result))
     }
 }

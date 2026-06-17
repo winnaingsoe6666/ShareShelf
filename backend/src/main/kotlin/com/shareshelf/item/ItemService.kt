@@ -8,6 +8,8 @@ import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,50 +41,23 @@ class ItemService(
     fun findAll(
         search: String? = null,
         categoryId: Long? = null,
-        status: ItemStatus? = null
-    ): List<ItemResponse> {
+        status: ItemStatus? = null,
+        pageable: Pageable
+    ): Page<ItemResponse> {
         val items = if (search != null || categoryId != null || status != null) {
-            itemRepository.search(search, categoryId, status)
+            itemRepository.search(search, categoryId, status, pageable)
         } else {
-            itemRepository.findAll()
+            itemRepository.findAll(pageable)
         }
         return items.map { item ->
-            ItemResponse(
-                id = item.id!!,
-                ownerId = item.ownerId,
-                ownerName = item.owner?.name ?: "Unknown",
-                ownerTrustScore = item.owner?.trustScore?.toDouble() ?: 0.0,
-                categoryId = item.categoryId,
-                categoryName = item.category?.name,
-                title = item.title,
-                description = item.description,
-                dailyPrice = item.dailyPrice,
-                depositAmount = item.depositAmount,
-                status = item.status,
-                imageUrls = parseJsonArray(item.imageUrls),
-                createdAt = item.createdAt
-            )
+            toResponse(item, item.owner?.name ?: "Unknown", item.owner?.trustScore?.toDouble() ?: 0.0)
         }
     }
 
     fun findById(id: Long): ItemResponse {
         val item = itemRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Item not found") }
-        return ItemResponse(
-            id = item.id!!,
-            ownerId = item.ownerId,
-            ownerName = item.owner?.name ?: "Unknown",
-            ownerTrustScore = item.owner?.trustScore?.toDouble() ?: 0.0,
-            categoryId = item.categoryId,
-            categoryName = item.category?.name,
-            title = item.title,
-            description = item.description,
-            dailyPrice = item.dailyPrice,
-            depositAmount = item.depositAmount,
-            status = item.status,
-            imageUrls = parseJsonArray(item.imageUrls),
-            createdAt = item.createdAt
-        )
+        return toResponse(item, item.owner?.name ?: "Unknown", item.owner?.trustScore?.toDouble() ?: 0.0)
     }
 
     @Transactional

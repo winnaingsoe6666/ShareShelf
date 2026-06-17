@@ -7,6 +7,10 @@ import com.shareshelf.item.dto.ItemResponse
 import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.ItemStatus
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -22,9 +26,10 @@ class ItemController(
     fun listItems(
         @RequestParam(required = false) search: String?,
         @RequestParam(required = false) categoryId: Long?,
-        @RequestParam(required = false) status: ItemStatus?
-    ): ResponseEntity<ApiResponse<List<ItemResponse>>> {
-        val items = itemService.findAll(search, categoryId, status)
+        @RequestParam(required = false) status: ItemStatus?,
+        @PageableDefault(size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
+    ): ResponseEntity<ApiResponse<Page<ItemResponse>>> {
+        val items = itemService.findAll(search, categoryId, status, pageable)
         return ResponseEntity.ok(ApiResponse.success(items))
     }
 

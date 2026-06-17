@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 class HealthController {
 
     @GetMapping("/api/health")
-    fun health(): ResponseEntity<Map<String, String>> {
-        return ResponseEntity.ok(mapOf("status" to "UP"))
+    fun health(): ResponseEntity<ApiResponse<Map<String, String>>> {
+        return ResponseEntity.ok(ApiResponse.success(mapOf("status" to "UP")))
     }
 }

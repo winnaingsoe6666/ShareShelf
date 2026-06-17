@@ -8,6 +8,8 @@ import org.springframework.core.env.Profiles
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.core.AuthenticationException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -39,6 +41,16 @@ class GlobalExceptionHandler(
     fun handleAccessDenied(ex: AccessDeniedException): ResponseEntity<ApiResponse<Unit>> =
         ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(ApiResponse.error("Access denied"))
+
+    @ExceptionHandler(BadCredentialsException::class)
+    fun handleBadCredentials(ex: BadCredentialsException): ResponseEntity<ApiResponse<Unit>> =
+        ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.error(ex.message ?: "Invalid credentials"))
+
+    @ExceptionHandler(AuthenticationException::class)
+    fun handleAuthentication(ex: AuthenticationException): ResponseEntity<ApiResponse<Unit>> =
+        ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.error(ex.message ?: "Authentication failed"))
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity<ApiResponse<Unit>> {

@@ -10,6 +10,8 @@ import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,12 +50,9 @@ class BorrowService(
         return toResponse(saved, item.title, parseFirstImage(item.imageUrls))
     }
 
-    fun findByUser(userId: Long): List<BorrowResponse> {
-        val asBorrower = borrowRepository.findByBorrowerId(userId)
-        val asOwner = borrowRepository.findByOwnerId(userId)
-        val all = (asBorrower + asOwner).distinctBy { it.id }
-
-        return all.map { borrow ->
+    fun findByUser(userId: Long, pageable: Pageable): Page<BorrowResponse> {
+        val borrows = borrowRepository.findByUserId(userId, pageable)
+        return borrows.map { borrow ->
             val item = itemRepository.findById(borrow.itemId)
             val borrower = userRepository.findById(borrow.borrowerId)
             val owner = userRepository.findById(borrow.ownerId)
