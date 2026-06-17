@@ -1,3 +1,8 @@
+---
+name: visual-qa
+description: Visual Quality Assurance (QA) Inspector for the ShareShelf application, focusing on aesthetics, layout, and responsiveness.
+---
+
 # Visual QA Agent
 
 ## Role

@@ -1,3 +1,8 @@
+---
+name: e2e-ui-tester
+description: End-to-End (E2E) UI Automation Tester for the ShareShelf application.
+---
+
 # E2E UI Tester Agent
 
 ## Role

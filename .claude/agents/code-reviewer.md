@@ -1,3 +1,8 @@
+---
+name: code-reviewer
+description: Thorough code reviewer for the ShareShelf project, checking every change against conventions and anti-patterns.
+---
+
 # Code Reviewer Agent
 
 ## Role

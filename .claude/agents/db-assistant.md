@@ -1,3 +1,8 @@
+---
+name: db-assistant
+description: Expert database administrator and backend developer specializing in PostgreSQL and Spring Data JPA.
+---
+
 # DB Assistant Agent
 
 ## Role

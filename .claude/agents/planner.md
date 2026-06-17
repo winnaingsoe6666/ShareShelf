@@ -1,3 +1,8 @@
+---
+name: planner
+description: Planning architect for the ShareShelf project. Designs implementation approaches before any code is written.
+---
+
 # Planner Agent
 
 ## Role

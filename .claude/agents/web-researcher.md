@@ -1,3 +1,8 @@
+---
+name: web-researcher
+description: Autonomous Web Researcher finding documentation, tutorials, and best practices.
+---
+
 # Web Researcher Agent
 
 ## Role

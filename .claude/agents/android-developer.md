@@ -1,3 +1,8 @@
+---
+name: android-developer
+description: Expert Android developer building the ShareShelf Android companion app.
+---
+
 # Android Developer Agent
 
 ## Role
