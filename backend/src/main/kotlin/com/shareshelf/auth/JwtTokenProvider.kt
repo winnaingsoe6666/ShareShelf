@@ -13,7 +13,8 @@ import java.util.UUID
 @Component
 class JwtTokenProvider(
     @Value("\${jwt.secret}") private val jwtSecret: String,
-    @Value("\${jwt.expiration-ms}") private val expirationMs: Long
+    @Value("\${jwt.expiration-ms}") private val expirationMs: Long,
+    private val jtiBlacklist: JtiBlacklist
 ) {
     private val signingKey by lazy {
         Keys.hmacShaKeyFor(jwtSecret.toByteArray(StandardCharsets.UTF_8))
@@ -51,6 +52,8 @@ class JwtTokenProvider(
     fun validateToken(token: String): Boolean {
         return try {
             val claims = parseClaims(token)
+            val jti = claims.id
+            if (jti != null && jtiBlacklist.isBlacklisted(jti)) return false
             !claims.expiration.before(Date())
         } catch (e: Exception) {
             false

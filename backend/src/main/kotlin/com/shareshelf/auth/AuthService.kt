@@ -72,7 +72,8 @@ class AuthService(
 
     @Transactional
     fun refresh(refreshTokenString: String): ApiResponse<AuthResponse> {
-        val storedToken = refreshTokenRepository.findByToken(refreshTokenString)
+        val hashedToken = hashToken(refreshTokenString)
+        val storedToken = refreshTokenRepository.findByToken(hashedToken)
             ?: return ApiResponse.error("Invalid refresh token")
 
         if (storedToken.revoked) {
@@ -107,18 +108,25 @@ class AuthService(
     }
 
     private fun createRefreshToken(userId: Long): String {
-        val token = UUID.randomUUID().toString()
+        val rawToken = UUID.randomUUID().toString()
+        val hashedToken = hashToken(rawToken)
         val expiresAt = LocalDateTime.now().plusSeconds(refreshExpirationMs / 1000)
 
         val refreshToken = RefreshToken(
-            token = token,
+            token = hashedToken,
             userId = userId,
             expiresAt = expiresAt,
             revoked = false
         )
 
         refreshTokenRepository.save(refreshToken)
-        return token
+        return rawToken
+    }
+
+    private fun hashToken(token: String): String {
+        return java.security.MessageDigest.getInstance("SHA-256")
+            .digest(token.toByteArray())
+            .joinToString("") { "%02x".format(it) }
     }
 
     private fun toAuthResponse(user: User, token: String, refreshToken: String) = AuthResponse(
