@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class CustomUserDetailsService(
@@ -34,7 +35,16 @@ class UserPrincipal(private val user: User) : UserDetails {
     override fun getPassword() = user.passwordHash
     override fun getUsername() = user.email
     override fun isAccountNonExpired() = true
-    override fun isAccountNonLocked() = true
+    override fun isAccountNonLocked(): Boolean {
+        val lockedUntil = user.lockedUntil ?: return true
+        return !lockedUntil.isAfter(LocalDateTime.now())
+    }
+
     override fun isCredentialsNonExpired() = true
-    override fun isEnabled() = user.enabled
+
+    override fun isEnabled(): Boolean {
+        if (!user.enabled) return false
+        val lockedUntil = user.lockedUntil ?: return true
+        return !lockedUntil.isAfter(LocalDateTime.now())
+    }
 }

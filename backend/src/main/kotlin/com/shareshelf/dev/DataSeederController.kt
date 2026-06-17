@@ -10,6 +10,7 @@ import com.shareshelf.category.Category
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
+import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,6 +21,7 @@ import java.time.LocalDate
 import kotlin.random.Random
 
 @RestController
+@Profile("dev", "default")
 @RequestMapping("/api/dev")
 class DataSeederController(
     private val userRepository: UserRepository,

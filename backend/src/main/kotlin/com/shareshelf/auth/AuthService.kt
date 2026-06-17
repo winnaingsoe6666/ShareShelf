@@ -46,12 +46,31 @@ class AuthService(
         return ApiResponse.created(toAuthResponse(savedUser, token, refreshToken))
     }
 
+    @Transactional
     fun login(request: LoginRequest): ApiResponse<AuthResponse> {
         val user = userRepository.findByEmail(request.email)
             ?: return ApiResponse.error("Invalid email or password")
 
+        // Check if account is temporarily locked
+        if (user.lockedUntil?.isAfter(LocalDateTime.now()) == true) {
+            return ApiResponse.error("Account is temporarily locked due to too many failed login attempts. Please try again later.")
+        }
+
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
+            // Track failed login attempts
+            user.failedLoginAttempts++
+            if (user.failedLoginAttempts >= 5) {
+                user.lockedUntil = LocalDateTime.now().plusMinutes(30)
+            }
+            userRepository.save(user)
             return ApiResponse.error("Invalid email or password")
+        }
+
+        // Reset failed attempts and lock status on successful login
+        if (user.failedLoginAttempts > 0) {
+            user.failedLoginAttempts = 0
+            user.lockedUntil = null
+            userRepository.save(user)
         }
 
         val token = jwtTokenProvider.generateToken(user.id!!, user.email)
