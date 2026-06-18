@@ -45,8 +45,13 @@ export default function HomePage() {
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden bg-purple-50">
-          {/* Animated geometric background */}
-          <div className="absolute inset-0 bg-pattern-geometric opacity-60" />
+          {/* Background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/uploads/sharing_tool.jpg')" }}
+          />
+          {/* Overlay for readability */}
+          <div className="absolute inset-0 bg-purple-50/70" />
 
           <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 text-center">
             {/* Small badge/label above heading */}
