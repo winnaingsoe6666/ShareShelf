@@ -36,6 +36,8 @@ describe("LoginPage", () => {
     const user = userEvent.setup();
     (api.post as ReturnType<typeof vi.fn>).mockRejectedValue({ response: { status: 401 } });
     render(<LoginPage />);
+    await user.type(screen.getByLabelText("Email"), "test@test.com");
+    await user.type(screen.getByLabelText("Password"), "wrong");
     await user.click(screen.getByText("Sign In"));
     await waitFor(() => { expect(screen.getByText(/invalid email/i)).toBeTruthy(); });
   });
@@ -46,6 +48,8 @@ describe("LoginPage", () => {
       data: { success: true, data: { token: "t", userId: 1, name: "T", email: "t@t", trustScore: 4 } },
     });
     render(<LoginPage />);
+    await user.type(screen.getByLabelText("Email"), "test@test.com");
+    await user.type(screen.getByLabelText("Password"), "Password1");
     await user.click(screen.getByText("Sign In"));
     await waitFor(() => {
       expect(saveAuth).toHaveBeenCalled();

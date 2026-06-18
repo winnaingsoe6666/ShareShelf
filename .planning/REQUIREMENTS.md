@@ -7,18 +7,18 @@
 
 ### Phase 1: Fix Critical Issues & Testing Foundation
 
-- [ ] **FIX-01**: Add `@Transactional` to `BorrowService.create()` to prevent item/borrow state desync
-- [ ] **FIX-02**: Fix borrow page tab filter — users should only see their own requests
+- [x] **FIX-01**: Add `@Transactional` to `BorrowService.create()` to prevent item/borrow state desync
+- [x] **FIX-02**: Fix borrow page tab filter — users should only see their own requests
 - [x] **FIX-03**: Fix CORS configuration for production (Vercel → Railway) — *fixed upstream*
-- [ ] **FIX-04**: Fix uncaught exceptions in JWT filter (return 401 instead of 500)
-- [ ] **FIX-05**: Wire `categoryName` through item create/update responses (currently hardcoded null)
-- [ ] **FIX-06**: Fix empty catch blocks in borrow page (don't swallow API errors)
-- [ ] **FIX-07**: Replace hardcoded category options with API-driven data
-- [ ] **FIX-08**: Move auth redirects from render to `useEffect` in frontend
-- [ ] **FIX-09**: Add safe null handling for nullable entity IDs (replace `!!`)
-- [ ] **TEST-01**: Add JUnit 5 + MockK test dependencies and write backend unit tests
-- [ ] **TEST-02**: Add Vitest + React Testing Library and write frontend component tests
-- [ ] **RALPH-01**: Establish Claude Code memory with project context
+- [x] **FIX-04**: Fix uncaught exceptions in JWT filter (return 401 instead of 500)
+- [x] **FIX-05**: Wire `categoryName` through item create/update responses (currently hardcoded null)
+- [x] **FIX-06**: Fix empty catch blocks in borrow page (don't swallow API errors)
+- [x] **FIX-07**: Replace hardcoded category options with API-driven data
+- [x] **FIX-08**: Move auth redirects from render to `useEffect` in frontend
+- [x] **FIX-09**: Add safe null handling for nullable entity IDs (replace `!!`)
+- [x] **TEST-01**: Add JUnit 5 + MockK test dependencies and write backend unit tests
+- [x] **TEST-02**: Add Vitest + React Testing Library and write frontend component tests
+- [x] **RALPH-01**: Establish Claude Code memory with project context
 
 ### Phase 2: Photo Upload Feature
 
@@ -81,18 +81,18 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-01 | Phase 1 | Pending |
-| FIX-02 | Phase 1 | Pending |
-| FIX-03 | Phase 1 | Complete |
-| FIX-04 | Phase 1 | Pending |
-| FIX-05 | Phase 1 | Pending |
-| FIX-06 | Phase 1 | Pending |
-| FIX-07 | Phase 1 | Pending |
-| FIX-08 | Phase 1 | Pending |
-| FIX-09 | Phase 1 | Pending |
-| TEST-01 | Phase 1 | Pending |
-| TEST-02 | Phase 1 | Pending |
-| RALPH-01 | Phase 1 | Pending |
+| FIX-01 | Phase 1 | ✅ Complete |
+| FIX-02 | Phase 1 | ✅ Complete |
+| FIX-03 | Phase 1 | ✅ Complete |
+| FIX-04 | Phase 1 | ✅ Complete |
+| FIX-05 | Phase 1 | ✅ Complete |
+| FIX-06 | Phase 1 | ✅ Complete |
+| FIX-07 | Phase 1 | ✅ Complete |
+| FIX-08 | Phase 1 | ✅ Complete |
+| FIX-09 | Phase 1 | ✅ Complete |
+| TEST-01 | Phase 1 | ✅ Complete |
+| TEST-02 | Phase 1 | ✅ Complete |
+| RALPH-01 | Phase 1 | ✅ Complete |
 | PHOTO-01 | Phase 2 | Pending |
 | PHOTO-02 | Phase 2 | Pending |
 | PHOTO-03 | Phase 2 | Pending |

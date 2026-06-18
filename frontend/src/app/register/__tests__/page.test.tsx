@@ -38,6 +38,9 @@ describe("RegisterPage", () => {
       response: { data: { message: "Email exists" } },
     });
     render(<RegisterPage />);
+    await user.type(screen.getByLabelText("Full Name"), "Test User");
+    await user.type(screen.getByLabelText("Email"), "test@test.com");
+    await user.type(screen.getByLabelText("Password"), "Password1");
     await user.click(screen.getByText("Create Account"));
     await waitFor(() => { expect(screen.getByText("Email exists")).toBeTruthy(); });
   });
@@ -48,6 +51,9 @@ describe("RegisterPage", () => {
       data: { success: true, data: { token: "t", userId: 1, name: "T", email: "t@t", trustScore: 4 } },
     });
     render(<RegisterPage />);
+    await user.type(screen.getByLabelText("Full Name"), "Test User");
+    await user.type(screen.getByLabelText("Email"), "test@test.com");
+    await user.type(screen.getByLabelText("Password"), "Password1");
     await user.click(screen.getByText("Create Account"));
     await waitFor(() => {
       expect(saveAuth).toHaveBeenCalled();
