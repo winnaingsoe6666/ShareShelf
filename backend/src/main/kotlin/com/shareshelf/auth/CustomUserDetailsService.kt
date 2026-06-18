@@ -27,7 +27,7 @@ class CustomUserDetailsService(
 }
 
 class UserPrincipal(private val user: User) : UserDetails {
-    fun getId() = user.id!!
+    fun getId() = user.id ?: throw IllegalStateException("User entity has no ID assigned")
     fun getEmail() = user.email
     fun getName() = user.name
 

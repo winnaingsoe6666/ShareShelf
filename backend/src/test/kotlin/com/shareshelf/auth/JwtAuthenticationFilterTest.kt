@@ -115,4 +115,53 @@ class JwtAuthenticationFilterTest {
         assertNull(SecurityContextHolder.getContext().authentication)
         verify(exactly = 1) { filterChain.doFilter(request, response) }
     }
+
+    // --- FIX-04: Exception handling in filter chain ---
+
+    @Test
+    fun `should still call filterChain when loadUserById throws exception`() {
+        val token = "valid.jwt.token"
+        val jti = "jti-456"
+
+        val request = MockHttpServletRequest()
+        request.addHeader("Authorization", "Bearer $token")
+        val response = MockHttpServletResponse()
+        val filterChain = mockk<FilterChain>(relaxed = true)
+
+        every { jwtTokenProvider.validateToken(token) } returns true
+        every { jwtTokenProvider.getJtiFromToken(token) } returns jti
+        every { jtiBlacklist.isBlacklisted(jti) } returns false
+        every { jwtTokenProvider.getUserIdFromToken(token) } returns 999L
+        every { userDetailsService.loadUserById(999L) } throws
+            org.springframework.security.core.userdetails.UsernameNotFoundException("User not found")
+
+        // This should NOT throw — the filter should catch and clear context
+        filter.doFilter(request, response, filterChain)
+
+        // Security context should be cleared after exception
+        assertNull(SecurityContextHolder.getContext().authentication)
+        // Filter chain should STILL be called (even though exception happened)
+        verify(exactly = 1) { filterChain.doFilter(request, response) }
+    }
+
+    @Test
+    fun `should clear security context and continue chain when JWT validation throws`() {
+        val token = "bad.token"
+
+        val request = MockHttpServletRequest()
+        request.addHeader("Authorization", "Bearer $token")
+        val response = MockHttpServletResponse()
+        val filterChain = mockk<FilterChain>(relaxed = true)
+
+        every { jwtTokenProvider.validateToken(token) } throws
+            io.jsonwebtoken.MalformedJwtException("Malformed JWT")
+
+        // Should NOT throw — filter should handle exception
+        filter.doFilter(request, response, filterChain)
+
+        // Security context should be clear
+        assertNull(SecurityContextHolder.getContext().authentication)
+        // Filter chain must still be called
+        verify(exactly = 1) { filterChain.doFilter(request, response) }
+    }
 }

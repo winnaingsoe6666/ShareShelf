@@ -30,27 +30,32 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = extractToken(request)
+        try {
+            val token = extractToken(request)
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            val jti = jwtTokenProvider.getJtiFromToken(token)
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                val jti = jwtTokenProvider.getJtiFromToken(token)
 
-            if (jtiBlacklist.isBlacklisted(jti)) {
-                logger.warn("Blacklisted token used for request: {}", request.requestURI)
-                response.status = HttpServletResponse.SC_UNAUTHORIZED
-                response.writer.write("{\"success\":false,\"message\":\"Token has been revoked\"}")
-                return
+                if (jtiBlacklist.isBlacklisted(jti)) {
+                    logger.warn("Blacklisted token used for request: {}", request.requestURI)
+                    response.status = HttpServletResponse.SC_UNAUTHORIZED
+                    response.writer.write("{\"success\":false,\"message\":\"Token has been revoked\"}")
+                    return
+                }
+
+                val userId = jwtTokenProvider.getUserIdFromToken(token)
+                val userDetails = userDetailsService.loadUserById(userId)
+
+                val authentication = UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.authorities
+                )
+                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+
+                SecurityContextHolder.getContext().authentication = authentication
             }
-
-            val userId = jwtTokenProvider.getUserIdFromToken(token)
-            val userDetails = userDetailsService.loadUserById(userId)
-
-            val authentication = UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.authorities
-            )
-            authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
-
-            SecurityContextHolder.getContext().authentication = authentication
+        } catch (ex: Exception) {
+            logger.warn("Authentication failed for request: {}", request.requestURI, ex)
+            SecurityContextHolder.clearContext()
         }
 
         filterChain.doFilter(request, response)

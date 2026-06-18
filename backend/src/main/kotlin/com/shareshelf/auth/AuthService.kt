@@ -40,8 +40,13 @@ class AuthService(
         )
 
         val savedUser = userRepository.save(user)
-        val token = jwtTokenProvider.generateToken(savedUser.id!!, savedUser.email)
-        val refreshToken = createRefreshToken(savedUser.id!!)
+        val token = jwtTokenProvider.generateToken(
+            savedUser.id ?: throw IllegalStateException("User was saved but no ID was generated"),
+            savedUser.email
+        )
+        val refreshToken = createRefreshToken(
+            savedUser.id ?: throw IllegalStateException("User was saved but no ID was generated")
+        )
 
         return toAuthResponse(savedUser, token, refreshToken)
     }
@@ -73,8 +78,13 @@ class AuthService(
             userRepository.save(user)
         }
 
-        val token = jwtTokenProvider.generateToken(user.id!!, user.email)
-        val refreshToken = createRefreshToken(user.id!!)
+        val token = jwtTokenProvider.generateToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated"),
+            user.email
+        )
+        val refreshToken = createRefreshToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated")
+        )
 
         return toAuthResponse(user, token, refreshToken)
     }
@@ -110,8 +120,13 @@ class AuthService(
         val user = userRepository.findById(storedToken.userId)
             .orElseThrow { EntityNotFoundException("User not found") }
 
-        val newAccessToken = jwtTokenProvider.generateToken(user.id!!, user.email)
-        val newRefreshToken = createRefreshToken(user.id!!)
+        val newAccessToken = jwtTokenProvider.generateToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated"),
+            user.email
+        )
+        val newRefreshToken = createRefreshToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated")
+        )
 
         return toAuthResponse(user, newAccessToken, newRefreshToken)
     }
@@ -120,8 +135,13 @@ class AuthService(
         val user = userRepository.findById(userId)
             .orElseThrow { EntityNotFoundException("User not found") }
 
-        val token = jwtTokenProvider.generateToken(user.id!!, user.email)
-        val refreshToken = createRefreshToken(user.id!!)
+        val token = jwtTokenProvider.generateToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated"),
+            user.email
+        )
+        val refreshToken = createRefreshToken(
+            user.id ?: throw IllegalStateException("User was saved but no ID was generated")
+        )
 
         return toAuthResponse(user, token, refreshToken)
     }
@@ -151,7 +171,7 @@ class AuthService(
     private fun toAuthResponse(user: User, token: String, refreshToken: String) = AuthResponse(
         token = token,
         refreshToken = refreshToken,
-        userId = user.id!!,
+        userId = user.id ?: throw IllegalStateException("User was saved but no ID was generated"),
         name = user.name,
         email = user.email,
         trustScore = user.trustScore.toDouble(),
