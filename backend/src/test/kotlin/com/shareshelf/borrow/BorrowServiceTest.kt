@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -157,6 +158,19 @@ class BorrowServiceTest {
 
         verify(exactly = 1) { itemRepository.findById(1L) }
         verify(exactly = 0) { borrowRepository.save(any()) }
+    }
+
+    @Test
+    fun `create method is annotated with Transactional`() {
+        val method = BorrowService::class.java.getMethod(
+            "create",
+            CreateBorrowRequest::class.java,
+            Long::class.java
+        )
+        assertTrue(
+            method.isAnnotationPresent(Transactional::class.java),
+            "BorrowService.create() must be annotated with @Transactional to prevent item/borrow state desync"
+        )
     }
 
     // --- approve ---
