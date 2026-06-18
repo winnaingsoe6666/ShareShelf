@@ -1,3 +1,5 @@
+import { Loader2 } from "lucide-react";
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
@@ -13,14 +15,14 @@ export default function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const base = "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const base = "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
   const variants = {
-    primary: "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
-    secondary: "bg-stone-800 text-white hover:bg-stone-900 focus:ring-stone-500",
-    outline: "border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 focus:ring-emerald-500",
-    ghost: "text-stone-600 hover:bg-stone-100 focus:ring-stone-500",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+    primary: "bg-green-600 text-white hover:bg-green-700 hover:-translate-y-px focus:ring-green-500",
+    secondary: "bg-purple-800 text-white hover:bg-purple-900 hover:-translate-y-px focus:ring-purple-500",
+    outline: "border border-purple-200 bg-white text-purple-700 hover:bg-purple-50 focus:ring-purple-500",
+    ghost: "text-purple-600 hover:bg-purple-100 focus:ring-purple-500",
+    danger: "bg-red-600 text-white hover:bg-red-700 hover:-translate-y-px focus:ring-red-500",
   };
 
   const sizes = {
@@ -36,10 +38,7 @@ export default function Button({
       {...props}
     >
       {loading && (
-        <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       )}
       {children}
     </button>

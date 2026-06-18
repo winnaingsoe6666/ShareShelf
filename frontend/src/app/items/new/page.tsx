@@ -80,7 +80,7 @@ export default function NewItemPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Describe the item, condition, and what's included..."
-              className="block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="block w-full rounded-lg border border-purple-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -92,7 +92,7 @@ export default function NewItemPage() {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="block w-full rounded-lg border border-purple-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="">Select a category</option>
               {catLoading ? (

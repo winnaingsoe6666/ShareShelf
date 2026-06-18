@@ -69,7 +69,7 @@ describe("Navbar", () => {
     expect(hamburger).toBeInTheDocument();
     fireEvent.click(hamburger!);
     // After click, mobile menu should appear - check for links in mobile menu
-    const mobileLinks = document.querySelector(".border-t.border-stone-200");
+    const mobileLinks = document.querySelector(".border-t.border-purple-200");
     expect(mobileLinks).toBeInTheDocument();
   });
 

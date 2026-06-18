@@ -57,7 +57,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold text-emerald-700">ShareShelf</Link>
+          <Link href="/" className="text-2xl font-bold text-purple-700">ShareShelf</Link>
           <h1 className="mt-4 text-xl font-semibold text-stone-900">Welcome back</h1>
           <p className="mt-1 text-sm text-stone-600">Sign in to your account</p>
         </div>
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-stone-600">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-emerald-600 hover:text-emerald-700">Sign up</Link>
+          <Link href="/register" className="font-medium text-purple-600 hover:text-purple-700">Sign up</Link>
         </p>
       </div>
     </div>

@@ -47,7 +47,7 @@ export default function ProfilePage() {
         <Card className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-xl font-bold text-emerald-700">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 text-xl font-bold text-purple-700">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                 {user.community && (
                   <p className="text-sm text-stone-500">{user.community}</p>
                 )}
-                <p className="mt-1 text-sm font-medium text-emerald-700">
+                <p className="mt-1 text-sm font-medium text-purple-700">
                   Trust Score: {user.trustScore.toFixed(1)} / 5.0
                 </p>
               </div>

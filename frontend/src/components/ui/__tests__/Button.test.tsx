@@ -31,24 +31,24 @@ describe("Button", () => {
   it("applies primary variant classes", () => {
     render(<Button variant="primary">Primary</Button>);
     const button = screen.getByRole("button");
-    expect(button.className).toContain("bg-emerald-600");
+    expect(button.className).toContain("bg-green-600");
     expect(button.className).toContain("text-white");
   });
 
   it("applies secondary variant classes", () => {
     render(<Button variant="secondary">Secondary</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-stone-800");
+    expect(screen.getByRole("button").className).toContain("bg-purple-800");
   });
 
   it("applies outline variant classes", () => {
     render(<Button variant="outline">Outline</Button>);
     const button = screen.getByRole("button");
-    expect(button.className).toContain("border-stone-300");
+    expect(button.className).toContain("border-purple-200");
   });
 
   it("applies ghost variant classes", () => {
     render(<Button variant="ghost">Ghost</Button>);
-    expect(screen.getByRole("button").className).toContain("text-stone-600");
+    expect(screen.getByRole("button").className).toContain("text-purple-600");
   });
 
   it("applies danger variant classes", () => {

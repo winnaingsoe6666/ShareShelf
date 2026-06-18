@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Image } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -65,14 +66,12 @@ export default function ItemDetailPage() {
       <main className="mx-auto max-w-4xl px-4 py-8">
         <div className="grid gap-8 md:grid-cols-2">
           {/* Image */}
-          <div className="aspect-square w-full overflow-hidden rounded-xl bg-stone-100">
+          <div className="aspect-square w-full overflow-hidden rounded-xl bg-purple-100">
             {item.imageUrls?.[0] ? (
               <img src={item.imageUrls[0]} alt={item.title} className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full items-center justify-center text-stone-300">
-                <svg className="h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+              <div className="flex h-full items-center justify-center text-purple-300">
+                <Image className="h-20 w-20" />
               </div>
             )}
           </div>
@@ -92,7 +91,7 @@ export default function ItemDetailPage() {
               <p className="text-sm text-stone-600">{item.description || "No description provided."}</p>
             </div>
 
-            <div className="mt-6 space-y-3 rounded-lg bg-stone-50 p-4">
+            <div className="mt-6 space-y-3 rounded-lg bg-purple-50 p-4">
               <div className="flex justify-between text-sm">
                 <span className="text-stone-600">Daily price</span>
                 <span className="font-semibold text-stone-900">{formatPrice(item.dailyPrice)}</span>
@@ -122,7 +121,7 @@ export default function ItemDetailPage() {
               <p className="mt-4 text-center text-sm text-stone-500">This is your listing</p>
             )}
             {borrowSuccess && (
-              <p className="mt-4 text-center text-sm text-emerald-600">Borrow request sent successfully!</p>
+              <p className="mt-4 text-center text-sm text-green-600">Borrow request sent successfully!</p>
             )}
           </div>
         </div>

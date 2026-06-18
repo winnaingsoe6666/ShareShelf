@@ -57,7 +57,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold text-emerald-700">ShareShelf</Link>
+          <Link href="/" className="text-2xl font-bold text-purple-700">ShareShelf</Link>
           <h1 className="mt-4 text-xl font-semibold text-stone-900">Create your account</h1>
           <p className="mt-1 text-sm text-stone-600">Join your community tool library</p>
         </div>
@@ -78,7 +78,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-stone-600">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-emerald-600 hover:text-emerald-700">Sign in</Link>
+          <Link href="/login" className="font-medium text-purple-600 hover:text-purple-700">Sign in</Link>
         </p>
       </div>
     </div>

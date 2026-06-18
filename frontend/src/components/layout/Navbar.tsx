@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Menu, Share2, X } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
 
 export default function Navbar() {
@@ -17,34 +18,32 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <nav className="sticky top-0 z-40 border-b border-purple-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-emerald-700">
-          <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-          </svg>
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-purple-700">
+          <Share2 className="h-7 w-7" />
           ShareShelf
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
-          <Link href="/items" className="text-sm font-medium text-stone-600 hover:text-emerald-700">
+          <Link href="/items" className="text-sm font-medium text-stone-600 hover:text-purple-700">
             Browse
           </Link>
           {loggedIn ? (
             <>
-              <Link href="/items/new" className="text-sm font-medium text-stone-600 hover:text-emerald-700">
+              <Link href="/items/new" className="text-sm font-medium text-stone-600 hover:text-purple-700">
                 Add Item
               </Link>
-              <Link href="/borrow" className="text-sm font-medium text-stone-600 hover:text-emerald-700">
+              <Link href="/borrow" className="text-sm font-medium text-stone-600 hover:text-purple-700">
                 My Borrows
               </Link>
-              <Link href="/profile" className="text-sm font-medium text-stone-600 hover:text-emerald-700">
+              <Link href="/profile" className="text-sm font-medium text-stone-600 hover:text-purple-700">
                 Profile
               </Link>
               <button
                 onClick={handleLogout}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
               >
                 Log Out
               </button>
@@ -53,13 +52,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
               >
                 Log In
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px"
               >
                 Sign Up
               </Link>
@@ -68,33 +67,31 @@ export default function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-          <svg className="h-6 w-6 text-stone-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
+        <button className="md:hidden cursor-pointer" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? (
+            <X className="h-6 w-6 text-stone-700" />
+          ) : (
+            <Menu className="h-6 w-6 text-stone-700" />
+          )}
         </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-stone-200 px-4 pb-4 pt-2 md:hidden">
+        <div className="border-t border-purple-200 px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-2">
-            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-stone-100">Browse</Link>
+            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Browse</Link>
             {loggedIn ? (
               <>
-                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-stone-100">Add Item</Link>
-                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-stone-100">My Borrows</Link>
-                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-stone-100">Profile</Link>
-                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-stone-100">Log Out</button>
+                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Add Item</Link>
+                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">My Borrows</Link>
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Profile</Link>
+                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors">Log Out</button>
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-stone-100">Log In</Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-emerald-600 px-3 py-2 text-center text-sm text-white">Sign Up</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Log In</Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">Sign Up</Link>
               </>
             )}
           </div>

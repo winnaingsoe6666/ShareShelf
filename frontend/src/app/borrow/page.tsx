@@ -80,14 +80,14 @@ export default function BorrowPage() {
       <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-bold text-stone-900">My Borrows</h1>
 
-        <div className="mt-6 flex gap-2 border-b border-stone-200">
+        <div className="mt-6 flex gap-2 border-b border-purple-200">
           {(["borrowed", "lent"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 tab === t
-                  ? "border-b-2 border-emerald-600 text-emerald-700"
+                  ? "border-b-2 border-purple-600 text-purple-700"
                   : "text-stone-500 hover:text-stone-700"
               }`}
             >

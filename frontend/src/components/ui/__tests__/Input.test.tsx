@@ -35,7 +35,7 @@ describe("Input", () => {
     render(<Input />);
     const input = screen.getByRole("textbox");
     expect(input.className).not.toContain("border-red-500");
-    expect(input.className).toContain("border-stone-300");
+    expect(input.className).toContain("border-purple-200");
   });
 
   it("forwards disabled attribute", () => {

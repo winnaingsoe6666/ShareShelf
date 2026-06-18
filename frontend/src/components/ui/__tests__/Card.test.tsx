@@ -12,7 +12,7 @@ describe("Card", () => {
     render(<Card>Content</Card>);
     const card = screen.getByText("Content");
     expect(card.className).toContain("rounded-xl");
-    expect(card.className).toContain("border-stone-200");
+    expect(card.className).toContain("border-purple-200");
   });
 
   it("adds cursor-pointer class when onClick is provided", () => {

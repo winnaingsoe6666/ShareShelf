@@ -11,15 +11,15 @@ describe("Badge", () => {
   it("applies default variant classes by default", () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText("Default");
-    expect(badge.className).toContain("bg-stone-100");
-    expect(badge.className).toContain("text-stone-700");
+    expect(badge.className).toContain("bg-purple-100");
+    expect(badge.className).toContain("text-purple-700");
   });
 
   it("applies success variant classes", () => {
     render(<Badge variant="success">Success</Badge>);
     const badge = screen.getByText("Success");
-    expect(badge.className).toContain("bg-emerald-100");
-    expect(badge.className).toContain("text-emerald-800");
+    expect(badge.className).toContain("bg-purple-100");
+    expect(badge.className).toContain("text-purple-800");
   });
 
   it("applies warning variant classes", () => {
