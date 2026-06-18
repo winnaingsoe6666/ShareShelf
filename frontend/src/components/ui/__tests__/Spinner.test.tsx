@@ -8,6 +8,7 @@ describe("Spinner", () => {
     const svg = container.querySelector("svg");
     expect(svg).toBeInTheDocument();
     expect(svg!.getAttribute("class")).toContain("animate-spin");
+    expect(svg!.getAttribute("class")).toContain("text-purple-600");
   });
 
   it("applies custom className to container div", () => {

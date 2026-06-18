@@ -13,13 +13,15 @@ describe("Badge", () => {
     const badge = screen.getByText("Default");
     expect(badge.className).toContain("bg-purple-100");
     expect(badge.className).toContain("text-purple-700");
+    expect(badge.className).toContain("rounded-lg");
+    expect(badge.className).toContain("border-current/10");
   });
 
   it("applies success variant classes", () => {
     render(<Badge variant="success">Success</Badge>);
     const badge = screen.getByText("Success");
-    expect(badge.className).toContain("bg-purple-100");
-    expect(badge.className).toContain("text-purple-800");
+    expect(badge.className).toContain("bg-green-100");
+    expect(badge.className).toContain("text-green-800");
   });
 
   it("applies warning variant classes", () => {

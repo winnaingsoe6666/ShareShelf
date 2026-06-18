@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Library } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import api from "@/lib/api";
@@ -54,27 +55,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold text-purple-700">ShareShelf</Link>
-          <h1 className="mt-4 text-xl font-semibold text-stone-900">Welcome back</h1>
-          <p className="mt-1 text-sm text-stone-600">Sign in to your account</p>
+    <div className="min-h-screen bg-purple-50 relative">
+      {/* Dot pattern background */}
+      <div
+        className="absolute inset-0 bg-pattern-dots opacity-50"
+        aria-hidden="true"
+      />
+      <div className="relative flex items-center justify-center min-h-screen px-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            {/* Green accent bar */}
+            <div className="h-1 bg-green-600 w-full" />
+            <div className="p-8">
+              {/* Header */}
+              <div className="mb-8 text-center">
+                <Library className="mx-auto h-12 w-12 text-purple-300" />
+                <h1 className="mt-4 font-heading text-3xl font-bold text-purple-900">
+                  Welcome back
+                </h1>
+                <p className="mt-1 text-sm text-stone-600">
+                  Sign in to your account
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button type="submit" loading={loading} className="w-full">
+                  Sign In
+                </Button>
+              </form>
+
+              <p className="mt-6 text-center text-sm text-stone-600">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/register"
+                  className="font-medium text-purple-600 hover:text-purple-700 transition-colors duration-200"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
-          )}
-          <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <Button type="submit" loading={loading} className="w-full">Sign In</Button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-stone-600">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-purple-600 hover:text-purple-700">Sign up</Link>
-        </p>
       </div>
     </div>
   );

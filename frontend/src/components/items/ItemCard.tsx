@@ -1,4 +1,4 @@
-import { Image } from "lucide-react";
+import { Image, User } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import type { Item } from "@/types";
@@ -29,7 +29,7 @@ export default function ItemCard({ item }: ItemCardProps) {
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-stone-900 truncate">{item.title}</h3>
+          <h3 className="font-semibold text-purple-900 truncate">{item.title}</h3>
           <Badge variant={statusVariant}>{item.status}</Badge>
         </div>
         {item.categoryName && (
@@ -37,7 +37,10 @@ export default function ItemCard({ item }: ItemCardProps) {
         )}
         <div className="mt-3 flex items-center justify-between">
           <span className="text-sm font-medium text-purple-700">{formatPrice(item.dailyPrice)}</span>
-          <span className="text-xs text-stone-400">by {item.ownerName}</span>
+          <span className="inline-flex items-center gap-1 text-xs text-stone-400">
+            <User className="h-3 w-3" />
+            {item.ownerName}
+          </span>
         </div>
       </div>
     </Card>

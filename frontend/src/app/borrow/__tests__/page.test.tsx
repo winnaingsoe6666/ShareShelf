@@ -40,6 +40,7 @@ vi.mock("@/lib/auth", () => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => ({ push: mockPush })),
+  usePathname: vi.fn(() => "/borrow"),
 }));
 
 import BorrowPage from "@/app/borrow/page";
@@ -167,15 +168,15 @@ describe("BorrowPage", () => {
     });
   });
 
-  it("loading state shows spinner", () => {
+  it("loading state shows skeleton placeholders", () => {
     // Use a never-resolving promise so loading stays true during render
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     (api.get as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}));
 
     render(<BorrowPage />);
 
-    // Spinner renders an SVG with animate-spin class
-    const spinnerSvg = document.querySelector("svg.animate-spin");
-    expect(spinnerSvg).toBeInTheDocument();
+    // Skeleton renders with role="status" and aria-label="Loading"
+    const skeletons = screen.getAllByRole("status", { name: "Loading" });
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 });

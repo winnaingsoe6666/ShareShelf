@@ -41,7 +41,9 @@ describe("Modal", () => {
 
   it("renders title in the modal header", () => {
     render(<Modal open onClose={vi.fn()} title="Delete Item"><p>Are you sure?</p></Modal>);
-    expect(screen.getByText("Delete Item")).toBeInTheDocument();
+    const title = screen.getByText("Delete Item");
+    expect(title).toBeInTheDocument();
+    expect(title.className).toContain("text-purple-900");
   });
 
   it("has a close button that calls onClose", () => {
@@ -51,6 +53,7 @@ describe("Modal", () => {
     const buttons = screen.getAllByRole("button");
     const closeButton = buttons.find(b => !b.textContent); // The X button has no text
     expect(closeButton).toBeInTheDocument();
+    expect(closeButton!.className).toContain("text-purple-400");
     fireEvent.click(closeButton!);
     expect(handleClose).toHaveBeenCalledTimes(1);
   });

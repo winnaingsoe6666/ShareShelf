@@ -34,6 +34,11 @@
   --font-family-body: 'Crimson Pro', 'Times New Roman', serif;
   --font-family-display: 'Cinzel', Georgia, serif;
 
+  /* --- Animations --- */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-skeleton-pulse: skeleton-pulse 1.5s ease-in-out infinite;
+
   /* --- Shadows --- */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -105,8 +110,50 @@
 }
 
 /* ==========================================================================
+   Additional keyframes — skeleton pulse + hero geometric pattern
+   ========================================================================== */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes pattern-shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+/* ==========================================================================
    prefers-reduced-motion — Respect user preference
    ========================================================================== */
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.bg-pattern-dots {
+  background-image: radial-gradient(#DDD6FE 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-pattern-geometric {
+  background-image:
+    linear-gradient(135deg, #7C3AED10 25%, transparent 25%),
+    linear-gradient(225deg, #7C3AED08 25%, transparent 25%),
+    linear-gradient(45deg, #7C3AED0A 25%, transparent 25%),
+    linear-gradient(315deg, #A78BFA05 25%, transparent 25%);
+  background-size: 40px 40px;
+  animation: pattern-shift 20s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-pattern-dots {
+    animation: none;
+  }
+  .bg-pattern-geometric {
+    animation: none;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,

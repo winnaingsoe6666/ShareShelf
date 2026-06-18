@@ -13,6 +13,8 @@ describe("Card", () => {
     const card = screen.getByText("Content");
     expect(card.className).toContain("rounded-xl");
     expect(card.className).toContain("border-purple-200");
+    expect(card.className).toContain("bg-purple-50");
+    expect(card.className).toContain("shadow-md");
   });
 
   it("adds cursor-pointer class when onClick is provided", () => {

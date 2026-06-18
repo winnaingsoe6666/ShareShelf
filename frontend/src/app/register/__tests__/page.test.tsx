@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RegisterPage from "../page";
 
@@ -22,7 +22,7 @@ describe("RegisterPage", () => {
 
   it("renders registration form when not authenticated", () => {
     render(<RegisterPage />);
-    expect(screen.getByText("Create your account")).toBeTruthy();
+    expect(screen.getByText("Join ShareShelf")).toBeTruthy();
     expect(screen.getByText("Create Account")).toBeTruthy();
   });
 
@@ -59,5 +59,23 @@ describe("RegisterPage", () => {
       expect(saveAuth).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith("/items");
     });
+  });
+
+  it("shows password strength indicator when password is typed", () => {
+    render(<RegisterPage />);
+
+    // No password strength visible initially
+    expect(screen.queryByText("Weak")).toBeFalsy();
+    expect(screen.queryByText("Strong")).toBeFalsy();
+
+    // Type a strong password using fireEvent for synchronous update
+    const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+    fireEvent.change(passwordInput, { target: { value: "StrongPass1" } });
+
+    // Verify the input value was set
+    expect(passwordInput.value).toBe("StrongPass1");
+
+    // Strength should show "Strong" — use regex because React may split the text nodes
+    expect(screen.getByText(/Strong/)).toBeTruthy();
   });
 });

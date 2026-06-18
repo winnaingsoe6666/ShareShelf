@@ -11,7 +11,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body className="min-h-screen bg-purple-50 text-stone-900 antialiased font-[family-name:var(--font-body)]">
         {children}
       </body>

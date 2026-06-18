@@ -12,6 +12,7 @@ vi.mock("@/lib/auth", () => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => ({ push: mockPush })),
+  usePathname: vi.fn(() => "/"),
 }));
 
 import Navbar from "@/components/layout/Navbar";
@@ -62,15 +63,11 @@ describe("Navbar", () => {
   it("toggles mobile menu when hamburger is clicked", () => {
     vi.mocked(isAuthenticated).mockReturnValue(true);
     render(<Navbar />);
-    // Mobile menu should not be visible initially
-    // The mobile menu links are in a div that only renders when mobileOpen is true
-    // Click the hamburger button
     const hamburger = document.querySelector(".md\\:hidden");
     expect(hamburger).toBeInTheDocument();
     fireEvent.click(hamburger!);
-    // After click, mobile menu should appear - check for links in mobile menu
-    const mobileLinks = document.querySelector(".border-t.border-purple-200");
-    expect(mobileLinks).toBeInTheDocument();
+    const mobileMenu = document.querySelector(".animate-slide-up");
+    expect(mobileMenu).toBeInTheDocument();
   });
 
   it("always shows Browse link regardless of auth state", () => {

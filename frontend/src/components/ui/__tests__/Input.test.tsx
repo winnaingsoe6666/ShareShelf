@@ -11,7 +11,9 @@ describe("Input", () => {
 
   it("renders label when label prop is provided", () => {
     render(<Input label="Email" />);
-    expect(screen.getByText("Email")).toBeInTheDocument();
+    const label = screen.getByText("Email");
+    expect(label).toBeInTheDocument();
+    expect(label.className).toContain("text-purple-800");
   });
 
   it("does not render label when label prop is not provided", () => {
@@ -36,6 +38,7 @@ describe("Input", () => {
     const input = screen.getByRole("textbox");
     expect(input.className).not.toContain("border-red-500");
     expect(input.className).toContain("border-purple-200");
+    expect(input.className).toContain("ring-purple-500/20");
   });
 
   it("forwards disabled attribute", () => {
