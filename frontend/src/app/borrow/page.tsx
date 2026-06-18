@@ -25,6 +25,8 @@ export default function BorrowPage() {
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"borrowed" | "lent">("borrowed");
+  const [error, setError] = useState<string>("");
+  const [actionError, setActionError] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined" && !isAuthenticated()) {
@@ -33,9 +35,18 @@ export default function BorrowPage() {
     }
     api.get("/borrow")
       .then((res) => setRequests(res.data.data?.content ?? []))
-      .catch(() => {})
+      .catch(() => {
+        setError("Failed to load borrow requests. Please try again.");
+      })
       .finally(() => setLoading(false));
   }, [router]);
+
+  useEffect(() => {
+    if (actionError) {
+      const timer = setTimeout(() => setActionError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [actionError]);
 
   const handleAction = async (id: number, action: "approve" | "reject" | "return") => {
     try {
@@ -52,7 +63,7 @@ export default function BorrowPage() {
         })
       );
     } catch {
-      // ignore
+      setActionError(`Failed to ${action} request. Please try again.`);
     }
   };
 
@@ -84,6 +95,13 @@ export default function BorrowPage() {
             </button>
           ))}
         </div>
+
+        {error && (
+          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+        )}
+        {actionError && (
+          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{actionError}</div>
+        )}
 
         <div className="mt-6 space-y-4">
           {filtered.length === 0 ? (
