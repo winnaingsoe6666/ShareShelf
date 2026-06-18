@@ -21,7 +21,7 @@ import java.time.LocalDate
 import kotlin.random.Random
 
 @RestController
-@Profile("dev", "default")
+@Profile("dev", "default", "railway")
 @RequestMapping("/api/dev")
 class DataSeederController(
     private val userRepository: UserRepository,
