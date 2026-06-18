@@ -20,16 +20,21 @@ export default function NewItemPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [catLoading, setCatLoading] = useState(true);
+  const [catError, setCatError] = useState("");
+
   useEffect(() => {
     api.get("/categories")
       .then((res) => setCategories(res.data.data ?? []))
-      .catch(() => {});
+      .catch(() => setCatError("Failed to load categories. Check your connection."))
+      .finally(() => setCatLoading(false));
   }, []);
 
-  if (typeof window !== "undefined" && !isAuthenticated()) {
-    router.push("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined" && !isAuthenticated()) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,9 +95,17 @@ export default function NewItemPage() {
               className="block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="">Select a category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
+              {catLoading ? (
+                <option disabled>Loading categories...</option>
+              ) : catError ? (
+                <option disabled className="text-red-500">{catError}</option>
+              ) : categories.length === 0 ? (
+                <option disabled>No categories available</option>
+              ) : (
+                categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))
+              )}
             </select>
           </div>
           <Button type="submit" loading={loading} className="w-full">Create Listing</Button>

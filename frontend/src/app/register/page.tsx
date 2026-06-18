@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import api from "@/lib/api";
-import { saveAuth } from "@/lib/auth";
+import { saveAuth, isAuthenticated } from "@/lib/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && isAuthenticated()) {
+      router.push("/items");
+    }
+  }, [router]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
