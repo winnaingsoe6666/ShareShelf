@@ -24,11 +24,13 @@ class ItemServiceTest {
 
     private val itemRepository = mockk<ItemRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val categoryRepository = mockk<CategoryRepository>()
     private val objectMapper = ObjectMapper()
 
     private val itemService = ItemService(
         itemRepository = itemRepository,
         userRepository = userRepository,
+        categoryRepository = categoryRepository,
         objectMapper = objectMapper
     )
 
@@ -184,15 +186,18 @@ class ItemServiceTest {
 
         every { userRepository.findById(1L) } returns Optional.of(testUser)
         every { itemRepository.save(any()) } returns savedItem
+        every { categoryRepository.findById(1L) } returns Optional.of(Category(id = 1L, name = "Tools"))
 
         val result = itemService.create(request, ownerId = 1L)
 
         assertEquals(10L, result.id)
         assertEquals("New Item", result.title)
         assertEquals("Test User", result.ownerName)
+        assertEquals("Tools", result.categoryName)
 
         verify(exactly = 1) { userRepository.findById(1L) }
         verify(exactly = 1) { itemRepository.save(any()) }
+        verify(exactly = 1) { categoryRepository.findById(1L) }
     }
 
     @Test
@@ -213,14 +218,16 @@ class ItemServiceTest {
 
         every { userRepository.findById(1L) } returns Optional.of(testUser)
         every { itemRepository.save(any()) } returns savedItem
+        every { categoryRepository.findById(1L) } returns Optional.of(Category(id = 1L, name = "Tools"))
 
         val result = itemService.create(request, ownerId = 1L)
 
         assertEquals(11L, result.id)
         assertEquals("Hammer", result.title)
         assertEquals(1L, result.categoryId)
-        assertNotNull(result.categoryName, "categoryName must not be null when categoryId is set")
-        assertEquals("Tools", result.categoryName)
+        assertEquals("Tools", result.categoryName, "categoryName must be resolved from category repository")
+
+        verify(exactly = 1) { categoryRepository.findById(1L) }
     }
 
     // --- update ---
@@ -267,11 +274,14 @@ class ItemServiceTest {
         every { itemRepository.findById(1L) } returns Optional.of(item)
         every { itemRepository.save(any()) } returns updatedItem
         every { userRepository.findById(1L) } returns Optional.of(testUser)
+        every { categoryRepository.findById(2L) } returns Optional.of(Category(id = 2L, name = "Gardening"))
 
         val result = itemService.update(1L, request, userId = 1L)
 
         assertEquals(2L, result.categoryId)
-        assertNotNull(result.categoryName, "categoryName must not be null when categoryId is set")
+        assertEquals("Gardening", result.categoryName, "categoryName must be resolved from category repository")
+
+        verify(exactly = 1) { categoryRepository.findById(2L) }
     }
 
     // --- delete ---

@@ -2,6 +2,7 @@ package com.shareshelf.item
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shareshelf.auth.entity.UserRepository
+import com.shareshelf.category.CategoryRepository
 import com.shareshelf.item.dto.CreateItemRequest
 import com.shareshelf.item.dto.ItemResponse
 import com.shareshelf.item.dto.UpdateItemRequest
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 class ItemService(
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository,
+    private val categoryRepository: CategoryRepository,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -91,21 +93,24 @@ class ItemService(
         itemRepository.delete(item)
     }
 
-    private fun toResponse(item: Item, ownerName: String, ownerTrustScore: Double) = ItemResponse(
-        id = item.id!!,
-        ownerId = item.ownerId,
-        ownerName = ownerName,
-        ownerTrustScore = ownerTrustScore,
-        categoryId = item.categoryId,
-        categoryName = item.category?.name,
-        title = item.title,
-        description = item.description,
-        dailyPrice = item.dailyPrice,
-        depositAmount = item.depositAmount,
-        status = item.status,
-        imageUrls = parseJsonArray(item.imageUrls),
-        createdAt = item.createdAt
-    )
+    private fun toResponse(item: Item, ownerName: String, ownerTrustScore: Double): ItemResponse {
+        val category = item.categoryId?.let { categoryRepository.findById(it).orElse(null) }
+        return ItemResponse(
+            id = item.id!!,
+            ownerId = item.ownerId,
+            ownerName = ownerName,
+            ownerTrustScore = ownerTrustScore,
+            categoryId = item.categoryId,
+            categoryName = category?.name,
+            title = item.title,
+            description = item.description,
+            dailyPrice = item.dailyPrice,
+            depositAmount = item.depositAmount,
+            status = item.status,
+            imageUrls = parseJsonArray(item.imageUrls),
+            createdAt = item.createdAt
+        )
+    }
 
     private fun parseJsonArray(json: String): List<String> {
         return try {
