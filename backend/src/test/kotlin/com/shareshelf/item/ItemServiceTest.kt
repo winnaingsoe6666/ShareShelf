@@ -3,6 +3,8 @@ package com.shareshelf.item
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
+import com.shareshelf.category.Category
+import com.shareshelf.category.CategoryRepository
 import com.shareshelf.item.dto.CreateItemRequest
 import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.Item
@@ -22,11 +24,13 @@ class ItemServiceTest {
 
     private val itemRepository = mockk<ItemRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val categoryRepository = mockk<CategoryRepository>()
     private val objectMapper = ObjectMapper()
 
     private val itemService = ItemService(
         itemRepository = itemRepository,
         userRepository = userRepository,
+        categoryRepository = categoryRepository,
         objectMapper = objectMapper
     )
 
@@ -182,15 +186,48 @@ class ItemServiceTest {
 
         every { userRepository.findById(1L) } returns Optional.of(testUser)
         every { itemRepository.save(any()) } returns savedItem
+        every { categoryRepository.findById(1L) } returns Optional.of(Category(id = 1L, name = "Tools"))
 
         val result = itemService.create(request, ownerId = 1L)
 
         assertEquals(10L, result.id)
         assertEquals("New Item", result.title)
         assertEquals("Test User", result.ownerName)
+        assertEquals("Tools", result.categoryName)
 
         verify(exactly = 1) { userRepository.findById(1L) }
         verify(exactly = 1) { itemRepository.save(any()) }
+        verify(exactly = 1) { categoryRepository.findById(1L) }
+    }
+
+    @Test
+    fun `create should return categoryName from category repository`() {
+        val request = CreateItemRequest(
+            title = "Hammer",
+            description = "Heavy duty",
+            categoryId = 1L,
+            dailyPrice = BigDecimal("3.00"),
+            depositAmount = BigDecimal("15.00")
+        )
+        val savedItem = testItem(
+            id = 11L,
+            title = "Hammer",
+            categoryId = 1L,
+            dailyPrice = BigDecimal("3.00")
+        ).apply { depositAmount = BigDecimal("15.00") }
+
+        every { userRepository.findById(1L) } returns Optional.of(testUser)
+        every { itemRepository.save(any()) } returns savedItem
+        every { categoryRepository.findById(1L) } returns Optional.of(Category(id = 1L, name = "Tools"))
+
+        val result = itemService.create(request, ownerId = 1L)
+
+        assertEquals(11L, result.id)
+        assertEquals("Hammer", result.title)
+        assertEquals(1L, result.categoryId)
+        assertEquals("Tools", result.categoryName, "categoryName must be resolved from category repository")
+
+        verify(exactly = 1) { categoryRepository.findById(1L) }
     }
 
     // --- update ---
@@ -226,6 +263,25 @@ class ItemServiceTest {
 
         verify(exactly = 1) { itemRepository.findById(1L) }
         verify(exactly = 0) { itemRepository.save(any()) }
+    }
+
+    @Test
+    fun `update should return updated categoryName when categoryId changes`() {
+        val item = testItem(title = "Old Title", categoryId = 1L)
+        val request = UpdateItemRequest(categoryId = 2L)
+        val updatedItem = testItem(title = "Old Title", categoryId = 2L)
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+        every { userRepository.findById(1L) } returns Optional.of(testUser)
+        every { categoryRepository.findById(2L) } returns Optional.of(Category(id = 2L, name = "Gardening"))
+
+        val result = itemService.update(1L, request, userId = 1L)
+
+        assertEquals(2L, result.categoryId)
+        assertEquals("Gardening", result.categoryName, "categoryName must be resolved from category repository")
+
+        verify(exactly = 1) { categoryRepository.findById(2L) }
     }
 
     // --- delete ---
