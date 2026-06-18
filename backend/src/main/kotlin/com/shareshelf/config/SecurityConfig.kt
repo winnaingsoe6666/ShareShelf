@@ -43,8 +43,8 @@ class SecurityConfig(
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }
-            .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)
 
         return http.build()
     }
