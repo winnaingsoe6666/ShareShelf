@@ -21,7 +21,7 @@ export default function BrowseItemsPage() {
       api.get("/items").catch(() => ({ data: { data: [] } })),
       api.get("/categories").catch(() => ({ data: { data: [] } })),
     ]).then(([itemsRes, catRes]) => {
-      setItems(itemsRes.data.data ?? []);
+      setItems(itemsRes.data.data?.content ?? []);
       setCategories(catRes.data.data ?? []);
     }).catch(() => setError("Failed to load items"))
       .finally(() => setLoading(false));

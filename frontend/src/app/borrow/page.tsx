@@ -8,7 +8,7 @@ import Badge from "@/components/ui/Badge";
 import Spinner from "@/components/ui/Spinner";
 import Button from "@/components/ui/Button";
 import api from "@/lib/api";
-import { isAuthenticated } from "@/lib/auth";
+import { getUser, isAuthenticated } from "@/lib/auth";
 import { formatDate } from "@/lib/utils";
 import type { BorrowRequest } from "@/types";
 
@@ -32,7 +32,7 @@ export default function BorrowPage() {
       return;
     }
     api.get("/borrow")
-      .then((res) => setRequests(res.data.data ?? []))
+      .then((res) => setRequests(res.data.data?.content ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [router]);
@@ -56,9 +56,10 @@ export default function BorrowPage() {
     }
   };
 
+  const user = getUser();
   const filtered = tab === "borrowed"
-    ? requests.filter((r) => r.borrowerId)
-    : requests.filter((r) => r.ownerId);
+    ? requests.filter((r) => r.borrowerId === user?.id)
+    : requests.filter((r) => r.ownerId === user?.id);
 
   if (loading) return <><Navbar /><Spinner className="py-24" /></>;
 

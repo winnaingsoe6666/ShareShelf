@@ -62,7 +62,10 @@ export default function RegisterPage() {
           )}
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <div className="space-y-1">
+            <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <p className="text-xs text-stone-500">Must be at least 8 characters with one uppercase letter and one digit.</p>
+          </div>
           <Input label="Community (optional)" value={community} onChange={(e) => setCommunity(e.target.value)} placeholder="e.g. Downtown, University, Apt 4B" />
           <Button type="submit" loading={loading} className="w-full">Create Account</Button>
         </form>

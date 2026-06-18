@@ -56,6 +56,7 @@ export interface Review {
   reviewerId: number;
   reviewerName: string;
   revieweeId: number;
+  revieweeName: string;
   rating: number;
   comment?: string;
   createdAt: string;
@@ -63,6 +64,7 @@ export interface Review {
 
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   userId: number;
   name: string;
   email: string;

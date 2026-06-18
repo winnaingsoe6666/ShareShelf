@@ -26,7 +26,7 @@ export default function ProfilePage() {
       api.get("/items").catch(() => ({ data: { data: [] } })),
       api.get(`/review/user/${user?.id}`).catch(() => ({ data: { data: [] } })),
     ]).then(([itemsRes, reviewsRes]) => {
-      setItems((itemsRes.data.data ?? []).filter((i: Item) => i.ownerId === user?.id));
+      setItems((itemsRes.data.data?.content ?? []).filter((i: Item) => i.ownerId === user?.id));
       setReviews(reviewsRes.data.data ?? []);
     }).finally(() => setLoading(false));
   }, [router, user?.id]);

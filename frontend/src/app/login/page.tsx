@@ -28,8 +28,20 @@ export default function LoginPage() {
       } else {
         setError(res.data.message || "Login failed");
       }
-    } catch {
-      setError("Invalid email or password");
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
+        const status = axiosErr.response?.status;
+        if (status === 429) {
+          setError("Too many attempts. Please wait and try again.");
+        } else if (status === 401) {
+          setError(axiosErr.response?.data?.message || "Invalid email or password");
+        } else {
+          setError("Invalid email or password");
+        }
+      } else {
+        setError("Invalid email or password");
+      }
     } finally {
       setLoading(false);
     }

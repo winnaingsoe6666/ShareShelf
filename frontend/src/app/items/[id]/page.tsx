@@ -27,7 +27,7 @@ export default function ItemDetailPage() {
 
   useEffect(() => {
     api.get(`/items/${id}`)
-      .then((res) => setItem(res.data.data ?? res.data))
+      .then((res) => setItem(res.data.data))
       .catch(() => setError("Item not found"))
       .finally(() => setLoading(false));
   }, [id]);

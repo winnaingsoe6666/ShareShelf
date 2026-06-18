@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import api from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
+import type { Category } from "@/types";
 
 export default function NewItemPage() {
   const router = useRouter();
@@ -15,8 +16,15 @@ export default function NewItemPage() {
   const [categoryId, setCategoryId] = useState("");
   const [dailyPrice, setDailyPrice] = useState("");
   const [depositAmount, setDepositAmount] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    api.get("/categories")
+      .then((res) => setCategories(res.data.data ?? []))
+      .catch(() => {});
+  }, []);
 
   if (typeof window !== "undefined" && !isAuthenticated()) {
     router.push("/login");
@@ -82,8 +90,8 @@ export default function NewItemPage() {
               className="block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="">Select a category</option>
-              {["Tools", "Electronics", "Outdoor & Camping", "Sports & Fitness", "Kitchen & Dining", "Gardening"].map((name, i) => (
-                <option key={i + 1} value={i + 1}>{name}</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
           </div>
