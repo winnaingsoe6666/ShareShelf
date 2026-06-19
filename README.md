@@ -1,162 +1,172 @@
 # ShareShelf — Community Tool Library
 
-**ShareShelf** is a community-powered tool library designed to foster local collaboration by helping people borrow, lend, and share rarely used tools and equipment within their neighborhood, apartment complex, university, or local community. 
+**ShareShelf** is a community-powered tool library that lets neighbors borrow, lend, and share rarely used tools and equipment within their neighborhood, university, or local community.
 
-Whether it's a power drill for a quick weekend project, a tent for a camping trip, or gardening equipment for the spring, ShareShelf connects individuals who need temporary access to gear with neighbors who have items sitting idle.
+Instead of buying a \$200 drill for one shelf or a tent for one camping trip, browse what your neighbors are already sharing — or list your own idle gear and build trust in your community.
+
+---
 
 ### Why ShareShelf?
-- 🌍 **Reduce Waste:** Promote sustainable living by maximizing the lifespan and utility of manufactured goods.
-- 💰 **Save Money:** Avoid the high costs of purchasing tools and equipment that you might only use once or twice a year.
-- 🤝 **Build Community:** Connect with your neighbors, build local trust, and strengthen the bonds within your local network.
-- 📦 **Save Space:** Declutter your garage or apartment by borrowing what you need, only when you need it.
 
-With built-in trust scores, community statistics, and seamless in-app notifications, ShareShelf makes the process of lending and borrowing as smooth and reliable as possible.
+- 🌍 **Reduce Waste** — Maximize the lifespan of tools instead of manufacturing more
+- 💰 **Save Money** — Borrow what you need once or twice a year; skip the purchase
+- 🤝 **Build Community** — Every borrow builds trust between neighbors
+- 📦 **Save Space** — Declutter your garage; borrow only when you need it
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4, next-intl |
-| **Backend** | Spring Boot 3.4, Kotlin, Gradle 8.12 (Kotlin DSL) |
-| **Database** | PostgreSQL + Flyway (versioned migrations) |
-| **Auth** | JWT (jjwt), Spring Security |
-| **Testing** | Vitest, Playwright, JUnit 5, MockK |
+|---|---|
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4 |
+| **Backend** | Spring Boot 3.4, Kotlin 2.1, Gradle 8.12 (Kotlin DSL) |
+| **Database** | PostgreSQL + Flyway (V1–V10 migrations) |
+| **Auth** | JWT (jjwt 0.12) + refresh tokens + JTI blacklist + account lockout |
+| **i18n** | next-intl — English + Burmese (မြန်မာ) |
+| **Testing** | JUnit 5 + MockK (backend), Vitest + React Testing Library (frontend), Playwright (E2E) |
+
+---
 
 ## Project Structure
 
 ```
 ShareShelf/
-├── backend/               # Spring Boot REST API
-│   ├── build.gradle.kts   # Gradle build config
-│   └── src/
-│       ├── main/kotlin/   # Kotlin source files
-│       └── resources/     # Config + Flyway migrations
-├── frontend/              # Next.js client app
-│   └── src/
-│       ├── app/           # Pages (App Router)
-│       ├── components/    # Reusable UI + domain components
-│       ├── lib/           # API client, auth helpers
-│       └── types/         # TypeScript types
-├── scripts/               # Dev helper scripts
-└── proposal/              # Project proposal
+├── backend/                      # Spring Boot REST API (Kotlin)
+│   ├── build.gradle.kts
+│   └── src/main/
+│       ├── kotlin/com/shareshelf/ # Auth, Item, Borrow, Review, Category,
+│       │                           # Notification, Community, Storage, Config
+│       └── resources/db/migration/ # Flyway V1–V10
+├── frontend/                     # Next.js client (TypeScript)
+│   ├── src/
+│   │   ├── app/[locale]/         # Pages: home, items, community, borrow,
+│   │   │                         #   profile, about, readme, login, register
+│   │   ├── components/           # UI kit + layout (Navbar, Footer, Modal,
+│   │   │                         #   Skeleton, ImageUpload, ItemCard, etc.)
+│   │   ├── lib/                  # API client, auth helpers, design tokens
+│   │   ├── i18n/                 # next-intl routing & navigation
+│   │   └── test/                 # Test setup & mocks
+│   └── messages/                 # en.json, my.json translation files
+├── slides/                       # PechaKucha deck (Marp)
+├── proposal/                     # Project proposal
+├── scripts/                      # DB start & seed helper scripts
+├── Dockerfile                    # Railway backend deployment
+├── report.md                     # Ch-3 report
+└── CLAUDE.md                     # AI-assisted development guide
 ```
+
+---
 
 ## Quick Start
 
 ### Prerequisites
 
-- **Java 21+** — verify: `java --version`
-- **Node.js 20+** — verify: `node --version`
-- **PostgreSQL 16+** — verify: `psql --version`
-- **Gradle 8.12** (optional — the wrapper handles it)
+- **Java 21+** — `java --version`
+- **Node.js 18+** — `node --version`
+- **PostgreSQL 16+** — `psql --version`
 
 ### 1. Database
 
 ```bash
-# Start PostgreSQL and create the database
-sudo ./scripts/start-db.sh
+sudo ./scripts/start-db.sh          # Creates database & user
 ```
 
 ### 2. Backend
 
 ```bash
 cd backend
-
-# Build and run
-./gradlew bootRun
-
-# The API starts at http://localhost:8080
+./gradlew bootRun                   # http://localhost:8080
 # Swagger UI: http://localhost:8080/swagger-ui.html
 ```
 
 ### 3. Frontend
 
-In a separate terminal:
-
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start dev server
-npm run dev
-
-# The app runs at http://localhost:3000
+npm run dev                         # http://localhost:3000
 ```
 
 ### 4. Seed Demo Data (optional)
 
 ```bash
-./scripts/seed.sh
+./scripts/seed.sh                   # Or: curl http://localhost:8080/api/dev/seed
 ```
 
-Demo credentials:
-- `alice@example.com` / `password123`
-- `bob@example.com` / `password123`
-- `charlie@example.com` / `password123`
+Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (password: `password123`)
+
+---
+
+## Features
+
+- [x] **User Authentication** — Register, login, JWT, refresh tokens, account lockout, JTI blacklist, logout
+- [x] **Item Management** — Create, edit, delete listings with photo uploads and image galleries
+- [x] **Borrowing Workflow** — Request → Approve/Reject → Mark Returned, with full lifecycle tracking
+- [x] **Reviews & Trust Scores** — 1–5 star ratings after each borrow, trust score recalculated automatically
+- [x] **Search & Discovery** — Search by name, filter by category, status, and minimum rating
+- [x] **In-App Notifications** — Real-time bell with unread count, mark read, mark all read
+- [x] **Community Dashboard** — Animated counters (items shared, members, successful borrows), top sharers
+- [x] **Internationalization** — English + Burmese (မြန်မာ) with language switcher
+- [x] **Rate Limiting** — API protection against abuse
+- [x] **File Storage** — Photo upload with preview and removal
+- [x] **Deployment** — Railway (backend Docker) + Vercel (frontend), CI/CD configured
+- [x] **Testing** — Unit, integration, and E2E tests across backend and frontend
+- [x] **AI-Assisted Development** — MCP servers, Claude Skills & Agents documented in CLAUDE.md
+
+---
 
 ## API Endpoints
 
 | Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
+|---|---|---|---|
 | POST | `/api/auth/register` | No | Create account |
-| POST | `/api/auth/login` | No | Log in, get JWT |
+| POST | `/api/auth/login` | No | Log in, get JWT + refresh token |
 | GET | `/api/auth/me` | Yes | Current user profile |
-| POST | `/api/auth/logout` | Yes | Log out |
-| POST | `/api/auth/refresh` | No | Refresh JWT token |
-| GET | `/api/items` | Yes | List/search items |
+| POST | `/api/auth/logout` | Yes | Log out (JTI blacklist) |
+| POST | `/api/auth/refresh` | No | Refresh access token |
+| GET | `/api/items` | Yes | List/search items (search, category, status, rating) |
 | POST | `/api/items` | Yes | Create item listing |
 | GET | `/api/items/{id}` | Yes | Item detail |
 | PUT | `/api/items/{id}` | Yes | Update item |
 | DELETE | `/api/items/{id}` | Yes | Delete item |
-| POST | `/api/items/{id}/images` | Yes | Upload item image |
-| DELETE | `/api/items/{id}/images` | Yes | Delete item image |
+| POST | `/api/items/{id}/images` | Yes | Upload item photo |
+| DELETE | `/api/items/{id}/images` | Yes | Remove item photo |
 | POST | `/api/borrow` | Yes | Submit borrow request |
-| GET | `/api/borrow` | Yes | My borrows & lends |
+| GET | `/api/borrow` | Yes | My borrows (borrowing + lending) |
 | PUT | `/api/borrow/{id}/approve` | Yes | Approve request |
 | PUT | `/api/borrow/{id}/reject` | Yes | Reject request |
 | PUT | `/api/borrow/{id}/return` | Yes | Mark returned |
-| POST | `/api/review` | Yes | Rate a transaction |
+| POST | `/api/review` | Yes | Submit review & rating |
 | GET | `/api/review/user/{id}` | Yes | User's reviews |
 | GET | `/api/categories` | Yes | List categories |
-| GET | `/api/notifications` | Yes | List user notifications |
-| GET | `/api/notifications/unread-count` | Yes | Get unread count |
+| GET | `/api/notifications` | Yes | User notifications |
+| GET | `/api/notifications/unread-count` | Yes | Unread notification count |
 | PUT | `/api/notifications/{id}/read` | Yes | Mark notification read |
 | PUT | `/api/notifications/read-all` | Yes | Mark all read |
 | GET | `/api/community/stats` | No | Platform statistics |
 | GET | `/api/health` | No | Health check |
 | GET | `/api/dev/seed` | No | Seed demo data |
 
-## Features
-
-- [x] User Registration and Authentication
-- [x] Item Management (create, edit, delete listings)
-- [x] Borrowing Workflow (request → approve/reject → return)
-- [x] Search and Discovery (by name, category, status)
-- [x] Reviews and Ratings (1-5 star, trust score)
-- [x] Photo upload and image gallery support
-- [x] In-app Notifications
-- [x] Community Statistics
-- [x] Internationalization (i18n)
-- [x] Deployment configuration (Docker, Railway)
-- [x] Comprehensive Testing (Vitest, Playwright, JUnit)
+---
 
 ## Environment Variables
 
-### Backend (`backend/.env`)
+### Backend
 
 | Variable | Default | Description |
-|----------|---------|-------------|
+|---|---|---|
 | `DB_PASSWORD` | `shareshelf_dev` | PostgreSQL password |
-| `JWT_SECRET` | (dev secret) | JWT signing key (min 256 bits) |
-| `SPRING_PROFILES_ACTIVE` | `dev` | Spring profile |
+| `JWT_SECRET` | (dev value) | JWT HMAC-SHA signing key |
+| `SPRING_PROFILES_ACTIVE` | `dev` | Spring profile (`dev` or `railway`) |
 
-### Frontend (`frontend/.env.local`)
+### Frontend
 
 | Variable | Default | Description |
-|----------|---------|-------------|
+|---|---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8080` | Backend API base URL |
+
+---
 
 ## License
 
