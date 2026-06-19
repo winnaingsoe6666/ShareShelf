@@ -11,6 +11,7 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 - [ ] **Phase 3: E2E Tests & CI/CD Pipeline** - End-to-end testing with Playwright and automated CI/CD with test gates
 - [ ] **Phase 4: Code Quality & Technical Debt** - Address N+1 queries, rate limiting, validation, JPA entity patterns, and logging
 - [ ] **Phase 5: Community Features** - In-app notifications, community dashboard, and enhanced search filters
+- [ ] **Phase 6: Location Search** - Spatial location search with PostGIS — pin-drop on items, distance filter, and interactive map view
 
 ## Phase Details
 
@@ -76,6 +77,20 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 6: Location Search
+**Goal**: Add spatial location search — users set item locations via pin-drop on a map, browse items by distance with radius filters, and view items spatially on an interactive map
+**Depends on**: Phase 5
+**Requirements**: LOC-01, LOC-02, LOC-03, LOC-04, LOC-05
+**Success Criteria** (what must be TRUE):
+  1. PostGIS extension enabled on Railway PostgreSQL via Flyway migration
+  2. Items carry lat/lng coordinates from pin-drop on create/edit forms
+  3. Browse page supports distance-based filtering with radius presets (1km, 3km, 5km, 10km)
+  4. Dedicated map search page with Leaflet/OpenStreetMap and marker clustering
+  5. Backend spatial queries use GiST index for constant-time performance regardless of table size
+  6. Frontend and backend tests cover spatial queries and map components
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -85,3 +100,4 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | 3. E2E Tests & CI/CD Pipeline | 0/TBD | Not started | - |
 | 4. Code Quality & Technical Debt | 0/TBD | Not started | - |
 | 5. Community Features | 3/3 | Complete | 2026-06-19 |
+| 6. Location Search | 0/TBD | Not started | - |
