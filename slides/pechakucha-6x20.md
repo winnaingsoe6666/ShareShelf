@@ -140,7 +140,7 @@ How the frontmatter controls the deck
 
 ---
 
-Rehearsal tips
+<!-- Rehearsal tips
 
   1. Time your talking points — exactly 20 seconds per slide. Practice until
      your spoken content fits the auto-advance.
