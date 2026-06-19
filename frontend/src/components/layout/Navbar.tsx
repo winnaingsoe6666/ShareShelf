@@ -2,6 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
@@ -30,7 +31,8 @@ function timeAgo(dateString: string): string {
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  const locale = useLocale();
+  const t = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -128,7 +130,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
           <Link href="/items" className={navLinkClass("/items")}>
-            Browse
+            {t("nav.browse")}
           </Link>
 
           {/* Language switcher */}
@@ -150,13 +152,13 @@ export default function Navbar() {
           {loggedIn ? (
             <>
               <Link href="/community" className={navLinkClass("/community")}>
-                Community
+                {t("nav.community")}
               </Link>
               <Link href="/items/new" className={navLinkClass("/items/new")}>
-                Add Item
+                {t("nav.addItem")}
               </Link>
               <Link href="/borrow" className={navLinkClass("/borrow")}>
-                My Borrows
+                {t("nav.myBorrows")}
               </Link>
 
               {/* Notification bell */}
@@ -164,7 +166,7 @@ export default function Navbar() {
                 <button
                   onClick={handleNotifToggle}
                   className="relative cursor-pointer rounded-lg p-1.5 text-stone-600 hover:bg-purple-100 transition-colors"
-                  aria-label="Notifications"
+                  aria-label={t("nav.notifications")}
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -178,13 +180,13 @@ export default function Navbar() {
                 {notifOpen && (
                   <div className="absolute right-0 mt-2 w-80 rounded-xl border border-purple-200 bg-white shadow-xl animate-fade-in">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-purple-100">
-                      <h3 className="font-heading text-sm font-semibold text-purple-900">Notifications</h3>
+                      <h3 className="font-heading text-sm font-semibold text-purple-900">{t("nav.notifications")}</h3>
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllRead}
                           className="text-xs text-purple-600 hover:text-purple-800 cursor-pointer"
                         >
-                          Mark all read
+                          {t("nav.markAllRead")}
                         </button>
                       )}
                     </div>
@@ -192,7 +194,7 @@ export default function Navbar() {
                       {notifications.length === 0 ? (
                         <div className="py-8 text-center text-stone-400">
                           <Bell className="h-8 w-8 mx-auto mb-2 text-stone-300" />
-                          <p className="text-sm">No notifications</p>
+                          <p className="text-sm">{t("nav.noNotifications")}</p>
                         </div>
                       ) : (
                         notifications.map((notif) => (
@@ -224,13 +226,13 @@ export default function Navbar() {
               </div>
 
               <Link href="/profile" className={navLinkClass("/profile")}>
-                Profile
+                {t("nav.profile")}
               </Link>
               <button
                 onClick={handleLogout}
                 className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
               >
-                Log Out
+                {t("nav.logOut")}
               </button>
             </>
           ) : (
@@ -239,13 +241,13 @@ export default function Navbar() {
                 href="/login"
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
               >
-                Log In
+                {t("nav.logIn")}
               </Link>
               <Link
                 href="/register"
                 className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px"
               >
-                Sign Up
+                {t("nav.signUp")}
               </Link>
             </>
           )}
@@ -269,19 +271,19 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="animate-slide-up border-t border-purple-200 px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-2">
-            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Browse</Link>
+            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.browse")}</Link>
             {loggedIn ? (
               <>
-                <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Community</Link>
-                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Add Item</Link>
-                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">My Borrows</Link>
-                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Profile</Link>
-                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors cursor-pointer">Log Out</button>
+                <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.community")}</Link>
+                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.addItem")}</Link>
+                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.myBorrows")}</Link>
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.profile")}</Link>
+                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors cursor-pointer">{t("nav.logOut")}</button>
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Log In</Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">Sign Up</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.logIn")}</Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">{t("nav.signUp")}</Link>
               </>
             )}
 

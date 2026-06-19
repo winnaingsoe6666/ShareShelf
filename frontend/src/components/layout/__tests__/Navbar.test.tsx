@@ -17,10 +17,31 @@ vi.mock("@/lib/api", () => ({
   },
 }));
 
-vi.mock("next/navigation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("next/navigation")>()),
+vi.mock("@/i18n/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/i18n/navigation")>()),
   useRouter: vi.fn(() => ({ push: mockPush })),
   usePathname: vi.fn(() => "/"),
+}));
+
+// Mock useLocale and useTranslations from next-intl.
+// useTranslations returns a lookup that maps nav keys to their English text.
+const navTranslations: Record<string, string> = {
+  "nav.browse": "Browse",
+  "nav.community": "Community",
+  "nav.addItem": "Add Item",
+  "nav.myBorrows": "My Borrows",
+  "nav.profile": "Profile",
+  "nav.logOut": "Log Out",
+  "nav.logIn": "Log In",
+  "nav.signUp": "Sign Up",
+  "nav.notifications": "Notifications",
+  "nav.markAllRead": "Mark all read",
+  "nav.noNotifications": "No notifications",
+};
+
+vi.mock("next-intl", () => ({
+  useLocale: vi.fn(() => "en"),
+  useTranslations: vi.fn(() => (key: string) => navTranslations[key] || key),
 }));
 
 import Navbar from "@/components/layout/Navbar";
