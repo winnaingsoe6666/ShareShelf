@@ -117,6 +117,18 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Hook / Share & Care message */}
+        <section className="border-t border-purple-200 bg-purple-50 py-12 sm:py-16">
+          <div className="mx-auto max-w-3xl px-4 text-center">
+            <h2 className="font-heading text-2xl font-bold text-purple-900 sm:text-3xl">
+              {t("home.hook.title")}
+            </h2>
+            <p className="mt-3 text-lg text-stone-600 leading-relaxed">
+              {t("home.hook.desc")}
+            </p>
+          </div>
+        </section>
+
         {/* How it works */}
         <section className="border-t border-purple-200 bg-white py-16 sm:py-20">
           <div className="mx-auto max-w-6xl px-4">

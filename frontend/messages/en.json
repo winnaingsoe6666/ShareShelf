@@ -31,6 +31,10 @@
       "browseTools": "Browse Tools",
       "joinNow": "Join Now"
     },
+    "hook": {
+      "title": "Share & Care",
+      "desc": "Share items you no longer use with others in your community. Every tool shared saves money, reduces waste, and brings neighbors closer together."
+    },
     "howItWorks": {
       "title": "How It Works",
       "subtitle": "Three simple steps to start sharing",
