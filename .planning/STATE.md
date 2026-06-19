@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Phase 6 context gathered
 last_updated: "2026-06-19T11:18:30.643Z"
-last_activity: "2026-06-19 - Completed quick task 260619-vlx: Add enableAllProjectMcpServers: true to .claude/settings.json"
+last_activity: "2026-06-19 - Completed quick task 260619-vxm: Remove Marp usage guide comment block from slide deck"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-13)
 Phase: 1 (Fix Critical Issues & Testing Foundation) — COMPLETE
 Plan: 7 of 7 complete — all Phase 1 requirements satisfied
 Status: Phase 1 complete. All 9 fixes applied, test infrastructure established, Claude memory initialized.
-Last activity: 2026-06-19 - Completed quick task 260619-vlx: Add enableAllProjectMcpServers: true to .claude/settings.json
+Last activity: 2026-06-19 - Completed quick task 260619-vxm: Remove Marp usage guide comment block from slide deck
 
 Progress: [██████████] 100%
 
@@ -78,6 +78,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260619-i0d | Implement PHOTO-02 and PHOTO-03 - Frontend image upload UI + display for ShareShelf | 2026-06-19 | 7c53933 | [260619-i0d-implement-photo-02-and-photo-03-frontend](./quick/260619-i0d-implement-photo-02-and-photo-03-frontend/) |
 | 260619-vlx | Add enableAllProjectMcpServers: true to .claude/settings.json so the project configures team-wide trust for the MCP servers defined in .mcp.json | 2026-06-19 | e540c85 | [260619-vlx-add-enableallprojectmcpservers-true-to-c](./quick/260619-vlx-add-enableallprojectmcpservers-true-to-c/) |
+| 260619-vxm | Remove Marp usage guide comment block from slides/ShareShelf_product_intro.md — HTML comment had --- separators creating phantom slides | 2026-06-19 | 729dd9c | [260619-vxm-remove-marp-usage-guide-comment-block-fr](./quick/260619-vxm-remove-marp-usage-guide-comment-block-fr/) |
 
 ## Deferred Items
 
