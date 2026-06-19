@@ -75,3 +75,84 @@ auto-advance: 20
 **Six slides. Twenty seconds each. One working platform — live now.**
 
 <!-- 20s -->
+
+
+<!--
+================================================================================
+                      HOW TO PRESENT — MARP + AUTO-ADVANCE GUIDE
+================================================================================
+
+What is PechaKucha 6×20?
+  6 slides × 20 seconds each = 2 minutes total.
+  Each slide auto-advances after 20 seconds — no clicking, no pausing.
+
+---
+
+VS Code (recommended)
+
+  1. Install "Marp for VS Code" extension:
+     https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode
+
+  2. Open this file: slides/pechakucha-6x20.md
+
+  3. Enable auto-advance:
+     Ctrl+Shift+P → "Marp: Toggle Auto-Advance"
+
+  4. Open preview:
+     Ctrl+Shift+P → "Marp: Open Preview"
+     (or click the preview icon in the toolbar)
+
+  5. Start presenting:
+     Click the "present" icon (top-right of the preview panel)
+     → Full-screen presentation with 20s auto-advance.
+
+---
+
+Marp CLI
+
+  Install:
+    npm install -g @marp-team/marp-cli
+
+  Preview with auto-advance:
+    marp --preview slides/pechakucha-6x20.md
+
+  Export to PDF:
+    marp slides/pechakucha-6x20.md -o slides/output.pdf
+
+  Export to HTML:
+    marp slides/pechakucha-6x20.md -o slides/output.html
+
+  Export to PowerPoint:
+    marp slides/pechakucha-6x20.md -o slides/output.pptx
+
+---
+
+How the frontmatter controls the deck
+
+  ---
+  marp: true            # Enable Marp rendering
+  paginate: true        # Show slide numbers (1/6, 2/6, ...)
+  transition: fade      # Smooth fade between slides
+  auto-advance: 20      # Auto-advance every 20 seconds
+  ---
+
+  The comment "<!-- 20s -->" under each slide marks the timing for that slide.
+
+---
+
+Rehearsal tips
+
+  1. Time your talking points — exactly 20 seconds per slide. Practice until
+     your spoken content fits the auto-advance.
+
+  2. Don't read the bullets verbatim — the audience can read. Use them as
+     anchors and expand on each point.
+
+  3. The bold punchline at the bottom of each slide is your retention line —
+     let it land. Pause slightly before the auto-advance fires.
+
+  4. Run it twice before presenting — the auto-advance feels fast the first
+     time. Muscle memory helps.
+
+================================================================================
+-->
