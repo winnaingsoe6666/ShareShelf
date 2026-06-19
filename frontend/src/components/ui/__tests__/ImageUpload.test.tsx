@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ImageUpload from "../ImageUpload";
@@ -6,6 +6,12 @@ import ImageUpload from "../ImageUpload";
 vi.mock("@/components/ui/Spinner", () => ({
   default: () => <div data-testid="spinner" />,
 }));
+
+// jsdom does not implement URL.createObjectURL / revokeObjectURL
+beforeAll(() => {
+  URL.createObjectURL = vi.fn((_file: File) => `blob:mock-${Math.random()}`);
+  URL.revokeObjectURL = vi.fn();
+});
 
 describe("ImageUpload", () => {
   let onUpload: ReturnType<typeof vi.fn>;
@@ -61,8 +67,6 @@ describe("ImageUpload", () => {
   });
 
   it("shows preview of selected file via URL.createObjectURL before upload completes", async () => {
-    const mockUrl = "blob:preview-url";
-    vi.spyOn(URL, "createObjectURL").mockReturnValue(mockUrl);
     const user = userEvent.setup();
     // Return a never-resolving promise so preview stays visible
     onUpload.mockReturnValue(new Promise(() => {}));
@@ -71,7 +75,6 @@ describe("ImageUpload", () => {
     const input = screen.getByTestId("file-input");
     await user.upload(input, file);
     expect(screen.getByAltText("Preview")).toBeTruthy();
-    vi.restoreAllMocks();
   });
 
   it("shows loading spinner on the uploading tile when uploading is true", () => {
