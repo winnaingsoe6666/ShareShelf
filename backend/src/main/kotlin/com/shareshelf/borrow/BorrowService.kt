@@ -9,6 +9,8 @@ import com.shareshelf.borrow.entity.BorrowRequest
 import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.ItemStatus
+import com.shareshelf.notification.NotificationService
+import com.shareshelf.notification.entity.NotificationType
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -20,6 +22,7 @@ class BorrowService(
     private val borrowRepository: BorrowRepository,
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository,
+    private val notificationService: NotificationService,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -46,6 +49,17 @@ class BorrowService(
         )
 
         val saved = borrowRepository.save(borrow)
+
+        // Notify owner that someone wants to borrow their item
+        val borrower = userRepository.findById(borrowerId)
+        val borrowerName = borrower.map { it.name }.orElse("Someone")
+        notificationService.create(
+            userId = item.ownerId,
+            type = NotificationType.borrow_requested,
+            message = "$borrowerName wants to borrow $item.title",
+            relatedItemId = item.id,
+            relatedBorrowId = saved.id
+        )
 
         return toResponse(saved, item.title, parseFirstImage(item.imageUrls))
     }
@@ -94,6 +108,18 @@ class BorrowService(
 
         borrow.status = BorrowStatus.approved
         val saved = borrowRepository.save(borrow)
+
+        // Notify borrower that their request was approved
+        val owner = userRepository.findById(userId)
+        val ownerName = owner.map { it.name }.orElse("The owner")
+        notificationService.create(
+            userId = borrow.borrowerId,
+            type = NotificationType.borrow_approved,
+            message = "$ownerName approved your request for ${item.title}",
+            relatedItemId = item.id,
+            relatedBorrowId = saved.id
+        )
+
         return toResponse(saved)
     }
 
@@ -114,10 +140,22 @@ class BorrowService(
 
         // Make item available again (safety net in case item was borrowed by another request)
         val item = itemRepository.findById(borrow.itemId)
+        val itemTitle = item.map { it.title }.orElse("an item")
         item.ifPresent {
             it.status = ItemStatus.available
             itemRepository.save(it)
         }
+
+        // Notify borrower that their request was rejected
+        val owner = userRepository.findById(userId)
+        val ownerName = owner.map { it.name }.orElse("The owner")
+        notificationService.create(
+            userId = borrow.borrowerId,
+            type = NotificationType.borrow_rejected,
+            message = "$ownerName declined your request for $itemTitle",
+            relatedItemId = borrow.itemId,
+            relatedBorrowId = saved.id
+        )
 
         return toResponse(saved)
     }
@@ -139,10 +177,22 @@ class BorrowService(
 
         // Make item available again after return
         val item = itemRepository.findById(borrow.itemId)
+        val itemTitle = item.map { it.title }.orElse("an item")
         item.ifPresent {
             it.status = ItemStatus.available
             itemRepository.save(it)
         }
+
+        // Notify borrower that the item was marked as returned
+        val owner = userRepository.findById(userId)
+        val ownerName = owner.map { it.name }.orElse("The owner")
+        notificationService.create(
+            userId = borrow.borrowerId,
+            type = NotificationType.borrow_returned,
+            message = "$ownerName marked $itemTitle as returned",
+            relatedItemId = borrow.itemId,
+            relatedBorrowId = saved.id
+        )
 
         return toResponse(saved)
     }

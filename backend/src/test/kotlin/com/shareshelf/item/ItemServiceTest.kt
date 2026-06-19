@@ -100,14 +100,14 @@ class ItemServiceTest {
         val item = testItem(title = "Power Drill")
         val page = PageImpl(listOf(item), pageable, 1)
 
-        every { itemRepository.search("drill", null, null, pageable) } returns page
+        every { itemRepository.search("drill", null, null, null, pageable) } returns page
 
         val result = itemService.findAll(search = "drill", pageable = pageable)
 
         assertEquals(1, result.totalElements)
         assertEquals("Power Drill", result.content.first().title)
 
-        verify(exactly = 1) { itemRepository.search("drill", null, null, pageable) }
+        verify(exactly = 1) { itemRepository.search("drill", null, null, null, pageable) }
     }
 
     @Test
@@ -116,13 +116,13 @@ class ItemServiceTest {
         val item = testItem()
         val page = PageImpl(listOf(item), pageable, 1)
 
-        every { itemRepository.search(null, 5L, null, pageable) } returns page
+        every { itemRepository.search(null, 5L, null, null, pageable) } returns page
 
         val result = itemService.findAll(categoryId = 5L, pageable = pageable)
 
         assertEquals(1, result.totalElements)
 
-        verify(exactly = 1) { itemRepository.search(null, 5L, null, pageable) }
+        verify(exactly = 1) { itemRepository.search(null, 5L, null, null, pageable) }
     }
 
     @Test
@@ -320,5 +320,130 @@ class ItemServiceTest {
         assertThrows(jakarta.persistence.EntityNotFoundException::class.java) {
             itemService.delete(99L, userId = 1L)
         }
+    }
+
+    // --- addImage ---
+
+    @Test
+    fun `addImage appends URL to existing imageUrls`() {
+        val item = testItem().apply {
+            imageUrls = """["/uploads/items/existing.jpg"]"""
+        }
+        val updatedItem = testItem().apply {
+            imageUrls = """["/uploads/items/existing.jpg","/uploads/items/new.jpg"]"""
+        }
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+
+        val result = itemService.addImage(1L, "/uploads/items/new.jpg", userId = 1L)
+
+        assertEquals(2, result.imageUrls.size)
+        assertTrue(result.imageUrls.contains("/uploads/items/existing.jpg"))
+        assertTrue(result.imageUrls.contains("/uploads/items/new.jpg"))
+
+        verify(exactly = 1) { itemRepository.findById(1L) }
+        verify(exactly = 1) { itemRepository.save(any()) }
+    }
+
+    @Test
+    fun `addImage appends URL to empty imageUrls`() {
+        val item = testItem().apply { imageUrls = "[]" }
+        val updatedItem = testItem().apply {
+            imageUrls = """["/uploads/items/first.jpg"]"""
+        }
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+
+        val result = itemService.addImage(1L, "/uploads/items/first.jpg", userId = 1L)
+
+        assertEquals(1, result.imageUrls.size)
+        assertEquals("/uploads/items/first.jpg", result.imageUrls.first())
+    }
+
+    @Test
+    fun `addImage throws AccessDeniedException when ownerId does not match userId`() {
+        val item = testItem(ownerId = 1L)
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+
+        assertThrows(AccessDeniedException::class.java) {
+            itemService.addImage(1L, "/uploads/items/stolen.jpg", userId = 2L)
+        }
+
+        verify(exactly = 1) { itemRepository.findById(1L) }
+        verify(exactly = 0) { itemRepository.save(any()) }
+    }
+
+    @Test
+    fun `addImage throws EntityNotFoundException when item not found`() {
+        every { itemRepository.findById(99L) } returns Optional.empty()
+
+        assertThrows(jakarta.persistence.EntityNotFoundException::class.java) {
+            itemService.addImage(99L, "/uploads/items/nope.jpg", userId = 1L)
+        }
+
+        verify(exactly = 1) { itemRepository.findById(99L) }
+        verify(exactly = 0) { itemRepository.save(any()) }
+    }
+
+    // --- removeImage ---
+
+    @Test
+    fun `removeImage removes matching URL`() {
+        val item = testItem().apply {
+            imageUrls = """["/uploads/items/keep.jpg","/uploads/items/remove.jpg"]"""
+        }
+        val updatedItem = testItem().apply {
+            imageUrls = """["/uploads/items/keep.jpg"]"""
+        }
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+
+        val result = itemService.removeImage(1L, "/uploads/items/remove.jpg", userId = 1L)
+
+        assertEquals(1, result.imageUrls.size)
+        assertEquals("/uploads/items/keep.jpg", result.imageUrls.first())
+        assertFalse(result.imageUrls.contains("/uploads/items/remove.jpg"))
+
+        verify(exactly = 1) { itemRepository.findById(1L) }
+        verify(exactly = 1) { itemRepository.save(any()) }
+    }
+
+    @Test
+    fun `removeImage handles non-existent URL gracefully`() {
+        val item = testItem().apply {
+            imageUrls = """["/uploads/items/only.jpg"]"""
+        }
+        val updatedItem = testItem().apply {
+            imageUrls = """["/uploads/items/only.jpg"]"""
+        }
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+
+        val result = itemService.removeImage(1L, "/uploads/items/not-there.jpg", userId = 1L)
+
+        assertEquals(1, result.imageUrls.size)
+        assertEquals("/uploads/items/only.jpg", result.imageUrls.first())
+
+        verify(exactly = 1) { itemRepository.findById(1L) }
+        verify(exactly = 1) { itemRepository.save(any()) }
+    }
+
+    @Test
+    fun `removeImage throws AccessDeniedException when ownerId does not match userId`() {
+        val item = testItem(ownerId = 1L)
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+
+        assertThrows(AccessDeniedException::class.java) {
+            itemService.removeImage(1L, "/uploads/items/any.jpg", userId = 2L)
+        }
+
+        verify(exactly = 1) { itemRepository.findById(1L) }
+        verify(exactly = 0) { itemRepository.save(any()) }
     }
 }

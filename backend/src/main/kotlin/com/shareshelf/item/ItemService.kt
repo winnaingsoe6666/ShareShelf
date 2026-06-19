@@ -44,10 +44,11 @@ class ItemService(
         search: String? = null,
         categoryId: Long? = null,
         status: ItemStatus? = null,
+        minRating: Double? = null,
         pageable: Pageable
     ): Page<ItemResponse> {
-        val items = if (search != null || categoryId != null || status != null) {
-            itemRepository.search(search, categoryId, status, pageable)
+        val items = if (search != null || categoryId != null || status != null || minRating != null) {
+            itemRepository.search(search, categoryId, status, minRating, pageable)
         } else {
             itemRepository.findAll(pageable)
         }
@@ -91,6 +92,40 @@ class ItemService(
             throw org.springframework.security.access.AccessDeniedException("Only the owner can delete this item")
         }
         itemRepository.delete(item)
+    }
+
+    @Transactional
+    fun addImage(itemId: Long, imageUrl: String, userId: Long): ItemResponse {
+        val item = itemRepository.findById(itemId)
+            .orElseThrow { EntityNotFoundException("Item not found") }
+
+        if (item.ownerId != userId) {
+            throw org.springframework.security.access.AccessDeniedException("Only the owner can modify this item")
+        }
+
+        val currentUrls = parseJsonArray(item.imageUrls).toMutableList()
+        currentUrls.add(imageUrl)
+        item.imageUrls = objectMapper.writeValueAsString(currentUrls)
+
+        val saved = itemRepository.save(item)
+        return toResponse(saved, saved.owner?.name ?: "Unknown", saved.owner?.trustScore?.toDouble() ?: 0.0)
+    }
+
+    @Transactional
+    fun removeImage(itemId: Long, imageUrl: String, userId: Long): ItemResponse {
+        val item = itemRepository.findById(itemId)
+            .orElseThrow { EntityNotFoundException("Item not found") }
+
+        if (item.ownerId != userId) {
+            throw org.springframework.security.access.AccessDeniedException("Only the owner can modify this item")
+        }
+
+        val currentUrls = parseJsonArray(item.imageUrls).toMutableList()
+        currentUrls.remove(imageUrl)
+        item.imageUrls = objectMapper.writeValueAsString(currentUrls)
+
+        val saved = itemRepository.save(item)
+        return toResponse(saved, saved.owner?.name ?: "Unknown", saved.owner?.trustScore?.toDouble() ?: 0.0)
     }
 
     private fun toResponse(item: Item, ownerName: String, ownerTrustScore: Double): ItemResponse {

@@ -39,7 +39,8 @@ class SecurityConfig(
                         "/swagger-ui.html",
                         "/v3/api-docs/**"
                     ).permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**", "/api/categories").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**", "/api/categories", "/api/community/stats").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }

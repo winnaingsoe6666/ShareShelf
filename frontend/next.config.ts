@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
@@ -18,6 +21,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Backward compatibility: redirect old non-locale URLs to /en
+  async redirects() {
+    return [
+      { source: "/items", destination: "/en/items", permanent: true },
+      { source: "/items/:path*", destination: "/en/items/:path*", permanent: true },
+      { source: "/community", destination: "/en/community", permanent: true },
+      { source: "/borrow", destination: "/en/borrow", permanent: true },
+      { source: "/profile", destination: "/en/profile", permanent: true },
+      { source: "/login", destination: "/en/login", permanent: true },
+      { source: "/register", destination: "/en/register", permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       {
@@ -28,4 +43,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

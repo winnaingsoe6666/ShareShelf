@@ -1,19 +1,109 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, Share2, X } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
+import api from "@/lib/api";
+import type { Notification } from "@/types";
+
+const notificationIcons: Record<string, React.ReactNode> = {
+  borrow_requested: <Package className="h-4 w-4 text-purple-500" />,
+  borrow_approved: <CheckCircle2 className="h-4 w-4 text-green-600" />,
+  borrow_rejected: <XCircle className="h-4 w-4 text-red-500" />,
+  borrow_returned: <RotateCcw className="h-4 w-4 text-blue-500" />,
+  review_received: <Star className="h-4 w-4 text-amber-500" />,
+};
+
+function timeAgo(dateString: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const notifRef = useRef<HTMLDivElement>(null);
   const user = getUser();
   const loggedIn = isAuthenticated();
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
+
+  const fetchUnreadCount = useCallback(() => {
+    if (!loggedIn) return;
+    api.get("/notifications/unread-count")
+      .then((res) => setUnreadCount(res.data.data?.count ?? 0))
+      .catch(() => {});
+  }, [loggedIn]);
+
+  const fetchNotifications = useCallback(() => {
+    if (!loggedIn) return;
+    api.get("/notifications", { params: { size: 10 } })
+      .then((res) => setNotifications(res.data.data?.content ?? []))
+      .catch(() => {});
+  }, [loggedIn]);
+
+  // Poll unread count every 30s when logged in
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [fetchUnreadCount]);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleNotifToggle = () => {
+    if (!notifOpen) {
+      fetchNotifications();
+      fetchUnreadCount();
+    }
+    setNotifOpen(!notifOpen);
+  };
+
+  const handleNotifClick = (notif: Notification) => {
+    setNotifOpen(false);
+    // Mark as read
+    api.put(`/notifications/${notif.id}/read`).catch(() => {});
+    setUnreadCount((c) => Math.max(0, c - 1));
+    // Navigate based on type
+    if (notif.relatedBorrowId) {
+      router.push("/borrow");
+    } else if (notif.type === "review_received") {
+      router.push("/profile");
+    } else if (notif.relatedItemId) {
+      router.push(`/items/${notif.relatedItemId}`);
+    }
+  };
+
+  const handleMarkAllRead = () => {
+    api.put("/notifications/read-all")
+      .then(() => {
+        setUnreadCount(0);
+        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      })
+      .catch(() => {});
+  };
 
   const handleLogout = () => {
     clearAuth();
@@ -40,14 +130,99 @@ export default function Navbar() {
           <Link href="/items" className={navLinkClass("/items")}>
             Browse
           </Link>
+
+          {/* Language switcher */}
+          <div className="flex items-center gap-1 border border-purple-200 rounded-lg p-0.5">
+            <button
+              onClick={() => router.replace(pathname, { locale: 'en' })}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'en' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => router.replace(pathname, { locale: 'my' })}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'my' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+            >
+              မြန်မာ
+            </button>
+          </div>
+
           {loggedIn ? (
             <>
+              <Link href="/community" className={navLinkClass("/community")}>
+                Community
+              </Link>
               <Link href="/items/new" className={navLinkClass("/items/new")}>
                 Add Item
               </Link>
               <Link href="/borrow" className={navLinkClass("/borrow")}>
                 My Borrows
               </Link>
+
+              {/* Notification bell */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  onClick={handleNotifToggle}
+                  className="relative cursor-pointer rounded-lg p-1.5 text-stone-600 hover:bg-purple-100 transition-colors"
+                  aria-label="Notifications"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notification dropdown */}
+                {notifOpen && (
+                  <div className="absolute right-0 mt-2 w-80 rounded-xl border border-purple-200 bg-white shadow-xl animate-fade-in">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-purple-100">
+                      <h3 className="font-heading text-sm font-semibold text-purple-900">Notifications</h3>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          className="text-xs text-purple-600 hover:text-purple-800 cursor-pointer"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="py-8 text-center text-stone-400">
+                          <Bell className="h-8 w-8 mx-auto mb-2 text-stone-300" />
+                          <p className="text-sm">No notifications</p>
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <button
+                            key={notif.id}
+                            onClick={() => handleNotifClick(notif)}
+                            className={`w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-purple-50 transition-colors cursor-pointer ${
+                              !notif.isRead ? "border-l-2 border-purple-500 bg-purple-50/50" : ""
+                            }`}
+                          >
+                            <div className="mt-0.5 shrink-0">
+                              {notificationIcons[notif.type] || <Bell className="h-4 w-4 text-stone-400" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className={`text-sm ${notif.isRead ? "text-stone-600" : "text-stone-900 font-medium"}`}>
+                                {notif.message}
+                              </p>
+                              <p className="mt-0.5 text-xs text-stone-400">{timeAgo(notif.createdAt)}</p>
+                            </div>
+                            {!notif.isRead && (
+                              <div className="mt-1.5 h-2 w-2 rounded-full bg-purple-500 shrink-0" />
+                            )}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Link href="/profile" className={navLinkClass("/profile")}>
                 Profile
               </Link>
@@ -97,6 +272,7 @@ export default function Navbar() {
             <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Browse</Link>
             {loggedIn ? (
               <>
+                <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Community</Link>
                 <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Add Item</Link>
                 <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">My Borrows</Link>
                 <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">Profile</Link>
@@ -108,6 +284,22 @@ export default function Navbar() {
                 <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">Sign Up</Link>
               </>
             )}
+
+            {/* Language switcher */}
+            <div className="flex items-center gap-1 border border-purple-200 rounded-lg p-0.5 self-start mt-1">
+              <button
+                onClick={() => { router.replace(pathname, { locale: 'en' }); setMobileOpen(false); }}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'en' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => { router.replace(pathname, { locale: 'my' }); setMobileOpen(false); }}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'my' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+              >
+                မြန်မာ
+              </button>
+            </div>
           </div>
         </div>
       )}

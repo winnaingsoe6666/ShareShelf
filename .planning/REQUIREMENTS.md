@@ -22,11 +22,11 @@
 
 ### Phase 2: Photo Upload Feature
 
-- [ ] **PHOTO-01**: Backend API endpoint for item photo upload (local filesystem)
-- [ ] **PHOTO-02**: Frontend image upload UI component for item create/edit forms
-- [ ] **PHOTO-03**: Display uploaded images on item detail page and cards
-- [ ] **PHOTO-04**: Backend tests for photo upload (JUnit 5 + MockMvc)
-- [ ] **PHOTO-05**: Frontend tests for image upload component
+- [x] **PHOTO-01**: Backend API endpoint for item photo upload (local filesystem)
+- [x] **PHOTO-02**: Frontend image upload UI component for item create/edit forms
+- [x] **PHOTO-03**: Display uploaded images on item detail page and cards
+- [x] **PHOTO-04**: Backend tests for photo upload (JUnit 5 + MockMvc)
+- [x] **PHOTO-05**: Frontend tests for image upload component
 
 ### Phase 3: E2E Tests & CI/CD
 
@@ -45,9 +45,9 @@
 
 ### Phase 5: Community Features
 
-- [ ] **COMM-01**: User notifications (in-app) for borrow request status changes
-- [ ] **COMM-02**: Community dashboard showing active borrows and available items
-- [ ] **COMM-03**: Enhanced search with filters (distance, availability, rating)
+- [x] **COMM-01**: User notifications (in-app) for borrow request status changes
+- [x] **COMM-02**: Community dashboard showing active borrows and available items
+- [x] **COMM-03**: Enhanced search with filters (availability, rating, trust score)
 
 ## v2 Requirements
 
@@ -93,11 +93,11 @@
 | TEST-01 | Phase 1 | ✅ Complete |
 | TEST-02 | Phase 1 | ✅ Complete |
 | RALPH-01 | Phase 1 | ✅ Complete |
-| PHOTO-01 | Phase 2 | Pending |
-| PHOTO-02 | Phase 2 | Pending |
-| PHOTO-03 | Phase 2 | Pending |
-| PHOTO-04 | Phase 2 | Pending |
-| PHOTO-05 | Phase 2 | Pending |
+| PHOTO-01 | Phase 2 | ✅ Complete |
+| PHOTO-02 | Phase 2 | ✅ Complete |
+| PHOTO-03 | Phase 2 | ✅ Complete |
+| PHOTO-04 | Phase 2 | ✅ Complete |
+| PHOTO-05 | Phase 2 | ✅ Complete |
 | TEST-03 | Phase 3 | Pending |
 | RALPH-02 | Phase 3 | Pending |
 | RALPH-03 | Phase 3 | Pending |
@@ -107,9 +107,9 @@
 | QUAL-03 | Phase 4 | Pending |
 | QUAL-04 | Phase 4 | Pending |
 | QUAL-05 | Phase 4 | Pending |
-| COMM-01 | Phase 5 | Pending |
-| COMM-02 | Phase 5 | Pending |
-| COMM-03 | Phase 5 | Pending |
+| COMM-01 | Phase 5 | ✅ Complete |
+| COMM-02 | Phase 5 | ✅ Complete |
+| COMM-03 | Phase 5 | ✅ Complete |
 
 **Coverage:**
 - v1 requirements: 29 total

@@ -81,7 +81,7 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fix Critical Issues & Testing Foundation | 7/7 | Complete | 2026-06-18 |
-| 2. Photo Upload Feature | 0/TBD | Not started | - |
+| 2. Photo Upload Feature | 0/TBD | Complete | 2026-06-19 |
 | 3. E2E Tests & CI/CD Pipeline | 0/TBD | Not started | - |
 | 4. Code Quality & Technical Debt | 0/TBD | Not started | - |
-| 5. Community Features | 0/TBD | Not started | - |
+| 5. Community Features | 3/3 | Complete | 2026-06-19 |

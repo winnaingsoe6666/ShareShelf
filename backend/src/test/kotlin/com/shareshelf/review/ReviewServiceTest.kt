@@ -5,6 +5,7 @@ import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.BorrowRepository
 import com.shareshelf.borrow.entity.BorrowRequest
 import com.shareshelf.borrow.entity.BorrowStatus
+import com.shareshelf.notification.NotificationService
 import com.shareshelf.review.dto.CreateReviewRequest
 import com.shareshelf.review.entity.Review
 import io.mockk.*
@@ -21,11 +22,13 @@ class ReviewServiceTest {
     private val reviewRepository = mockk<ReviewRepository>()
     private val borrowRepository = mockk<BorrowRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val notificationService = mockk<NotificationService>(relaxed = true)
 
     private val reviewService = ReviewService(
         reviewRepository = reviewRepository,
         borrowRepository = borrowRepository,
-        userRepository = userRepository
+        userRepository = userRepository,
+        notificationService = notificationService
     )
 
     private val owner = User(

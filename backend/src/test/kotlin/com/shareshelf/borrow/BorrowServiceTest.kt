@@ -9,6 +9,7 @@ import com.shareshelf.borrow.entity.BorrowStatus
 import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
+import com.shareshelf.notification.NotificationService
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -27,12 +28,14 @@ class BorrowServiceTest {
     private val borrowRepository = mockk<BorrowRepository>()
     private val itemRepository = mockk<ItemRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val notificationService = mockk<NotificationService>(relaxed = true)
     private val objectMapper = ObjectMapper()
 
     private val borrowService = BorrowService(
         borrowRepository = borrowRepository,
         itemRepository = itemRepository,
         userRepository = userRepository,
+        notificationService = notificationService,
         objectMapper = objectMapper
     )
 

@@ -1,7 +1,13 @@
-import Link from "next/link";
+"use client";
+
+import { Link } from "@/i18n/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
 
   return (
     <footer className="border-t border-purple-200 bg-purple-50">
@@ -64,8 +70,26 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Language switcher */}
+        <div className="mt-8 flex justify-center">
+          <div className="flex items-center gap-1 border border-purple-200 rounded-lg p-0.5">
+            <button
+              onClick={() => router.replace(pathname, { locale: 'en' })}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'en' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => router.replace(pathname, { locale: 'my' })}
+              className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${locale === 'my' ? 'bg-purple-600 text-white' : 'text-stone-500 hover:text-purple-700'}`}
+            >
+              မြန်မာ
+            </button>
+          </div>
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-8 border-t border-purple-200 pt-4 text-center text-sm text-stone-400">
+        <div className="mt-4 border-t border-purple-200 pt-4 text-center text-sm text-stone-400">
           &copy; {year} ShareShelf. All rights reserved.
         </div>
       </div>

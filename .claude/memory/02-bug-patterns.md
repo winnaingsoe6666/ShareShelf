@@ -1,8 +1,9 @@
 # Bug Patterns Catalog
 
 **Generated:** 2026-06-18
-**Source:** Phase 1 Code Review (01-REVIEW.md), Codebase Concerns (CONCERNS.md)
-**Purpose:** Catalog of all 13 findings from Phase 1 code review, organized by pattern category, with root causes, fixes, and prevention strategies.
+**Updated:** 2026-06-19 — added JPA schema gap pattern (CR-04) and filter ordering pattern (CR-05)
+**Source:** Phase 1 Code Review (01-REVIEW.md), Codebase Concerns (CONCERNS.md), Railway deploy failures
+**Purpose:** Catalog of all findings from Phase 1 code review, organized by pattern category, with root causes, fixes, and prevention strategies.
 
 ---
 
@@ -162,26 +163,41 @@
 
 **Prevention strategy:** Zero tolerance for `!!` on nullable fields. Use `?: throw` with descriptive messages. Grep for `!!` as a CI check.
 
----
+## Pattern 10: JPA Schema Gap — Missing @Version Column (CR-04)
 
-## Info Items (Lower Priority)
+**Severity:** Critical (blocks Railway startup)
+**Pattern:** JPA entity has `@Version` field for optimistic locking, but the Flyway migration that creates the table (or a subsequent migration) never added the corresponding database column.
 
-### IN-01: Dead Code — Unused Repository Method
-**Pattern:** Unused custom query method in repository interface.
-**Affected:** `BorrowRepository.kt:10` — `findByItemIdAndBorrowerIdAndStatus`
-**Recommendation:** Remove, or document intended future use.
+**Root cause:** When `Item.kt` gained `@Version var version: Long? = null` (for JPA optimistic locking), no Flyway migration was written to add the column to the existing `items` table. Hibernate `ddl-auto: validate` detects the mismatch between the entity mapping and the actual database schema, and aborts Spring Boot startup before `/api/health` can respond.
 
-### IN-02: Dead Code — Redundant Getter Wrapper
-**Pattern:** Explicit method that shadows a Kotlin property getter.
-**Affected:** `Item.kt:52` — `fun ownerId() = ownerId`
-**Recommendation:** Remove the function.
+**Affected file:** `backend/src/main/kotlin/com/shareshelf/item/entity/Item.kt:47-48`
 
-### IN-03: Inconsistent Error Handling
-**Pattern:** Login page error handling is less informative than register page's.
-**Affected:** `login/page.tsx:31` vs `register/page.tsx:38-44`
-**Recommendation:** Apply register's pattern (extract server error message) to login page. Already implemented — login page now handles 429 and 401 status codes.
+**Fix approach:**
+- Create a new Flyway migration that adds the missing column:
+  ```sql
+  ALTER TABLE items ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
+  ```
+- Fixed in commit `0a16cad` (V9__add_items_version.sql)
 
-### IN-04: Data Class Entities (JPA Anti-Pattern)
-**Pattern:** Kotlin `data class` used for JPA entities — equals/hashCode derived from all constructor properties, not just ID.
-**Affected:** All 4 entities (User, Item, BorrowRequest, Review)
-**Recommendation:** Convert to regular classes with ID-based equals/hashCode (Phase 4, QUAL-01).
+**Prevention strategy:** Whenever adding `@Version`, `@Column`, or any new JPA-mapped field to an entity, always write a corresponding Flyway migration. Run `ddl-auto: validate` locally (not `update`) to catch these gaps before pushing.
+
+## Pattern 11: Security Filter Chain Ordering (CR-05)
+
+**Severity:** Critical (blocks Railway startup)
+**Pattern:** `addFilterBefore(X, Y::class.java)` is called before `Y` has been added to the Spring Security filter chain, causing `BeanInstantiationException: The Filter class Y does not have a registered order`.
+
+**Root cause:** In `SecurityConfig.kt`, the `rateLimitFilter` was configured to be placed before `JwtAuthenticationFilter` via `.addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)`, but `JwtAuthenticationFilter` hadn't been added to the chain yet (its `.addFilterBefore` call came on the next line). Spring Security validates filter ordering eagerly when building the `SecurityFilterChain` bean from the Kotlin DSL — it can't position a filter relative to another filter that isn't yet part of the chain.
+
+**Affected file:** `backend/src/main/kotlin/com/shareshelf/config/SecurityConfig.kt:46-47`
+
+**Fix approach:**
+- Register `jwtAuthenticationFilter` in the chain FIRST
+- THEN place `rateLimitFilter` before it
+- Fixed in commit `d21355e`:
+  ```kotlin
+  // Correct order:
+  .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+  .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)
+  ```
+
+**Prevention strategy:** When using `addFilterBefore(X, Y)` with a custom filter `Y`, always ensure `Y`'s own `addFilterBefore` call appears above `X`'s. The referenced filter must already be part of the chain. Spring Security builds the chain sequentially through the DSL.

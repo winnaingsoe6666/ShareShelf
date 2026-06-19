@@ -3,6 +3,8 @@ package com.shareshelf.review
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.borrow.BorrowRepository
 import com.shareshelf.borrow.entity.BorrowStatus
+import com.shareshelf.notification.NotificationService
+import com.shareshelf.notification.entity.NotificationType
 import com.shareshelf.review.dto.CreateReviewRequest
 import com.shareshelf.review.dto.ReviewResponse
 import com.shareshelf.review.entity.Review
@@ -15,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val borrowRepository: BorrowRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val notificationService: NotificationService
 ) {
 
     @Transactional
@@ -55,6 +58,16 @@ class ReviewService(
 
         // Update trust score
         updateTrustScore(revieweeId)
+
+        // Notify reviewee that they received a review
+        val reviewer = userRepository.findById(reviewerId)
+        val reviewerName = reviewer.map { it.name }.orElse("Someone")
+        notificationService.create(
+            userId = revieweeId,
+            type = NotificationType.review_received,
+            message = "$reviewerName left you a ${request.rating}-star review",
+            relatedBorrowId = request.borrowRequestId
+        )
 
         return toResponse(saved)
     }
