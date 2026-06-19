@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* --- Google Fonts: Cormorant Garamond (headings), Crimson Pro (body), Cinzel (display) --- */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&display=swap');
 
 /* --- Tailwind v4 --- */
 @import "tailwindcss";
@@ -33,6 +33,7 @@
   --font-family-heading: 'Cormorant Garamond', Georgia, serif;
   --font-family-body: 'Crimson Pro', 'Times New Roman', serif;
   --font-family-display: 'Cinzel', Georgia, serif;
+  --font-family-myanmar: 'Noto Sans Myanmar', 'Padauk', 'Myanmar Text', sans-serif;
 
   /* --- Animations --- */
   --animate-fade-in: fade-in 0.2s ease-out;
@@ -163,4 +164,44 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ==========================================================================
+   Myanmar (Burmese) Script Support
+   ========================================================================== */
+
+/* Myanmar script needs larger line-height for stacked vowel marks above/below consonants */
+html[lang="my"] body {
+  font-family: var(--font-family-myanmar);
+  line-height: 1.85;
+}
+
+html[lang="my"] .font-display {
+  font-family: var(--font-family-myanmar);
+}
+
+html[lang="my"] .font-heading,
+html[lang="my"] h1,
+html[lang="my"] h2,
+html[lang="my"] h3 {
+  font-family: var(--font-family-myanmar);
+}
+
+/* Override line-height on all text containers for Myanmar readability */
+html[lang="my"] p,
+html[lang="my"] a,
+html[lang="my"] button,
+html[lang="my"] span,
+html[lang="my"] li,
+html[lang="my"] h1,
+html[lang="my"] h2,
+html[lang="my"] h3,
+html[lang="my"] h4 {
+  line-height: 1.85;
+}
+
+/* Cards and sections in Myanmar — ensure adequate spacing */
+html[lang="my"] .rounded-xl,
+html[lang="my"] .rounded-2xl {
+  line-height: 1.85;
 }
