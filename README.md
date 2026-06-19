@@ -1,17 +1,26 @@
 # ShareShelf — Community Tool Library
 
-ShareShelf is a community-powered tool library that helps people borrow and lend rarely used tools and equipment within their neighborhood, apartment, university, or local community.
+**ShareShelf** is a community-powered tool library designed to foster local collaboration by helping people borrow, lend, and share rarely used tools and equipment within their neighborhood, apartment complex, university, or local community. 
 
-Instead of buying items used only a few times a year, members can share resources, save money, and reduce waste together.
+Whether it's a power drill for a quick weekend project, a tent for a camping trip, or gardening equipment for the spring, ShareShelf connects individuals who need temporary access to gear with neighbors who have items sitting idle.
+
+### Why ShareShelf?
+- 🌍 **Reduce Waste:** Promote sustainable living by maximizing the lifespan and utility of manufactured goods.
+- 💰 **Save Money:** Avoid the high costs of purchasing tools and equipment that you might only use once or twice a year.
+- 🤝 **Build Community:** Connect with your neighbors, build local trust, and strengthen the bonds within your local network.
+- 📦 **Save Space:** Declutter your garage or apartment by borrowing what you need, only when you need it.
+
+With built-in trust scores, community statistics, and seamless in-app notifications, ShareShelf makes the process of lending and borrowing as smooth and reliable as possible.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4 |
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4, next-intl |
 | **Backend** | Spring Boot 3.4, Kotlin, Gradle 8.12 (Kotlin DSL) |
 | **Database** | PostgreSQL + Flyway (versioned migrations) |
 | **Auth** | JWT (jjwt), Spring Security |
+| **Testing** | Vitest, Playwright, JUnit 5, MockK |
 
 ## Project Structure
 
@@ -94,11 +103,15 @@ Demo credentials:
 | POST | `/api/auth/register` | No | Create account |
 | POST | `/api/auth/login` | No | Log in, get JWT |
 | GET | `/api/auth/me` | Yes | Current user profile |
+| POST | `/api/auth/logout` | Yes | Log out |
+| POST | `/api/auth/refresh` | No | Refresh JWT token |
 | GET | `/api/items` | Yes | List/search items |
 | POST | `/api/items` | Yes | Create item listing |
 | GET | `/api/items/{id}` | Yes | Item detail |
 | PUT | `/api/items/{id}` | Yes | Update item |
 | DELETE | `/api/items/{id}` | Yes | Delete item |
+| POST | `/api/items/{id}/images` | Yes | Upload item image |
+| DELETE | `/api/items/{id}/images` | Yes | Delete item image |
 | POST | `/api/borrow` | Yes | Submit borrow request |
 | GET | `/api/borrow` | Yes | My borrows & lends |
 | PUT | `/api/borrow/{id}/approve` | Yes | Approve request |
@@ -107,17 +120,27 @@ Demo credentials:
 | POST | `/api/review` | Yes | Rate a transaction |
 | GET | `/api/review/user/{id}` | Yes | User's reviews |
 | GET | `/api/categories` | Yes | List categories |
+| GET | `/api/notifications` | Yes | List user notifications |
+| GET | `/api/notifications/unread-count` | Yes | Get unread count |
+| PUT | `/api/notifications/{id}/read` | Yes | Mark notification read |
+| PUT | `/api/notifications/read-all` | Yes | Mark all read |
+| GET | `/api/community/stats` | No | Platform statistics |
+| GET | `/api/health` | No | Health check |
+| GET | `/api/dev/seed` | No | Seed demo data |
 
-## Features (MVP)
+## Features
 
 - [x] User Registration and Authentication
 - [x] Item Management (create, edit, delete listings)
 - [x] Borrowing Workflow (request → approve/reject → return)
 - [x] Search and Discovery (by name, category, status)
 - [x] Reviews and Ratings (1-5 star, trust score)
-- [ ] Photo upload (local filesystem)
-- [ ] Image support in frontend
-- [ ] Deployment configuration
+- [x] Photo upload and image gallery support
+- [x] In-app Notifications
+- [x] Community Statistics
+- [x] Internationalization (i18n)
+- [x] Deployment configuration (Docker, Railway)
+- [x] Comprehensive Testing (Vitest, Playwright, JUnit)
 
 ## Environment Variables
 
