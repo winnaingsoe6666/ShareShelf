@@ -10,7 +10,15 @@ vi.mock("@/lib/auth", () => ({
   isAuthenticated: vi.fn(() => true),
 }));
 
-vi.mock("next/navigation", () => ({
+vi.mock("@/lib/api", () => ({
+  default: {
+    get: vi.fn(() => Promise.resolve({ data: { data: { count: 0 } } })),
+    put: vi.fn(() => Promise.resolve({ data: {} })),
+  },
+}));
+
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/navigation")>()),
   useRouter: vi.fn(() => ({ push: mockPush })),
   usePathname: vi.fn(() => "/"),
 }));
@@ -36,6 +44,7 @@ describe("Navbar", () => {
     expect(screen.getByText("Add Item")).toBeInTheDocument();
     expect(screen.getByText("My Borrows")).toBeInTheDocument();
     expect(screen.getByText("Profile")).toBeInTheDocument();
+    expect(screen.getByText("Community")).toBeInTheDocument();
     expect(screen.getByText("Log Out")).toBeInTheDocument();
     expect(screen.queryByText("Log In")).not.toBeInTheDocument();
     expect(screen.queryByText("Sign Up")).not.toBeInTheDocument();
@@ -48,7 +57,21 @@ describe("Navbar", () => {
     expect(screen.getByText("Sign Up")).toBeInTheDocument();
     expect(screen.queryByText("Add Item")).not.toBeInTheDocument();
     expect(screen.queryByText("My Borrows")).not.toBeInTheDocument();
+    expect(screen.queryByText("Community")).not.toBeInTheDocument();
     expect(screen.queryByText("Log Out")).not.toBeInTheDocument();
+  });
+
+  it("renders notification bell when logged in", () => {
+    vi.mocked(isAuthenticated).mockReturnValue(true);
+    render(<Navbar />);
+    const bell = screen.getByLabelText("Notifications");
+    expect(bell).toBeInTheDocument();
+  });
+
+  it("does not render notification bell when logged out", () => {
+    vi.mocked(isAuthenticated).mockReturnValue(false);
+    render(<Navbar />);
+    expect(screen.queryByLabelText("Notifications")).not.toBeInTheDocument();
   });
 
   it("calls clearAuth and navigates home on logout", () => {
