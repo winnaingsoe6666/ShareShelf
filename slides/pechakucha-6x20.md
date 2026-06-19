@@ -7,49 +7,71 @@ auto-advance: 20
 ---
 
 <!-- slide 1 -->
-# Who's my person?
-- Neighbors, students, and community members.
-- People who enjoy DIY projects, camping, or gardening.
-- Individuals who want to connect with their local community but lack space or a large budget.
+# The Everyday Borrower
+- Occasional DIY-ers, campers, students — people who need tools once or twice a year
+- Neighbors tired of buying a \$200 drill for a single shelf-install job
+- Community members who want to connect locally but lack a reason to reach out
+
+**They don't need to own it — they just need to use it.**
+
 <!-- 20s -->
 
 ---
 
 <!-- slide 2 -->
-# Their problem
-- Rarely used tools (like drills or tents) are expensive and bulky.
-- People often buy items they only use once or twice a year.
-- This leads to unnecessary waste, high costs, and cluttered homes.
+# The "Buy It, Use Once, Store It" Problem
+- Drills, tents, projectors — bought for one task, then buried in the closet forever
+- Every neighbor buys the same gear; none of them share — money wasted, homes cluttered
+- No simple, trustworthy way to borrow from someone nearby without awkward DMs
+
+**We buy too much and share too little — and it costs everyone.**
+
+<!-- 20s -->
 
 ---
 
 <!-- slide 3 -->
-# What I built
-- **ShareShelf**: A community-powered tool library.
-- A platform to safely borrow, lend, and share local equipment.
-- **Key Features**: Item management, borrowing workflows, trust scores, and in-app notifications.
+# ShareShelf — A Community Tool Library
+- List tools you rarely use; browse what neighbors are sharing nearby
+- Full borrowing lifecycle: request → approve → pickup → return → review
+- Trust & Safety built in — user ratings, reviews, and trust scores power every interaction
+
+**A complete borrowing platform that makes sharing as easy as scrolling.**
+
+<!-- 20s -->
 
 ---
 
 <!-- slide 4 -->
-# How I built it
-- **MCP**: `shareshelf-db` (Connects AI directly to the PostgreSQL database)
-- **Skill**: `analyze-shareshelf-db` (Ensures safe, read-only data inspection)
-- **Agent**: `db-assistant` (Expert DBA assisting with query optimization)
-- **Tech Stack**: Next.js 15, Spring Boot 3.4, PostgreSQL.
+# Built With AI, Ship With Confidence
+- MCP server `shareshelf-db` — AI reads PostgreSQL schema and live data in real time
+- Skill `analyze-shareshelf-db` — safe, read-only DB inspection directly from chat
+- Agent `db-assistant` — expert DBA optimizing queries and debugging data models
+
+**AI tooling didn't just help write code — it helped understand the data underneath.**
+
+<!-- 20s -->
 
 ---
 
 <!-- slide 5 -->
-# Why it matters
-- **Environment**: Reduces waste by maximizing tool lifespan.
-- **Community**: Fosters trust and connection among neighbors.
-- **Development**: Proves how AI integration accelerates debugging and building full-stack applications.
+# Less Waste, More Neighbors
+- Every borrow means one fewer purchase — saves money across the whole community
+- Fewer idle tools manufactured, shipped, and thrown away — real environmental impact
+- Every completed borrow builds a trust score — neighbors become collaborators, not strangers
+
+**Sharing tools shrinks waste, grows savings, and weaves stronger neighborhoods.**
+
+<!-- 20s -->
 
 ---
 
 <!-- slide 6 -->
-# Done checklist
-- [x] repo public
-- [x] MCP + skill + agent used
-- [x] report.md in team repo
+# What's Live & What's Next
+- Repo public, deployed on Railway + Vercel — anyone can sign up and browse today
+- Full workflow working: list → borrow → approve → return → review → trust score
+- MCP + Skill + Agent used throughout development; `report.md` documented in team repo
+
+**Six slides. Twenty seconds each. One working platform — live now.**
+
+<!-- 20s -->
