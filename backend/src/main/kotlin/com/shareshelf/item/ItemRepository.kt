@@ -39,4 +39,27 @@ interface ItemRepository : JpaRepository<Item, Long> {
            ORDER BY itemCount DESC"""
     )
     fun findTopLenders(pageable: Pageable): List<Array<Any>>
+
+    @Query(
+        value = """SELECT i.*, ST_Distance(i.location::geography,
+                  ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) as distance
+                  FROM items i
+                  WHERE i.location IS NOT NULL
+                  AND ST_DWithin(i.location::geography,
+                      ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+                      :radius)
+                  ORDER BY distance""",
+        countQuery = """SELECT COUNT(*) FROM items i
+                       WHERE i.location IS NOT NULL
+                       AND ST_DWithin(i.location::geography,
+                           ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+                           :radius)""",
+        nativeQuery = true
+    )
+    fun findNearby(
+        @Param("lat") lat: Double,
+        @Param("lng") lng: Double,
+        @Param("radius") radius: Double,
+        pageable: Pageable
+    ): Page<Item>
 }

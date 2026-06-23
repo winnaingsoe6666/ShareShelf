@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, FileText, DollarSign, FolderTree, Image } from "lucide-react";
+import { Package, FileText, DollarSign, FolderTree, Image, MapPin } from "lucide-react";
+import dynamic from "next/dynamic";
+const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -23,6 +25,8 @@ export default function NewItemPage() {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
 
   const [catLoading, setCatLoading] = useState(true);
   const [catError, setCatError] = useState("");
@@ -52,6 +56,8 @@ export default function NewItemPage() {
         categoryId: categoryId ? Number(categoryId) : undefined,
         dailyPrice: dailyPrice ? Number(dailyPrice) : undefined,
         depositAmount: depositAmount ? Number(depositAmount) : undefined,
+        latitude,
+        longitude,
       });
 
       if (res.data.success) {
@@ -155,6 +161,22 @@ export default function NewItemPage() {
                 )}
               </select>
             </div>
+          </div>
+
+          {/* Section: Item Location */}
+          <div className="space-y-4">
+            <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-purple-800">
+              <MapPin className="h-5 w-5 text-purple-500" />
+              Item Location
+            </h2>
+            <p className="text-sm text-stone-500">Drop a pin where this item is available</p>
+            <LocationPicker
+              latitude={latitude}
+              longitude={longitude}
+              onChange={(lat, lng) => { setLatitude(lat); setLongitude(lng); }}
+              onClear={() => { setLatitude(undefined); setLongitude(undefined); }}
+              disabled={loading || uploadingImages}
+            />
           </div>
 
           {/* Section: Image Upload */}

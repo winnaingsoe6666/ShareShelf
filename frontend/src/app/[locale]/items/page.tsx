@@ -19,7 +19,9 @@ import {
   Filter,
   Star,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
+import DistanceFilter from "@/components/map/DistanceFilter";
 import Navbar from "@/components/layout/Navbar";
 import ItemCard from "@/components/items/ItemCard";
 import Skeleton from "@/components/ui/Skeleton";
@@ -53,6 +55,9 @@ export default function BrowseItemsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [minRating, setMinRating] = useState<number | undefined>(undefined);
+  const [nearLat, setNearLat] = useState<number | undefined>(undefined);
+  const [nearLng, setNearLng] = useState<number | undefined>(undefined);
+  const [nearRadius, setNearRadius] = useState<number | undefined>(undefined);
   const [error, setError] = useState("");
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,6 +87,9 @@ export default function BrowseItemsPage() {
       categoryId: selectedCat?.id,
       status: statusFilter || undefined,
       minRating,
+      nearLat,
+      nearLng,
+      nearRadius,
       size: 50,
     };
 
@@ -95,7 +103,7 @@ export default function BrowseItemsPage() {
       .then((res) => setItems(res.data.data?.content ?? []))
       .catch(() => setError("Failed to load items"))
       .finally(() => setLoading(false));
-  }, [debouncedSearch, selectedCategory, statusFilter, minRating, categories]);
+  }, [debouncedSearch, selectedCategory, statusFilter, minRating, nearLat, nearLng, nearRadius, categories]);
 
   useEffect(() => {
     if (categories.length > 0 || selectedCategory === "") {
@@ -114,13 +122,22 @@ export default function BrowseItemsPage() {
               <h1 className="font-heading text-3xl font-bold text-purple-900">Browse Tools</h1>
               <p className="mt-2 text-stone-600">Discover tools shared by your community</p>
             </div>
-            <Link
-              href="/items/new"
-              className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px cursor-pointer"
-            >
-              <Plus className="h-4 w-4" />
-              Add Item
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/items/map"
+                className="inline-flex items-center gap-1 rounded-lg border border-purple-300 px-4 py-2 text-sm font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200"
+              >
+                <MapPin className="h-4 w-4" />
+                View on Map
+              </Link>
+              <Link
+                href="/items/new"
+                className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                Add Item
+              </Link>
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -190,6 +207,15 @@ export default function BrowseItemsPage() {
                 </button>
               ))}
             </div>
+
+            <span className="text-stone-300">|</span>
+            <DistanceFilter
+              onLocationChange={(lat, lng, radius) => {
+                setNearLat(lat);
+                setNearLng(lng);
+                setNearRadius(radius);
+              }}
+            />
 
             <span className="text-stone-300">|</span>
 

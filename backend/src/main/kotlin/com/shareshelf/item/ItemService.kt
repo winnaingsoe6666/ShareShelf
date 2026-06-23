@@ -9,6 +9,9 @@ import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.PrecisionModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -21,6 +24,7 @@ class ItemService(
     private val categoryRepository: CategoryRepository,
     private val objectMapper: ObjectMapper
 ) {
+    private val geometryFactory = GeometryFactory(PrecisionModel(), 4326)
 
     fun create(request: CreateItemRequest, ownerId: Long): ItemResponse {
         val user = userRepository.findById(ownerId)
@@ -36,6 +40,10 @@ class ItemService(
             status = ItemStatus.available
         )
 
+        if (request.latitude != null && request.longitude != null) {
+            item.location = geometryFactory.createPoint(Coordinate(request.longitude, request.latitude))
+        }
+
         val saved = itemRepository.save(item)
         return toResponse(saved, user.name, user.trustScore.toDouble())
     }
@@ -45,12 +53,21 @@ class ItemService(
         categoryId: Long? = null,
         status: ItemStatus? = null,
         minRating: Double? = null,
+        nearLat: Double? = null,
+        nearLng: Double? = null,
+        nearRadius: Double? = null,
         pageable: Pageable
     ): Page<ItemResponse> {
-        val items = if (search != null || categoryId != null || status != null || minRating != null) {
-            itemRepository.search(search, categoryId, status, minRating, pageable)
-        } else {
-            itemRepository.findAll(pageable)
+        val items = when {
+            nearLat != null && nearLng != null && nearRadius != null -> {
+                itemRepository.findNearby(nearLat, nearLng, nearRadius, pageable)
+            }
+            search != null || categoryId != null || status != null || minRating != null -> {
+                itemRepository.search(search, categoryId, status, minRating, pageable)
+            }
+            else -> {
+                itemRepository.findAll(pageable)
+            }
         }
         return items.map { item ->
             toResponse(item, item.owner?.name ?: "Unknown", item.owner?.trustScore?.toDouble() ?: 0.0)
@@ -143,7 +160,9 @@ class ItemService(
             depositAmount = item.depositAmount,
             status = item.status,
             imageUrls = parseJsonArray(item.imageUrls),
-            createdAt = item.createdAt
+            createdAt = item.createdAt,
+            latitude = item.location?.y,
+            longitude = item.location?.x
         )
     }
 

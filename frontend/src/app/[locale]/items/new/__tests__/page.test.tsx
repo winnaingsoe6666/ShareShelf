@@ -17,6 +17,20 @@ vi.mock("next/navigation", async (importOriginal) => ({
 vi.mock("@/components/layout/Navbar", () => ({
   default: () => <nav data-testid="navbar">Navbar</nav>,
 }));
+vi.mock("next/dynamic", () => ({
+  default: () => {
+    const MockLocationPicker = ({ latitude, longitude, onChange, onClear, disabled }: any) => (
+      <div data-testid="location-picker">
+        <span data-testid="lp-lat">{String(latitude)}</span>
+        <span data-testid="lp-lng">{String(longitude)}</span>
+        <button data-testid="lp-set" onClick={() => onChange?.(16.84, 96.17)} disabled={disabled}>Set Location</button>
+        <button data-testid="lp-clear" onClick={() => onClear?.()} disabled={disabled}>Clear</button>
+      </div>
+    );
+    MockLocationPicker.displayName = "MockLocationPicker";
+    return MockLocationPicker;
+  },
+}));
 vi.mock("@/components/ui/ImageUpload", () => ({
   default: ({ images, onUpload, onRemove, disabled, uploading, maxFiles }: any) => (
     <div data-testid="image-upload">

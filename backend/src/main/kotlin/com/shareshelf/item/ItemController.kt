@@ -31,9 +31,18 @@ class ItemController(
         @RequestParam(required = false) categoryId: Long?,
         @RequestParam(required = false) status: ItemStatus?,
         @RequestParam(required = false) minRating: Double?,
+        @RequestParam(required = false) nearLat: Double?,
+        @RequestParam(required = false) nearLng: Double?,
+        @RequestParam(required = false) nearRadius: Double?,
         @PageableDefault(size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
     ): ResponseEntity<ApiResponse<Page<ItemResponse>>> {
-        val items = itemService.findAll(search, categoryId, status, minRating, pageable)
+        if (nearRadius != null && (nearLat == null || nearLng == null)) {
+            throw IllegalArgumentException("nearLat and nearLng are required when nearRadius is provided")
+        }
+        if (nearRadius != null && (nearRadius < 1 || nearRadius > 50000)) {
+            throw IllegalArgumentException("nearRadius must be between 1 and 50000 meters")
+        }
+        val items = itemService.findAll(search, categoryId, status, minRating, nearLat, nearLng, nearRadius, pageable)
         return ResponseEntity.ok(ApiResponse.success(items))
     }
 

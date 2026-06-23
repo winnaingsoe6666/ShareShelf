@@ -33,6 +33,9 @@ export interface Item {
   status: ItemStatus;
   imageUrls: string[];
   createdAt: string;
+  latitude?: number;
+  longitude?: number;
+  distance?: number;
 }
 
 export interface BorrowRequest {

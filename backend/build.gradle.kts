@@ -48,6 +48,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.hibernate.orm:hibernate-spatial")
 
     // Dev tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
