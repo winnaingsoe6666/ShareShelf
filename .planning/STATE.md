@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: verifying
 stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-06-25T03:49:36Z"
+last_updated: "2026-06-25T03:57:23.633Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 16
-  completed_plans: 8
+  completed_plans: 9
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ Plan: 7 of 7 complete — all Phase 1 requirements satisfied
 Status: Phase complete — ready for verification
 Last activity: 2026-06-25
 
-Progress: [████░░░░░░] 44%
+Progress: [██████░░░░] 56%
 
 ## Performance Metrics
 
@@ -72,6 +72,8 @@ Recent decisions affecting current work:
 - [Phase 07]: OAuth2Service replicates AuthService refresh token pattern (SHA-256 hash, UUID raw token)
 - [Phase 07]: googleId changed from val to var to support account linking
 - [Phase 07]: Empty name from Google falls back to email prefix
+- [Phase ?]: OAuth2 login flow endpoints are public
+- [Phase ?]: Cookie-based return URL for stateless OAuth2
 
 ### Pending Todos
 
@@ -97,6 +99,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-25T03:49:36Z
+Last session: 2026-06-25T03:57:11.771Z
 Stopped at: Completed 07-02-PLAN.md
 Resume file: None
