@@ -40,9 +40,13 @@ export default function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
-  const user = getUser();
-  const loggedIn = isAuthenticated();
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const user = mounted ? getUser() : null;
+  const loggedIn = mounted ? isAuthenticated() : false;
 
   // Chat WebSocket for real-time unread updates
   const fetchChatUnread = useCallback(() => {
@@ -58,7 +62,10 @@ export default function Navbar() {
     onUnreadUpdate: fetchChatUnread,
   });
 
-  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
+  const isActive = (path: string) => {
+    if (path === "/items") return pathname === "/items";
+    return pathname === path || pathname?.startsWith(path + "/");
+  };
 
   const fetchUnreadCount = useCallback(() => {
     if (!loggedIn) return;
@@ -137,14 +144,14 @@ export default function Navbar() {
   };
 
   const navLinkClass = (path: string) =>
-    `text-sm font-medium transition-colors duration-200 py-1 ${
+    `${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium transition-colors duration-200 py-1 ${
       isActive(path)
         ? "text-purple-700 font-semibold border-b-2 border-purple-600"
         : "text-stone-600 hover:text-purple-700"
     }`;
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-purple-200 bg-purple-50/90 backdrop-blur supports-[backdrop-filter]:bg-purple-50/80">
+    <nav className={`sticky top-0 z-40 border-b border-purple-200 bg-purple-50/90 backdrop-blur supports-[backdrop-filter]:bg-purple-50/80 ${locale === 'my' ? 'font-[family-name:var(--font-family-myanmar)]' : ''}`}>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-purple-700">
           <Share2 className="h-7 w-7" />
@@ -265,7 +272,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
+                className={`cursor-pointer rounded-lg px-3 py-1.5 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-stone-600 hover:bg-purple-100 transition-colors`}
               >
                 {t("nav.logOut")}
               </button>
@@ -274,13 +281,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
+                className={`rounded-lg px-3 py-1.5 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-stone-600 hover:bg-purple-100 transition-colors`}
               >
                 {t("nav.logIn")}
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px"
+                className={`rounded-lg bg-green-600 px-4 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px`}
               >
                 {t("nav.signUp")}
               </Link>
@@ -306,13 +313,13 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="animate-slide-up border-t border-purple-200 px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-2">
-            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.browse")}</Link>
+            <Link href="/items" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.browse")}</Link>
             {loggedIn ? (
               <>
-                <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.community")}</Link>
-                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.addItem")}</Link>
-                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.myBorrows")}</Link>
-                <Link href="/messages" onClick={() => setMobileOpen(false)} className="relative rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors flex items-center gap-2">
+                <Link href="/community" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.community")}</Link>
+                <Link href="/items/new" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.addItem")}</Link>
+                <Link href="/borrow" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.myBorrows")}</Link>
+                <Link href="/messages" onClick={() => setMobileOpen(false)} className={`relative rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors flex items-center gap-2`}>
                   <MessageSquare className="h-4 w-4" />
                   {t("nav.messages")}
                   {chatUnreadCount > 0 && (
@@ -321,13 +328,13 @@ export default function Navbar() {
                     </span>
                   )}
                 </Link>
-                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.profile")}</Link>
-                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors cursor-pointer">{t("nav.logOut")}</button>
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.profile")}</Link>
+                <button onClick={handleLogout} className={`rounded px-3 py-2 text-left ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors cursor-pointer`}>{t("nav.logOut")}</button>
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.logIn")}</Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">{t("nav.signUp")}</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.logIn")}</Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className={`rounded bg-green-600 px-3 py-2 text-center ${locale === 'my' ? 'text-xs' : 'text-sm'} text-white`}>{t("nav.signUp")}</Link>
               </>
             )}
 

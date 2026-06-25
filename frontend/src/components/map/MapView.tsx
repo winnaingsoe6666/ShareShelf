@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L, { type LatLngExpression } from "leaflet";
@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import type { Item } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { formatDistance } from "@/lib/distance";
+import { isAuthenticated } from "@/lib/auth";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -21,6 +22,14 @@ const itemIcon = L.divIcon({
   popupAnchor: [0, -32],
 });
 
+const userLocationIcon = L.divIcon({
+  html: '<div style="width:20px;height:20px;border-radius:50%;background:#3B82F6;border:3px solid white;box-shadow:0 0 0 2px #3B82F6, 0 2px 6px rgba(0,0,0,0.3);"></div>',
+  className: "",
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+  popupAnchor: [0, -12],
+});
+
 interface MapViewProps {
   items: Item[];
   radius: number;
@@ -30,7 +39,13 @@ interface MapViewProps {
 
 const DEFAULT_CENTER: LatLngExpression = [16.84, 96.17];
 
-function GeolocationHandler({ onLocationFound }: { onLocationFound: (lat: number, lng: number) => void }) {
+function GeolocationHandler({
+  onLocationFound,
+  onUserPositionChange,
+}: {
+  onLocationFound: (lat: number, lng: number) => void;
+  onUserPositionChange: (lat: number, lng: number) => void;
+}) {
   const map = useMap();
   useEffect(() => {
     if (typeof navigator !== "undefined" && "geolocation" in navigator) {
@@ -38,13 +53,21 @@ function GeolocationHandler({ onLocationFound }: { onLocationFound: (lat: number
         (pos) => {
           const { latitude, longitude } = pos.coords;
           onLocationFound(latitude, longitude);
-          map.setView([latitude, longitude], 14);
+          onUserPositionChange(latitude, longitude);
+          // Use setTimeout to ensure map is fully initialized before setView
+          setTimeout(() => {
+            try {
+              map.setView([latitude, longitude], 14);
+            } catch {
+              // ignore if map not ready
+            }
+          }, 100);
         },
         () => { /* denied — stay at default center */ },
         { enableHighAccuracy: false, timeout: 5000 }
       );
     }
-  }, [map, onLocationFound]);
+  }, [map, onLocationFound, onUserPositionChange]);
   return null;
 }
 
@@ -54,6 +77,7 @@ export default function MapView({
   onRadiusChange,
   onLocationFound,
 }: MapViewProps) {
+  const [userPosition, setUserPosition] = useState<LatLngExpression | null>(null);
   const locatedItems = items.filter((i) => i.latitude != null && i.longitude != null);
 
   return (
@@ -64,7 +88,17 @@ export default function MapView({
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
           />
-          <GeolocationHandler onLocationFound={onLocationFound} />
+          <GeolocationHandler
+            onLocationFound={onLocationFound}
+            onUserPositionChange={(lat, lng) => setUserPosition([lat, lng])}
+          />
+          {isAuthenticated() && userPosition && (
+            <Marker position={userPosition} icon={userLocationIcon}>
+              <Popup>
+                <p className="text-sm font-medium text-blue-700">Your location</p>
+              </Popup>
+            </Marker>
+          )}
           <MarkerClusterGroup chunkedLoading maxClusterRadius={50}>
             {locatedItems.map((item) => (
               <Marker

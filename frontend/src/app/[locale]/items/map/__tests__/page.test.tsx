@@ -6,6 +6,20 @@ vi.mock("@/lib/api", () => ({ default: { get: vi.fn() } }));
 vi.mock("@/lib/auth", () => ({
   isAuthenticated: vi.fn(() => true),
   getUser: vi.fn(() => ({ id: 1, name: "Test", email: "t@t.com", trustScore: 4.5 })),
+  getToken: vi.fn(() => "mock-token"),
+  clearAuth: vi.fn(),
+  saveAuth: vi.fn(),
+}));
+
+const mapTranslations: Record<string, string> = {
+  "itemMap.title": "Search by Map",
+  "itemMap.subtitle": "Discover tools near you",
+  "itemMap.loading": "Loading map...",
+};
+
+vi.mock("next-intl", () => ({
+  useLocale: vi.fn(() => "en"),
+  useTranslations: vi.fn(() => (key: string) => mapTranslations[key] || key),
 }));
 vi.mock("@/components/layout/Navbar", () => ({
   default: () => <nav data-testid="navbar">Navbar</nav>,

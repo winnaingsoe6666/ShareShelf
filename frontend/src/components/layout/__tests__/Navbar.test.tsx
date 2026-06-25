@@ -8,6 +8,8 @@ vi.mock("@/lib/auth", () => ({
   getUser: vi.fn(() => ({ id: 1, name: "Test User", email: "test@test.com", trustScore: 4.5 })),
   clearAuth: vi.fn(),
   isAuthenticated: vi.fn(() => true),
+  getToken: vi.fn(() => "mock-token"),
+  saveAuth: vi.fn(),
 }));
 
 vi.mock("@/lib/api", () => ({

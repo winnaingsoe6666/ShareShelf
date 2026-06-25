@@ -48,6 +48,6 @@ vi.mock("react-leaflet", () => ({
 }));
 
 vi.mock("react-leaflet-cluster", () => ({
-  MarkerClusterGroup: ({ children, ...props }: any) =>
+  default: ({ children, ...props }: any) =>
     React.createElement("div", { "data-testid": "marker-cluster", ...props }, children),
 }));
