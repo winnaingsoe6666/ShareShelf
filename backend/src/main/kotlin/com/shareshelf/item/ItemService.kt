@@ -9,9 +9,6 @@ import com.shareshelf.item.dto.UpdateItemRequest
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
-import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.GeometryFactory
-import org.locationtech.jts.geom.PrecisionModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -24,7 +21,6 @@ class ItemService(
     private val categoryRepository: CategoryRepository,
     private val objectMapper: ObjectMapper
 ) {
-    private val geometryFactory = GeometryFactory(PrecisionModel(), 4326)
 
     fun create(request: CreateItemRequest, ownerId: Long): ItemResponse {
         val user = userRepository.findById(ownerId)
@@ -41,7 +37,8 @@ class ItemService(
         )
 
         if (request.latitude != null && request.longitude != null) {
-            item.location = geometryFactory.createPoint(Coordinate(request.longitude, request.latitude))
+            item.latitude = request.latitude
+            item.longitude = request.longitude
         }
 
         val saved = itemRepository.save(item)
@@ -161,8 +158,8 @@ class ItemService(
             status = item.status,
             imageUrls = parseJsonArray(item.imageUrls),
             createdAt = item.createdAt,
-            latitude = item.location?.y,
-            longitude = item.location?.x
+            latitude = item.latitude,
+            longitude = item.longitude
         )
     }
 

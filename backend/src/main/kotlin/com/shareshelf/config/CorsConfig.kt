@@ -14,11 +14,10 @@ class CorsConfig(
 
     @Bean
     fun corsFilter(): CorsFilter {
+        val origins = allowedOrigins.split(",").map { it.trim() }
         val config = CorsConfiguration().apply {
             allowCredentials = true
-            allowedOrigins = allowedOrigins
-                .split(",")
-                .map { it.trim() }
+            allowedOrigins = origins
             allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             allowedHeaders = listOf("*")
             exposedHeaders = listOf("Authorization")

@@ -41,19 +41,18 @@ interface ItemRepository : JpaRepository<Item, Long> {
     fun findTopLenders(pageable: Pageable): List<Array<Any>>
 
     @Query(
-        value = """SELECT i.*, ST_Distance(i.location::geography,
-                  ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) as distance
+        value = """SELECT i.*,
+                  (6371000 * acos(
+                    cos(radians(:lat)) * cos(radians(i.latitude)) *
+                    cos(radians(i.longitude) - radians(:lng)) +
+                    sin(radians(:lat)) * sin(radians(i.latitude))
+                  )) AS distance
                   FROM items i
-                  WHERE i.location IS NOT NULL
-                  AND ST_DWithin(i.location::geography,
-                      ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
-                      :radius)
+                  WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
+                  HAVING distance <= :radius
                   ORDER BY distance""",
         countQuery = """SELECT COUNT(*) FROM items i
-                       WHERE i.location IS NOT NULL
-                       AND ST_DWithin(i.location::geography,
-                           ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
-                           :radius)""",
+                       WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL""",
         nativeQuery = true
     )
     fun findNearby(
