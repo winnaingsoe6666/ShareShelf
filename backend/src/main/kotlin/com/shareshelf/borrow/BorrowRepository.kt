@@ -13,6 +13,7 @@ interface BorrowRepository : JpaRepository<BorrowRequest, Long> {
     fun findByOwnerId(ownerId: Long, pageable: Pageable): Page<BorrowRequest>
     fun findByItemId(itemId: Long): List<BorrowRequest>
     fun findByItemIdAndBorrowerIdAndStatus(itemId: Long, borrowerId: Long, status: BorrowStatus): List<BorrowRequest>
+    fun findByItemIdAndBorrowerId(itemId: Long, borrowerId: Long): List<BorrowRequest>
     fun countByStatus(status: BorrowStatus): Long
 
     @Query(

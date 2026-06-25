@@ -4,9 +4,11 @@ import { Link } from "@/i18n/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star } from "lucide-react";
+import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star, MessageSquare } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
 import api from "@/lib/api";
+import { getUnreadCount } from "@/lib/chat";
+import { useChatSocket } from "@/lib/useChatSocket";
 import type { Notification } from "@/types";
 
 const notificationIcons: Record<string, React.ReactNode> = {
@@ -37,11 +39,33 @@ export default function Navbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
-  const user = getUser();
-  const loggedIn = isAuthenticated();
 
-  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
+  useEffect(() => { setMounted(true); }, []);
+
+  const user = mounted ? getUser() : null;
+  const loggedIn = mounted ? isAuthenticated() : false;
+
+  // Chat WebSocket for real-time unread updates
+  const fetchChatUnread = useCallback(() => {
+    if (!loggedIn) return;
+    getUnreadCount()
+      .then((data) => setChatUnreadCount(data.conversationsWithUnread))
+      .catch(() => {});
+  }, [loggedIn]);
+
+  useChatSocket({
+    userId: user?.id ?? null,
+    onMessage: () => {},
+    onUnreadUpdate: fetchChatUnread,
+  });
+
+  const isActive = (path: string) => {
+    if (path === "/items") return pathname === "/items";
+    return pathname === path || pathname?.startsWith(path + "/");
+  };
 
   const fetchUnreadCount = useCallback(() => {
     if (!loggedIn) return;
@@ -63,6 +87,13 @@ export default function Navbar() {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
+
+  // Fetch chat unread count on mount and poll every 30s
+  useEffect(() => {
+    fetchChatUnread();
+    const interval = setInterval(fetchChatUnread, 30000);
+    return () => clearInterval(interval);
+  }, [fetchChatUnread]);
 
   // Close notification dropdown on outside click
   useEffect(() => {
@@ -113,14 +144,14 @@ export default function Navbar() {
   };
 
   const navLinkClass = (path: string) =>
-    `text-sm font-medium transition-colors duration-200 py-1 ${
+    `${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium transition-colors duration-200 py-1 ${
       isActive(path)
         ? "text-purple-700 font-semibold border-b-2 border-purple-600"
         : "text-stone-600 hover:text-purple-700"
     }`;
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-purple-200 bg-purple-50/90 backdrop-blur supports-[backdrop-filter]:bg-purple-50/80">
+    <nav className={`sticky top-0 z-40 border-b border-purple-200 bg-purple-50/90 backdrop-blur supports-[backdrop-filter]:bg-purple-50/80 ${locale === 'my' ? 'font-[family-name:var(--font-family-myanmar)]' : ''}`}>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-purple-700">
           <Share2 className="h-7 w-7" />
@@ -159,6 +190,17 @@ export default function Navbar() {
               </Link>
               <Link href="/borrow" className={navLinkClass("/borrow")}>
                 {t("nav.myBorrows")}
+              </Link>
+
+              {/* Messages with unread badge */}
+              <Link href="/messages" className={`relative ${navLinkClass("/messages")}`}>
+                <MessageSquare className="h-4 w-4 inline mr-1" />
+                {t("nav.messages")}
+                {chatUnreadCount > 0 && (
+                  <span className="absolute -top-1 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
+                    {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                  </span>
+                )}
               </Link>
 
               {/* Notification bell */}
@@ -230,7 +272,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
+                className={`cursor-pointer rounded-lg px-3 py-1.5 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-stone-600 hover:bg-purple-100 transition-colors`}
               >
                 {t("nav.logOut")}
               </button>
@@ -239,13 +281,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-purple-100 transition-colors"
+                className={`rounded-lg px-3 py-1.5 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-stone-600 hover:bg-purple-100 transition-colors`}
               >
                 {t("nav.logIn")}
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px"
+                className={`rounded-lg bg-green-600 px-4 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px`}
               >
                 {t("nav.signUp")}
               </Link>
@@ -271,19 +313,28 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="animate-slide-up border-t border-purple-200 px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-2">
-            <Link href="/items" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.browse")}</Link>
+            <Link href="/items" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.browse")}</Link>
             {loggedIn ? (
               <>
-                <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.community")}</Link>
-                <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.addItem")}</Link>
-                <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.myBorrows")}</Link>
-                <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.profile")}</Link>
-                <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors cursor-pointer">{t("nav.logOut")}</button>
+                <Link href="/community" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.community")}</Link>
+                <Link href="/items/new" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.addItem")}</Link>
+                <Link href="/borrow" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.myBorrows")}</Link>
+                <Link href="/messages" onClick={() => setMobileOpen(false)} className={`relative rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors flex items-center gap-2`}>
+                  <MessageSquare className="h-4 w-4" />
+                  {t("nav.messages")}
+                  {chatUnreadCount > 0 && (
+                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
+                      {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                    </span>
+                  )}
+                </Link>
+                <Link href="/profile" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.profile")}</Link>
+                <button onClick={handleLogout} className={`rounded px-3 py-2 text-left ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors cursor-pointer`}>{t("nav.logOut")}</button>
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.logIn")}</Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded bg-green-600 px-3 py-2 text-center text-sm text-white">{t("nav.signUp")}</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.logIn")}</Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className={`rounded bg-green-600 px-3 py-2 text-center ${locale === 'my' ? 'text-xs' : 'text-sm'} text-white`}>{t("nav.signUp")}</Link>
               </>
             )}
 

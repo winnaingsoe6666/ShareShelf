@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   Plus,
@@ -19,7 +20,9 @@ import {
   Filter,
   Star,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
+import DistanceFilter from "@/components/map/DistanceFilter";
 import Navbar from "@/components/layout/Navbar";
 import ItemCard from "@/components/items/ItemCard";
 import Skeleton from "@/components/ui/Skeleton";
@@ -37,14 +40,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
   "Home & Kitchen": <Home className="h-4 w-4" />,
 };
 
-const ratingOptions = [
-  { value: undefined, label: "Any Rating" },
-  { value: 4, label: "4+ Stars" },
-  { value: 3, label: "3+ Stars" },
-  { value: 2, label: "2+ Stars" },
-];
-
 export default function BrowseItemsPage() {
+  const t = useTranslations();
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,8 +50,18 @@ export default function BrowseItemsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [minRating, setMinRating] = useState<number | undefined>(undefined);
+  const [nearLat, setNearLat] = useState<number | undefined>(undefined);
+  const [nearLng, setNearLng] = useState<number | undefined>(undefined);
+  const [nearRadius, setNearRadius] = useState<number | undefined>(undefined);
   const [error, setError] = useState("");
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  const ratingOptions = [
+    { value: undefined, label: t("items.ratingAny") },
+    { value: 4, label: t("items.rating4Plus") },
+    { value: 3, label: t("items.rating3Plus") },
+    { value: 2, label: t("items.rating2Plus") },
+  ];
 
   // Debounce search input
   const handleSearchChange = useCallback((value: string) => {
@@ -82,6 +89,9 @@ export default function BrowseItemsPage() {
       categoryId: selectedCat?.id,
       status: statusFilter || undefined,
       minRating,
+      nearLat,
+      nearLng,
+      nearRadius,
       size: 50,
     };
 
@@ -95,7 +105,7 @@ export default function BrowseItemsPage() {
       .then((res) => setItems(res.data.data?.content ?? []))
       .catch(() => setError("Failed to load items"))
       .finally(() => setLoading(false));
-  }, [debouncedSearch, selectedCategory, statusFilter, minRating, categories]);
+  }, [debouncedSearch, selectedCategory, statusFilter, minRating, nearLat, nearLng, nearRadius, categories]);
 
   useEffect(() => {
     if (categories.length > 0 || selectedCategory === "") {
@@ -111,16 +121,25 @@ export default function BrowseItemsPage() {
         <div className="mb-8 rounded-2xl bg-white border border-purple-200 shadow-md p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-heading text-3xl font-bold text-purple-900">Browse Tools</h1>
-              <p className="mt-2 text-stone-600">Discover tools shared by your community</p>
+              <h1 className="font-heading text-3xl font-bold text-purple-900">{t("items.browseTitle")}</h1>
+              <p className="mt-2 text-stone-600">{t("items.browseSubtitle")}</p>
             </div>
-            <Link
-              href="/items/new"
-              className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px cursor-pointer"
-            >
-              <Plus className="h-4 w-4" />
-              Add Item
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/items/map"
+                className="inline-flex items-center gap-1 rounded-lg border border-purple-300 px-4 py-2 text-sm font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200"
+              >
+                <MapPin className="h-4 w-4" />
+                View on Map
+              </Link>
+              <Link
+                href="/items/new"
+                className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                {t("items.addItem")}
+              </Link>
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -128,7 +147,7 @@ export default function BrowseItemsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
               <input
                 type="text"
-                placeholder="Search items..."
+                placeholder={t("items.search")}
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="block w-full rounded-lg border border-purple-200 pl-10 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200"
@@ -147,7 +166,7 @@ export default function BrowseItemsPage() {
               }`}
             >
               <Grid3X3 className="h-3.5 w-3.5" />
-              All
+              {t("items.allCategories")}
             </button>
             {categories.map((cat) => (
               <button
@@ -172,9 +191,9 @@ export default function BrowseItemsPage() {
             {/* Status filter */}
             <div className="flex gap-1">
               {[
-                { value: "", label: "All", icon: <Grid3X3 className="h-3.5 w-3.5" /> },
-                { value: "available", label: "Available", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
-                { value: "borrowed", label: "Borrowed", icon: <Search className="h-3.5 w-3.5" /> },
+                { value: "", label: t("items.statusAll"), icon: <Grid3X3 className="h-3.5 w-3.5" /> },
+                { value: "available", label: t("items.statusAvailable"), icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
+                { value: "borrowed", label: t("items.statusBorrowed"), icon: <Search className="h-3.5 w-3.5" /> },
               ].map((opt) => (
                 <button
                   key={opt.value}
@@ -190,6 +209,15 @@ export default function BrowseItemsPage() {
                 </button>
               ))}
             </div>
+
+            <span className="text-stone-300">|</span>
+            <DistanceFilter
+              onLocationChange={(lat, lng, radius) => {
+                setNearLat(lat);
+                setNearLng(lng);
+                setNearRadius(radius);
+              }}
+            />
 
             <span className="text-stone-300">|</span>
 
@@ -243,8 +271,8 @@ export default function BrowseItemsPage() {
             <div className="py-16 text-center text-stone-500">
               <SearchX className="h-12 w-12 mx-auto mb-3 text-stone-300" />
               <p>
-                No items found. Try a different search or{" "}
-                <Link href="/items/new" className="text-purple-600 hover:underline">add one</Link>.
+                {t("items.noItemsFound")}{" "}
+                <Link href="/items/new" className="text-purple-600 hover:underline">{t("items.addOne")}</Link>.
               </p>
             </div>
           ) : (

@@ -1,4 +1,5 @@
 import { Image, User } from "lucide-react";
+import DistanceBadge from "@/components/map/DistanceBadge";
 import { Link } from "@/i18n/navigation";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -36,6 +37,9 @@ export default function ItemCard({ item }: ItemCardProps) {
           </div>
           {item.categoryName && (
             <p className="mt-1 text-xs text-stone-500">{item.categoryName}</p>
+          )}
+          {item.distance != null && (
+            <DistanceBadge meters={item.distance} className="mt-1" />
           )}
           <div className="mt-3 flex items-center justify-between">
             <span className="text-sm font-medium text-purple-700">{formatPrice(item.dailyPrice)}</span>

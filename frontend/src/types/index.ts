@@ -33,6 +33,9 @@ export interface Item {
   status: ItemStatus;
   imageUrls: string[];
   createdAt: string;
+  latitude?: number;
+  longitude?: number;
+  distance?: number;
 }
 
 export interface BorrowRequest {
@@ -89,4 +92,40 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   errors?: string[];
+}
+
+// Chat types
+
+export interface ChatMessage {
+  id: number;
+  senderId: number;
+  receiverId: number;
+  itemId: number;
+  message: string;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface Conversation {
+  itemId: number;
+  itemTitle: string;
+  itemImageUrl: string | null;
+  otherUserId: number;
+  otherUserName: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+}
+
+export interface ConversationDetail {
+  itemId: number;
+  itemTitle: string;
+  itemImageUrl: string | null;
+  otherUserId: number;
+  otherUserName: string;
+  messages: ChatMessage[];
+}
+
+export interface UnreadCount {
+  conversationsWithUnread: number;
 }

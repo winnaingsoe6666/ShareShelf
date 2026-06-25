@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Package, User, Calendar, Clock, Inbox, CheckCircle2 } from "lucide-react";
+import { Package, User, Calendar, Clock, Inbox, CheckCircle2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Skeleton from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import api from "@/lib/api";
+import { useTranslations } from "next-intl";
 import { getUser, isAuthenticated } from "@/lib/auth";
 import { formatDate } from "@/lib/utils";
 import type { BorrowRequest } from "@/types";
@@ -29,6 +30,7 @@ export default function BorrowPage() {
   const [error, setError] = useState<string>("");
   const [actionError, setActionError] = useState<string>("");
   const [confirmedAction, setConfirmedAction] = useState<number | null>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     if (typeof window !== "undefined" && !isAuthenticated()) {
@@ -38,10 +40,10 @@ export default function BorrowPage() {
     api.get("/borrow")
       .then((res) => setRequests(res.data.data?.content ?? []))
       .catch(() => {
-        setError("Failed to load borrow requests. Please try again.");
+        setError(t("borrowPage.failedToLoad"));
       })
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [router, t]);
 
   useEffect(() => {
     if (actionError) {
@@ -116,20 +118,20 @@ export default function BorrowPage() {
     <>
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="font-heading text-3xl font-bold text-purple-900">My Borrows</h1>
+        <h1 className="font-heading text-3xl font-bold text-purple-900">{t("borrowPage.title")}</h1>
 
         <div className="mt-6 flex gap-2 border-b border-purple-200">
-          {(["borrowed", "lent"] as const).map((t) => (
+          {(["borrowed", "lent"] as const).map((tabKey) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
               className={`px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${
-                tab === t
+                tab === tabKey
                   ? "border-b-2 border-purple-600 text-purple-700"
                   : "text-stone-500 hover:text-stone-700"
               }`}
             >
-              {t === "borrowed" ? "Items I&apos;m Borrowing" : "Items I&apos;m Lending"}
+              {tabKey === "borrowed" ? t("borrowPage.borrowing") : t("borrowPage.lending")}
             </button>
           ))}
         </div>
@@ -145,7 +147,7 @@ export default function BorrowPage() {
           {filtered.length === 0 ? (
             <div className="py-16 text-center text-stone-500">
               <Inbox className="h-12 w-12 mx-auto mb-3 text-stone-300" />
-              <p>No requests found.</p>
+              <p>{tab === "borrowed" ? t("borrowPage.noBorrowing") : t("borrowPage.noLending")}</p>
             </div>
           ) : (
             filtered.map((req) => (
@@ -159,7 +161,7 @@ export default function BorrowPage() {
                     </div>
                     <p className="mt-1 text-sm text-stone-600">
                       <User className="h-4 w-4 inline mr-1.5 text-stone-400" />
-                      {tab === "borrowed" ? `Owner: ${req.ownerName}` : `Borrower: ${req.borrowerName}`}
+                      {tab === "borrowed" ? `${t("borrow.owner")}: ${req.ownerName}` : `${t("borrower")}: ${req.borrowerName}`}
                     </p>
                     {req.startDate && (
                       <p className="text-sm text-stone-500">
@@ -172,22 +174,32 @@ export default function BorrowPage() {
                     )}
                     <p className="mt-1 text-xs text-stone-400">
                       <Clock className="h-4 w-4 inline mr-1.5 text-stone-400" />
-                      Requested {formatDate(req.createdAt)}
+                      {t("borrowPage.requestedOn")} {formatDate(req.createdAt)}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => {
+                        const otherUserId = tab === "borrowed" ? req.ownerId : req.borrowerId;
+                        router.push(`/messages?itemId=${req.itemId}&userId=${otherUserId}`);
+                      }}
+                      className="cursor-pointer rounded-lg p-1.5 text-stone-400 hover:text-emerald-500 hover:bg-emerald-50 transition-colors"
+                      aria-label={t("borrowPage.chat")}
+                    >
+                      <MessageSquare className="h-5 w-5" />
+                    </button>
                     {confirmedAction === req.id ? (
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
                     ) : (
                       <>
                         {tab === "lent" && req.status === "pending" && (
                           <>
-                            <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "approve")}>Approve</Button>
-                            <Button size="sm" variant="danger" onClick={() => handleAction(req.id, "reject")}>Reject</Button>
+                            <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "approve")}>{t("borrow.approve")}</Button>
+                            <Button size="sm" variant="danger" onClick={() => handleAction(req.id, "reject")}>{t("borrow.reject")}</Button>
                           </>
                         )}
                         {tab === "lent" && req.status === "approved" && (
-                          <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "return")}>Mark Returned</Button>
+                          <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "return")}>{t("borrow.markReturned")}</Button>
                         )}
                       </>
                     )}

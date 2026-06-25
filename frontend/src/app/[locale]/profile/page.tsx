@@ -8,6 +8,7 @@ import Card from "@/components/ui/Card";
 import Skeleton from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import api from "@/lib/api";
+import { useTranslations } from "next-intl";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
 import type { Item, Review } from "@/types";
 
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [items, setItems] = useState<Item[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations();
 
   useEffect(() => {
     if (typeof window !== "undefined" && !isAuthenticated()) {
@@ -75,7 +77,7 @@ export default function ProfilePage() {
       </main>
     </>
   );
-  if (!user) return <><Navbar /><p className="py-24 text-center text-stone-500">Not logged in</p></>;
+  if (!user) return <><Navbar /><p className="py-24 text-center text-stone-500">{t("profilePage.notLoggedIn")}</p></>;
 
   const handleLogout = () => {
     clearAuth();
@@ -91,17 +93,17 @@ export default function ProfilePage() {
           <Card className="p-4 text-center">
             <Package className="h-5 w-5 text-purple-500 mx-auto mb-1" />
             <p className="text-2xl font-bold text-purple-900">{items.length}</p>
-            <p className="text-xs text-stone-500 mt-0.5">Items Listed</p>
+            <p className="text-xs text-stone-500 mt-0.5">{t("profilePage.itemsListed")}</p>
           </Card>
           <Card className="p-4 text-center">
             <Star className="h-5 w-5 text-amber-500 mx-auto mb-1 fill-amber-500" />
             <p className="text-2xl font-bold text-purple-900">{user.trustScore.toFixed(1)}</p>
-            <p className="text-xs text-stone-500 mt-0.5">Trust Score</p>
+            <p className="text-xs text-stone-500 mt-0.5">{t("profilePage.trustScore")}</p>
           </Card>
           <Card className="p-4 text-center">
             <MessageSquare className="h-5 w-5 text-purple-500 mx-auto mb-1" />
             <p className="text-2xl font-bold text-purple-900">{reviews.length}</p>
-            <p className="text-xs text-stone-500 mt-0.5">Reviews</p>
+            <p className="text-xs text-stone-500 mt-0.5">{t("profilePage.reviews")}</p>
           </Card>
         </div>
 
@@ -143,11 +145,11 @@ export default function ProfilePage() {
 
         {/* My Items */}
         <section className="mt-8">
-          <h2 className="font-heading text-xl font-semibold text-purple-900">My Items ({items.length})</h2>
+          <h2 className="font-heading text-xl font-semibold text-purple-900">{t("profilePage.myItems")} ({items.length})</h2>
           {items.length === 0 ? (
             <div className="mt-6 text-center text-stone-500">
               <Package className="h-10 w-10 mx-auto mb-2 text-stone-300" />
-              <p className="text-sm">You haven&apos;t listed any items yet.</p>
+              <p className="text-sm">{t("profilePage.noItems")}</p>
             </div>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -163,11 +165,11 @@ export default function ProfilePage() {
 
         {/* Reviews */}
         <section className="mt-8">
-          <h2 className="font-heading text-xl font-semibold text-purple-900">Reviews ({reviews.length})</h2>
+          <h2 className="font-heading text-xl font-semibold text-purple-900">{t("profilePage.reviews")} ({reviews.length})</h2>
           {reviews.length === 0 ? (
             <div className="mt-6 text-center text-stone-500">
               <MessageSquare className="h-10 w-10 mx-auto mb-2 text-stone-300" />
-              <p className="text-sm">No reviews yet.</p>
+              <p className="text-sm">{t("profilePage.noReviews")}</p>
             </div>
           ) : (
             <div className="mt-4 space-y-3">

@@ -10,6 +10,12 @@ vi.mock("@/lib/auth", () => ({
   getUser: vi.fn(() => ({ id: 1, name: "Test User", email: "t@t.com", trustScore: 4.5, community: "Downtown" })),
   saveAuth: vi.fn(),
   clearAuth: vi.fn(),
+  getToken: vi.fn(() => "mock-token"),
+}));
+
+vi.mock("next-intl", () => ({
+  useLocale: vi.fn(() => "en"),
+  useTranslations: vi.fn(() => (key: string) => key),
 }));
 vi.mock("next/navigation", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/navigation")>()),

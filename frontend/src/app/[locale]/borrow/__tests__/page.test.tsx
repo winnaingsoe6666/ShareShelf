@@ -36,9 +36,12 @@ vi.mock("@/lib/api", () => ({
 vi.mock("@/lib/auth", () => ({
   isAuthenticated: vi.fn(() => true),
   getUser: vi.fn(() => mockUser),
+  getToken: vi.fn(() => "mock-token"),
+  clearAuth: vi.fn(),
+  saveAuth: vi.fn(),
 }));
 
-// Mock nav translations so Navbar renders with translations
+// Mock nav + borrow translations so Navbar and page render with translations
 const navTranslations: Record<string, string> = {
   "nav.browse": "Browse",
   "nav.community": "Community",
@@ -51,6 +54,25 @@ const navTranslations: Record<string, string> = {
   "nav.notifications": "Notifications",
   "nav.markAllRead": "Mark all read",
   "nav.noNotifications": "No notifications",
+  "borrow.title": "My Borrows",
+  "borrow.borrowing": "Items I'm Borrowing",
+  "borrow.lending": "Items I'm Lending",
+  "borrow.noRequests": "No requests found.",
+  "borrow.owner": "Owner",
+  "borrow.borrower": "Borrower",
+  "borrow.requested": "Requested",
+  "borrow.approve": "Approve",
+  "borrow.reject": "Reject",
+  "borrow.markReturned": "Mark Returned",
+  "borrow.failedToLoad": "Failed to load borrow requests. Please try again.",
+  "borrowPage.title": "My Borrows",
+  "borrowPage.borrowing": "Borrowing",
+  "borrowPage.lending": "Lending",
+  "borrowPage.noBorrowing": "You haven't borrowed anything yet.",
+  "borrowPage.noLending": "No one has borrowed your items yet.",
+  "borrowPage.requestedOn": "Requested",
+  "borrowPage.chat": "Chat",
+  "borrowPage.failedToLoad": "Failed to load borrow requests.",
 };
 
 vi.mock("next-intl", () => ({
@@ -102,8 +124,8 @@ describe("BorrowPage", () => {
       expect(screen.queryByText("Drill")).toBeInTheDocument();
     });
 
-    // Click "Items I'm Lending" tab (use regex to handle &apos; encoding)
-    fireEvent.click(screen.getByText(/Items I.*m Lending/));
+    // Click "Lending" tab
+    fireEvent.click(screen.getByRole("button", { name: "Lending" }));
 
     await waitFor(() => {
       // Only requests where ownerId === 5 (current user) should appear
@@ -123,7 +145,7 @@ describe("BorrowPage", () => {
     render(<BorrowPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("No requests found.")).toBeInTheDocument();
+      expect(screen.getByText("You haven't borrowed anything yet.")).toBeInTheDocument();
     });
   });
 
@@ -136,12 +158,12 @@ describe("BorrowPage", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Failed to load borrow requests. Please try again.")
+        screen.getByText("Failed to load borrow requests.")
       ).toBeInTheDocument();
     });
 
     // Error banner should use the established red-50 pattern
-    const errorBanner = screen.getByText("Failed to load borrow requests. Please try again.");
+    const errorBanner = screen.getByText("Failed to load borrow requests.");
     expect(errorBanner.className).toContain("bg-red-50");
     expect(errorBanner.className).toContain("text-red-700");
   });
@@ -173,7 +195,7 @@ describe("BorrowPage", () => {
     });
 
     // Switch to lent tab so Approve button for Ladder is visible
-    fireEvent.click(screen.getByText(/Items I.*m Lending/));
+    fireEvent.click(screen.getByRole("button", { name: "Lending" }));
 
     await waitFor(() => {
       expect(screen.getByText("Approve")).toBeInTheDocument();

@@ -16,6 +16,17 @@ spring:
       ddl-auto: validate
   flyway:
     clean-disabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
   servlet:
     multipart:
       max-file-size: 10MB
@@ -29,6 +40,13 @@ logging:
 
 app:
   upload-dir: uploads
+  frontend-url: ${FRONTEND_URL}
+  r2:
+    endpoint: ${R2_ENDPOINT}
+    access-key-id: ${R2_ACCESS_KEY_ID}
+    secret-access-key: ${R2_SECRET_ACCESS_KEY}
+    bucket: ${R2_BUCKET}
+    public-url: ${R2_PUBLIC_URL}
 
 springdoc:
   api-docs:

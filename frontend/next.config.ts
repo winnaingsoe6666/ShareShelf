@@ -19,20 +19,21 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.vercel.app",
       },
+      {
+        // Cloudflare R2 public bucket domain
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+      },
+      {
+        // Cloudflare R2 custom domain (if configured)
+        protocol: "https",
+        hostname: "**.r2.dev",
+      },
     ],
   },
-  // Backward compatibility: redirect old non-locale URLs to /en
-  async redirects() {
-    return [
-      { source: "/items", destination: "/en/items", permanent: true },
-      { source: "/items/:path*", destination: "/en/items/:path*", permanent: true },
-      { source: "/community", destination: "/en/community", permanent: true },
-      { source: "/borrow", destination: "/en/borrow", permanent: true },
-      { source: "/profile", destination: "/en/profile", permanent: true },
-      { source: "/login", destination: "/en/login", permanent: true },
-      { source: "/register", destination: "/en/register", permanent: true },
-    ];
-  },
+  // No manual locale redirects needed — next-intl middleware handles locale routing
+  // with localePrefix: 'as-needed', the default locale (en) has no prefix,
+  // and other locales get prefixed automatically.
   async rewrites() {
     return [
       {

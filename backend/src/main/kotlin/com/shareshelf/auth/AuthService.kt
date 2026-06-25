@@ -5,6 +5,7 @@ import com.shareshelf.auth.dto.LoginRequest
 import com.shareshelf.auth.dto.RegisterRequest
 import com.shareshelf.auth.entity.RefreshToken
 import com.shareshelf.auth.entity.RefreshTokenRepository
+import com.shareshelf.auth.entity.AuthProvider
 import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
 import jakarta.persistence.EntityNotFoundException
@@ -59,6 +60,11 @@ class AuthService(
         // Check if account is temporarily locked
         if (user.lockedUntil?.isAfter(LocalDateTime.now()) == true) {
             throw BadCredentialsException("Account is temporarily locked due to too many failed login attempts. Please try again later.")
+        }
+
+        // Reject password login for Google-only users
+        if (user.authProvider == AuthProvider.GOOGLE && user.passwordHash.isNullOrEmpty()) {
+            throw BadCredentialsException("This account uses Google Sign-In. Please use Google to log in.")
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {

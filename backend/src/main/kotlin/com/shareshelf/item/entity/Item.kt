@@ -3,6 +3,7 @@ package com.shareshelf.item.entity
 import com.shareshelf.auth.entity.User
 import com.shareshelf.category.Category
 import jakarta.persistence.*
+import org.locationtech.jts.geom.Point
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -43,6 +44,9 @@ data class Item(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     var status: ItemStatus = ItemStatus.available,
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    var location: Point? = null,
 
     @Version
     var version: Long? = null,

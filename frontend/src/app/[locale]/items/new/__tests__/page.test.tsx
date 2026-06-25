@@ -9,6 +9,31 @@ vi.mock("@/lib/api", () => ({ default: { get: vi.fn(), post: vi.fn() } }));
 vi.mock("@/lib/auth", () => ({
   isAuthenticated: vi.fn(() => true),
   getUser: vi.fn(() => ({ id: 1, name: "Test", email: "t@t.com", trustScore: 4.5 })),
+  getToken: vi.fn(() => "mock-token"),
+  clearAuth: vi.fn(),
+  saveAuth: vi.fn(),
+}));
+
+const itemNewTranslations: Record<string, string> = {
+  "itemNew.title": "Add New Item",
+  "itemNew.itemTitle": "Item Title",
+  "itemNew.titlePlaceholder": "e.g., Power Drill, Camping Tent",
+  "itemNew.description": "Description",
+  "itemNew.descPlaceholder": "Describe your item...",
+  "itemNew.dailyPrice": "Daily Price (MMK)",
+  "itemNew.deposit": "Deposit Amount (MMK)",
+  "itemNew.category": "Category",
+  "itemNew.selectCategory": "Select a category",
+  "itemNew.location": "Location",
+  "itemNew.locationHint": "Click on the map to set your item's location",
+  "itemNew.images": "Images",
+  "itemNew.submit": "Create Item",
+  "itemNew.failed": "Failed to create item.",
+};
+
+vi.mock("next-intl", () => ({
+  useLocale: vi.fn(() => "en"),
+  useTranslations: vi.fn(() => (key: string) => itemNewTranslations[key] || key),
 }));
 vi.mock("next/navigation", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/navigation")>()),
@@ -16,6 +41,20 @@ vi.mock("next/navigation", async (importOriginal) => ({
 }));
 vi.mock("@/components/layout/Navbar", () => ({
   default: () => <nav data-testid="navbar">Navbar</nav>,
+}));
+vi.mock("next/dynamic", () => ({
+  default: () => {
+    const MockLocationPicker = ({ latitude, longitude, onChange, onClear, disabled }: any) => (
+      <div data-testid="location-picker">
+        <span data-testid="lp-lat">{String(latitude)}</span>
+        <span data-testid="lp-lng">{String(longitude)}</span>
+        <button data-testid="lp-set" onClick={() => onChange?.(16.84, 96.17)} disabled={disabled}>Set Location</button>
+        <button data-testid="lp-clear" onClick={() => onClear?.()} disabled={disabled}>Clear</button>
+      </div>
+    );
+    MockLocationPicker.displayName = "MockLocationPicker";
+    return MockLocationPicker;
+  },
 }));
 vi.mock("@/components/ui/ImageUpload", () => ({
   default: ({ images, onUpload, onRemove, disabled, uploading, maxFiles }: any) => (
@@ -43,8 +82,8 @@ describe("NewItemPage", () => {
     mockApiGet.mockResolvedValue({ data: { data: [{ id: 1, name: "Tools" }] } });
     renderPage();
     await waitFor(() => { expect(screen.getByText("Tools")).toBeTruthy(); });
-    expect(screen.getByText("List a New Item")).toBeTruthy();
-    expect(screen.getByText("Create Listing")).toBeTruthy();
+    expect(screen.getByText("Add New Item")).toBeTruthy();
+    expect(screen.getByText("Create Item")).toBeTruthy();
   });
 
   it("fetches categories from API on mount", async () => {
@@ -108,11 +147,11 @@ describe("NewItemPage", () => {
     await user.click(screen.getByTestId("image-upload-add"));
 
     // Fill in the title (required)
-    const titleInput = screen.getByLabelText("Title *");
+    const titleInput = screen.getByLabelText("Item Title *");
     await user.type(titleInput, "Test Item");
 
     // Submit the form
-    await user.click(screen.getByText("Create Listing"));
+    await user.click(screen.getByText("Create Item"));
 
     // Verify POST /items was called
     await waitFor(() => {

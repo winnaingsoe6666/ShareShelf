@@ -3,14 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Library } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import GoogleSignInButton from "@/components/ui/GoogleSignInButton";
+import AuthDivider from "@/components/ui/AuthDivider";
 import api from "@/lib/api";
 import { saveAuth, isAuthenticated } from "@/lib/auth";
 
 export default function LoginPage() {
+  const t = useTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated()) {
@@ -33,21 +39,21 @@ export default function LoginPage() {
         saveAuth(res.data.data);
         router.push("/items");
       } else {
-        setError(res.data.message || "Login failed");
+        setError(res.data.message || t("loginPage.failed"));
       }
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
         const status = axiosErr.response?.status;
         if (status === 429) {
-          setError("Too many attempts. Please wait and try again.");
+          setError(t("loginPage.failed"));
         } else if (status === 401) {
-          setError(axiosErr.response?.data?.message || "Invalid email or password");
+          setError(axiosErr.response?.data?.message || t("loginPage.failed"));
         } else {
-          setError("Invalid email or password");
+          setError(t("loginPage.failed"));
         }
       } else {
-        setError("Invalid email or password");
+        setError(t("loginPage.failed"));
       }
     } finally {
       setLoading(false);
@@ -68,15 +74,18 @@ export default function LoginPage() {
             <div className="h-1 bg-green-600 w-full" />
             <div className="p-8">
               {/* Header */}
-              <div className="mb-8 text-center">
+              <div className="mb-6 text-center">
                 <Library className="mx-auto h-12 w-12 text-purple-300" />
                 <h1 className="mt-4 font-heading text-3xl font-bold text-purple-900">
-                  Welcome back
+                  {t("loginPage.title")}
                 </h1>
                 <p className="mt-1 text-sm text-stone-600">
                   Sign in to your account
                 </p>
               </div>
+
+              <GoogleSignInButton text="Sign in with Google" />
+              <AuthDivider />
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -85,32 +94,39 @@ export default function LoginPage() {
                     {error}
                   </div>
                 )}
+                {searchParams.get("error") === "google_auth_failed" && !error && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    Google sign-in failed. Please try again.
+                  </div>
+                )}
                 <Input
-                  label="Email"
+                  label={t("loginPage.email")}
                   type="email"
+                  placeholder={t("loginPage.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
                 <Input
-                  label="Password"
+                  label={t("loginPage.password")}
                   type="password"
+                  placeholder={t("loginPage.passwordPlaceholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <Button type="submit" loading={loading} className="w-full">
-                  Sign In
+                  {loading ? t("loginPage.loggingIn") : t("loginPage.submit")}
                 </Button>
               </form>
 
               <p className="mt-6 text-center text-sm text-stone-600">
-                Don&apos;t have an account?{" "}
+                {t("loginPage.noAccount")}{" "}
                 <Link
                   href="/register"
                   className="font-medium text-purple-600 hover:text-purple-700 transition-colors duration-200"
                 >
-                  Sign up
+                  {t("loginPage.register")}
                 </Link>
               </p>
             </div>

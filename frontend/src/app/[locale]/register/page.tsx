@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { MapPin, Users } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import GoogleSignInButton from "@/components/ui/GoogleSignInButton";
+import AuthDivider from "@/components/ui/AuthDivider";
 import api from "@/lib/api";
 import { saveAuth, isAuthenticated } from "@/lib/auth";
 
@@ -19,7 +23,9 @@ const getStrength = (pwd: string): number => {
 };
 
 export default function RegisterPage() {
+  const t = useTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated()) {
@@ -51,14 +57,14 @@ export default function RegisterPage() {
         saveAuth(res.data.data);
         router.push("/items");
       } else {
-        setError(res.data.message || "Registration failed");
+        setError(res.data.message || t("registerPage.failed"));
       }
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const axiosErr = err as { response?: { data?: { message?: string } } };
-        setError(axiosErr.response?.data?.message || "Registration failed");
+        setError(axiosErr.response?.data?.message || t("registerPage.failed"));
       } else {
-        setError("Registration failed");
+        setError(t("registerPage.failed"));
       }
     } finally {
       setLoading(false);
@@ -79,15 +85,18 @@ export default function RegisterPage() {
             <div className="h-1 bg-green-600 w-full" />
             <div className="p-8">
               {/* Header */}
-              <div className="mb-8 text-center">
+              <div className="mb-6 text-center">
                 <Users className="mx-auto h-12 w-12 text-purple-300" />
                 <h1 className="mt-4 font-heading text-3xl font-bold text-purple-900">
-                  Join ShareShelf
+                  {t("registerPage.title")}
                 </h1>
                 <p className="mt-1 text-sm text-stone-600">
                   Join your community tool library
                 </p>
               </div>
+
+              <GoogleSignInButton text="Sign up with Google" />
+              <AuthDivider />
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,23 +105,31 @@ export default function RegisterPage() {
                     {error}
                   </div>
                 )}
+                {searchParams.get("error") === "google_auth_failed" && !error && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    Google sign-in failed. Please try again.
+                  </div>
+                )}
                 <Input
-                  label="Full Name"
+                  label={t("registerPage.name")}
+                  placeholder={t("registerPage.namePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
                 <Input
-                  label="Email"
+                  label={t("registerPage.email")}
                   type="email"
+                  placeholder={t("registerPage.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
                 <div className="space-y-1">
                   <Input
-                    label="Password"
+                    label={t("registerPage.password")}
                     type="password"
+                    placeholder={t("registerPage.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -156,27 +173,26 @@ export default function RegisterPage() {
                 {/* Community field with MapPin icon */}
                 <div className="space-y-1">
                   <label className="flex items-center gap-1 text-sm font-medium text-purple-800">
-                    <MapPin className="h-3.5 w-3.5" /> Community{" "}
-                    <span className="text-stone-400 font-normal">(optional)</span>
+                    <MapPin className="h-3.5 w-3.5" /> {t("registerPage.community")}
                   </label>
                   <Input
                     value={community}
                     onChange={(e) => setCommunity(e.target.value)}
-                    placeholder="e.g. Downtown, University, Apt 4B"
+                    placeholder={t("registerPage.communityPlaceholder")}
                   />
                 </div>
                 <Button type="submit" loading={loading} className="w-full">
-                  Create Account
+                  {loading ? t("registerPage.creating") : t("registerPage.submit")}
                 </Button>
               </form>
 
               <p className="mt-6 text-center text-sm text-stone-600">
-                Already have an account?{" "}
+                {t("registerPage.haveAccount")}{" "}
                 <Link
                   href="/login"
                   className="font-medium text-purple-600 hover:text-purple-700 transition-colors duration-200"
                 >
-                  Sign in
+                  {t("registerPage.login")}
                 </Link>
               </p>
             </div>

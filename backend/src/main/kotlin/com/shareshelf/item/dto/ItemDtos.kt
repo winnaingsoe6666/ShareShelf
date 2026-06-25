@@ -1,6 +1,8 @@
 package com.shareshelf.item.dto
 
 import com.shareshelf.item.entity.ItemStatus
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
@@ -17,7 +19,13 @@ data class CreateItemRequest(
 
     val dailyPrice: BigDecimal? = null,
 
-    val depositAmount: BigDecimal? = null
+    val depositAmount: BigDecimal? = null,
+
+    @field:Min(-90) @field:Max(90)
+    val latitude: Double? = null,
+
+    @field:Min(-180) @field:Max(180)
+    val longitude: Double? = null
 )
 
 data class UpdateItemRequest(
@@ -26,7 +34,9 @@ data class UpdateItemRequest(
     val categoryId: Long? = null,
     val dailyPrice: BigDecimal? = null,
     val depositAmount: BigDecimal? = null,
-    val status: ItemStatus? = null
+    val status: ItemStatus? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 data class ItemResponse(
@@ -42,5 +52,8 @@ data class ItemResponse(
     val depositAmount: BigDecimal?,
     val status: ItemStatus,
     val imageUrls: List<String>,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val distance: Double? = null
 )

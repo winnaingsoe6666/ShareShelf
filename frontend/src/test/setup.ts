@@ -28,3 +28,26 @@ vi.mock("next-intl/navigation", async () => {
     })),
   };
 });
+
+// Mock react-leaflet for jsdom (no window/document in test env)
+vi.mock("react-leaflet", () => ({
+  MapContainer: ({ children, className, ...props }: any) =>
+    React.createElement("div", { className, "data-testid": "map-container", ...props }, children),
+  TileLayer: ({ ...props }: any) =>
+    React.createElement("div", { "data-testid": "tile-layer", ...props }),
+  Marker: ({ children, position, ...props }: any) =>
+    React.createElement("div", { "data-testid": "marker", "data-lat": position?.[0], "data-lng": position?.[1], ...props }, children),
+  Popup: ({ children, ...props }: any) =>
+    React.createElement("div", { "data-testid": "popup", ...props }, children),
+  useMap: () => ({
+    setView: vi.fn(),
+    getCenter: () => ({ lat: 16.84, lng: 96.17 }),
+    getZoom: () => 14,
+  }),
+  useMapEvents: () => null,
+}));
+
+vi.mock("react-leaflet-cluster", () => ({
+  default: ({ children, ...props }: any) =>
+    React.createElement("div", { "data-testid": "marker-cluster", ...props }, children),
+}));

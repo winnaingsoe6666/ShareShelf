@@ -34,6 +34,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -48,6 +50,10 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.hibernate.orm:hibernate-spatial")
+
+    // Cloudflare R2 (S3-compatible storage)
+    implementation("software.amazon.awssdk:s3:2.25.0")
 
     // Dev tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
