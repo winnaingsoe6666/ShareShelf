@@ -21,8 +21,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${GOOGLE_CLIENT_ID:disabled}
+            client-secret: ${GOOGLE_CLIENT_SECRET:disabled}
             scope:
               - openid
               - profile
@@ -40,13 +40,13 @@ logging:
 
 app:
   upload-dir: uploads
-  frontend-url: ${FRONTEND_URL}
+  frontend-url: ${FRONTEND_URL:https://shareshelf.vercel.app}
   r2:
-    endpoint: ${R2_ENDPOINT}
-    access-key-id: ${R2_ACCESS_KEY_ID}
-    secret-access-key: ${R2_SECRET_ACCESS_KEY}
-    bucket: ${R2_BUCKET}
-    public-url: ${R2_PUBLIC_URL}
+    endpoint: ${R2_ENDPOINT:https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com}
+    access-key-id: ${R2_ACCESS_KEY_ID:disabled}
+    secret-access-key: ${R2_SECRET_ACCESS_KEY:disabled}
+    bucket: ${R2_BUCKET:shareshelf-images}
+    public-url: ${R2_PUBLIC_URL:https://YOUR_R2_PUBLIC_DOMAIN}
 
 springdoc:
   api-docs:
