@@ -1,27 +1,31 @@
 package com.shareshelf.storage
 
+import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 import org.springframework.mock.web.MockMultipartFile
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 class FileStorageServiceTest {
 
-    @TempDir
-    lateinit var tempDir: Path
+    private lateinit var s3Client: S3Client
+    private lateinit var service: FileStorageService
 
-    private fun createService(uploadDir: String): FileStorageService {
-        return FileStorageService(uploadDir)
+    private val bucket = "test-bucket"
+    private val publicUrl = "https://cdn.example.com"
+
+    @BeforeEach
+    fun setUp() {
+        s3Client = mockk(relaxed = true)
+        service = FileStorageService(s3Client, bucket, publicUrl)
     }
 
     @Test
-    fun `store saves file with UUID name and returns correct URL`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
+    fun `store uploads file to R2 and returns public URL`() {
         val file = MockMultipartFile(
             "file",
             "test-image.jpg",
@@ -31,24 +35,20 @@ class FileStorageServiceTest {
 
         val result = service.store(file, "items")
 
-        assertTrue(result.startsWith("/uploads/items/"))
+        assertTrue(result.startsWith("$publicUrl/items/"))
         assertTrue(result.endsWith(".jpg"))
         assertTrue(result.contains("-"))
 
-        val relativePath = result.removePrefix("/uploads/")
-        val savedPath = tempDir.resolve(relativePath)
-        assertTrue(Files.exists(savedPath))
-        assertEquals("test image content", Files.readString(savedPath))
-
-        service.delete(result)
-        assertFalse(Files.exists(savedPath))
+        verify {
+            s3Client.putObject(
+                any<PutObjectRequest>(),
+                any<RequestBody>()
+            )
+        }
     }
 
     @Test
     fun `store saves with png extension`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
         val file = MockMultipartFile(
             "file",
             "photo.png",
@@ -59,34 +59,11 @@ class FileStorageServiceTest {
         val result = service.store(file, "items")
 
         assertTrue(result.endsWith(".png"))
-        val relativePath = result.removePrefix("/uploads/")
-        assertTrue(Files.exists(tempDir.resolve(relativePath)))
-    }
-
-    @Test
-    fun `store creates subdirectory if not exists`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
-        val subDir = tempDir.resolve("items")
-        assertFalse(Files.exists(subDir))
-
-        val file = MockMultipartFile(
-            "file",
-            "photo.jpg",
-            "image/jpeg",
-            "content".toByteArray()
-        )
-
-        service.store(file, "items")
-        assertTrue(Files.exists(subDir))
+        assertTrue(result.startsWith("$publicUrl/items/"))
     }
 
     @Test
     fun `store rejects empty file`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
         val file = MockMultipartFile(
             "file",
             "empty.jpg",
@@ -102,9 +79,6 @@ class FileStorageServiceTest {
 
     @Test
     fun `store rejects unsupported extension exe`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
         val file = MockMultipartFile(
             "file",
             "malware.exe",
@@ -121,9 +95,6 @@ class FileStorageServiceTest {
 
     @Test
     fun `store rejects unsupported extension html`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
         val file = MockMultipartFile(
             "file",
             "page.html",
@@ -140,9 +111,6 @@ class FileStorageServiceTest {
 
     @Test
     fun `store accepts jpg jpeg png gif webp extensions`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
         val extensions = listOf("jpg", "jpeg", "png", "gif", "webp")
         for (ext in extensions) {
             val file = MockMultipartFile(
@@ -157,46 +125,21 @@ class FileStorageServiceTest {
     }
 
     @Test
-    fun `delete removes file`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
-        val file = MockMultipartFile(
-            "file",
-            "to-delete.jpg",
-            "image/jpeg",
-            "will be deleted".toByteArray()
-        )
-
-        val url = service.store(file, "items")
-        val relativePath = url.removePrefix("/uploads/")
-        val savedPath = tempDir.resolve(relativePath)
-        assertTrue(Files.exists(savedPath))
+    fun `delete calls s3Client deleteObject`() {
+        val url = "$publicUrl/items/some-file.jpg"
 
         service.delete(url)
-        assertFalse(Files.exists(savedPath))
-    }
 
-    @Test
-    fun `delete handles non-existent file gracefully`() {
-        val service = createService(tempDir.toString())
-        service.init()
-
-        // Should not throw — best-effort deletion
-        assertDoesNotThrow {
-            service.delete("/uploads/items/nonexistent-file.jpg")
+        verify {
+            s3Client.deleteObject(any<DeleteObjectRequest>())
         }
     }
 
     @Test
-    fun `init creates upload directory if not exists`() {
-        val uploadDir = tempDir.resolve("custom-uploads")
-        assertFalse(Files.exists(uploadDir))
-
-        val service = createService(uploadDir.toString())
-        service.init()
-
-        assertTrue(Files.exists(uploadDir))
-        assertTrue(Files.isDirectory(uploadDir))
+    fun `delete handles non-S3 URL gracefully`() {
+        // Should not throw — best-effort deletion
+        assertDoesNotThrow {
+            service.delete("/uploads/items/nonexistent-file.jpg")
+        }
     }
 }

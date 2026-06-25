@@ -46,7 +46,6 @@ class SecurityConfig(
                         "/login/oauth2/**"
                     ).permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**", "/api/categories", "/api/community/stats").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }

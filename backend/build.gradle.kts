@@ -51,6 +51,9 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.hibernate.orm:hibernate-spatial")
 
+    // Cloudflare R2 (S3-compatible storage)
+    implementation("software.amazon.awssdk:s3:2.25.0")
+
     // Dev tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
