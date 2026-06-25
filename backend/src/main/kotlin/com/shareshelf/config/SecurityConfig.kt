@@ -1,6 +1,8 @@
 package com.shareshelf.config
 
 import com.shareshelf.auth.JwtAuthenticationFilter
+import com.shareshelf.auth.OAuth2AuthenticationFailureHandler
+import com.shareshelf.auth.OAuth2AuthenticationSuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -18,7 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val rateLimitFilter: RateLimitFilter
+    private val rateLimitFilter: RateLimitFilter,
+    private val oAuth2SuccessHandler: OAuth2AuthenticationSuccessHandler,
+    private val oAuth2FailureHandler: OAuth2AuthenticationFailureHandler
 ) {
 
     @Bean
@@ -37,7 +41,9 @@ class SecurityConfig(
                         "/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/oauth2/**",
+                        "/login/oauth2/**"
                     ).permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**", "/api/categories", "/api/community/stats").permitAll()
                     .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
@@ -46,6 +52,13 @@ class SecurityConfig(
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter::class.java)
+            .oauth2Login { oauth2 ->
+                oauth2
+                    .authorizationEndpoint { it.baseUri("/oauth2/authorization") }
+                    .redirectionEndpoint { it.baseUri("/oauth2/callback/*") }
+                    .successHandler(oAuth2SuccessHandler)
+                    .failureHandler(oAuth2FailureHandler)
+            }
 
         return http.build()
     }
