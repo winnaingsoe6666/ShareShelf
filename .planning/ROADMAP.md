@@ -149,5 +149,5 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | 5. Community Features | 3/3 | Complete | 2026-06-19 |
 | 6. Location Search | 0/5 | Not started | - |
 | 7. Google OAuth Signup | 4/4 | Complete | 2026-06-25 |
-| 8. Photo Upload R2 Migration | 2/2 | Not started | - |
+| 8. Photo Upload R2 Migration | 2/2 | Complete | 2026-06-25 |
 | 9. In-App Chat | 4/4 | Not started | - |
