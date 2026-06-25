@@ -21,23 +21,28 @@ class R2Config(
 
     @Bean
     fun s3Client(): S3Client? {
-        if (endpoint.contains("YOUR_ACCOUNT_ID") || endpoint.contains("localhost:9000") && accessKeyId == "minioadmin") {
+        if (endpoint.contains("YOUR_ACCOUNT_ID") || accessKeyId == "disabled") {
             logger.warn("R2/S3 not configured — image upload disabled. Set R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY to enable.")
             return null
         }
-        return S3Client.builder()
-            .endpointOverride(URI.create(endpoint))
-            .credentialsProvider(
-                StaticCredentialsProvider.create(
-                    AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+        return try {
+            S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .credentialsProvider(
+                    StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+                    )
                 )
-            )
-            .region(Region.of("auto"))
-            .serviceConfiguration(
-                S3Configuration.builder()
-                    .pathStyleAccessEnabled(true)
-                    .build()
-            )
-            .build()
+                .region(Region.of("auto"))
+                .serviceConfiguration(
+                    S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build()
+                )
+                .build()
+        } catch (e: Exception) {
+            logger.error("Failed to create R2/S3 client: ${e.message}")
+            null
+        }
     }
 }
