@@ -19,7 +19,7 @@ data class User(
     var passwordHash: String = "",
 
     @Column(name = "google_id", unique = true)
-    val googleId: String? = null,
+    var googleId: String? = null,
 
     @Column(name = "auth_provider", nullable = false)
     @Enumerated(EnumType.STRING)
