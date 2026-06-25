@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Package, User, Calendar, Clock, Inbox, CheckCircle2 } from "lucide-react";
+import { Package, User, Calendar, Clock, Inbox, CheckCircle2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -176,6 +176,16 @@ export default function BorrowPage() {
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => {
+                        const otherUserId = tab === "borrowed" ? req.ownerId : req.borrowerId;
+                        router.push(`/messages?itemId=${req.itemId}&userId=${otherUserId}`);
+                      }}
+                      className="cursor-pointer rounded-lg p-1.5 text-stone-400 hover:text-emerald-500 hover:bg-emerald-50 transition-colors"
+                      aria-label="Open chat"
+                    >
+                      <MessageSquare className="h-5 w-5" />
+                    </button>
                     {confirmedAction === req.id ? (
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
                     ) : (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Image, Star, User, Shield, CheckCircle2 } from "lucide-react";
+import { Image, Star, User, Shield, CheckCircle2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -10,8 +10,10 @@ import Spinner from "@/components/ui/Spinner";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
 import ImageUpload from "@/components/ui/ImageUpload";
+import ChatWindow from "@/components/chat/ChatWindow";
 import api from "@/lib/api";
 import { getUser, isAuthenticated } from "@/lib/auth";
+import { useChatSocket } from "@/lib/useChatSocket";
 import { formatPrice, formatDate } from "@/lib/utils";
 import type { Item } from "@/types";
 
@@ -27,6 +29,15 @@ export default function ItemDetailPage() {
   const [borrowError, setBorrowError] = useState("");
   const [borrowSuccess, setBorrowSuccess] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [hasBorrowRequest, setHasBorrowRequest] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  const currentUser = getUser();
+  const { sendMessage } = useChatSocket({
+    userId: currentUser?.id ?? null,
+    onMessage: () => {},
+    onUnreadUpdate: () => {},
+  });
 
   useEffect(() => {
     api.get(`/items/${id}`)
@@ -34,6 +45,21 @@ export default function ItemDetailPage() {
       .catch(() => setError("Item not found"))
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Check if current user has a borrow request for this item
+  useEffect(() => {
+    if (!isAuthenticated()) return;
+    api.get("/borrow", { params: { itemId: id } })
+      .then((res) => {
+        const requests = res.data.data?.content ?? [];
+        const userHasRequest = requests.some(
+          (r: { itemId: number; borrowerId: number }) =>
+            r.itemId === Number(id) && r.borrowerId === currentUser?.id
+        );
+        setHasBorrowRequest(userHasRequest);
+      })
+      .catch(() => {});
+  }, [id, currentUser?.id]);
 
   const handleBorrow = async () => {
     if (!isAuthenticated()) {
@@ -139,6 +165,18 @@ export default function ItemDetailPage() {
                 )}
               </div>
             )}
+            {!isOwner && hasBorrowRequest && (
+              <div className="mt-4">
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  onClick={() => setShowChat(true)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Message Owner
+                </Button>
+              </div>
+            )}
             {isOwner && (
               <div className="mt-6 space-y-3">
                 <h3 className="font-heading text-lg font-semibold text-purple-800">Manage Images</h3>
@@ -186,6 +224,19 @@ export default function ItemDetailPage() {
             <Button className="w-full" loading={borrowing} onClick={handleBorrow}>
               Send Request
             </Button>
+          </div>
+        </Modal>
+
+        <Modal open={showChat} onClose={() => setShowChat(false)} title={`Chat with ${item.ownerName}`}>
+          <div className="h-[500px] -mx-6 -mb-6 flex flex-col">
+            <ChatWindow
+              itemId={item.id}
+              otherUserId={item.ownerId}
+              otherUserName={item.ownerName}
+              itemTitle={item.title}
+              itemImageUrl={item.imageUrls?.[0] ?? null}
+              sendMessage={sendMessage}
+            />
           </div>
         </Modal>
       </main>

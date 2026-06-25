@@ -4,9 +4,11 @@ import { Link } from "@/i18n/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star } from "lucide-react";
+import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star, MessageSquare } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
 import api from "@/lib/api";
+import { getUnreadCount } from "@/lib/chat";
+import { useChatSocket } from "@/lib/useChatSocket";
 import type { Notification } from "@/types";
 
 const notificationIcons: Record<string, React.ReactNode> = {
@@ -37,9 +39,24 @@ export default function Navbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
   const user = getUser();
   const loggedIn = isAuthenticated();
+
+  // Chat WebSocket for real-time unread updates
+  const fetchChatUnread = useCallback(() => {
+    if (!loggedIn) return;
+    getUnreadCount()
+      .then((data) => setChatUnreadCount(data.conversationsWithUnread))
+      .catch(() => {});
+  }, [loggedIn]);
+
+  useChatSocket({
+    userId: user?.id ?? null,
+    onMessage: () => {},
+    onUnreadUpdate: fetchChatUnread,
+  });
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
 
@@ -63,6 +80,13 @@ export default function Navbar() {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
+
+  // Fetch chat unread count on mount and poll every 30s
+  useEffect(() => {
+    fetchChatUnread();
+    const interval = setInterval(fetchChatUnread, 30000);
+    return () => clearInterval(interval);
+  }, [fetchChatUnread]);
 
   // Close notification dropdown on outside click
   useEffect(() => {
@@ -159,6 +183,17 @@ export default function Navbar() {
               </Link>
               <Link href="/borrow" className={navLinkClass("/borrow")}>
                 {t("nav.myBorrows")}
+              </Link>
+
+              {/* Messages with unread badge */}
+              <Link href="/messages" className={`relative ${navLinkClass("/messages")}`}>
+                <MessageSquare className="h-4 w-4 inline mr-1" />
+                Messages
+                {chatUnreadCount > 0 && (
+                  <span className="absolute -top-1 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
+                    {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                  </span>
+                )}
               </Link>
 
               {/* Notification bell */}
@@ -277,6 +312,15 @@ export default function Navbar() {
                 <Link href="/community" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.community")}</Link>
                 <Link href="/items/new" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.addItem")}</Link>
                 <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.myBorrows")}</Link>
+                <Link href="/messages" onClick={() => setMobileOpen(false)} className="relative rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Messages
+                  {chatUnreadCount > 0 && (
+                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
+                      {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                    </span>
+                  )}
+                </Link>
                 <Link href="/profile" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.profile")}</Link>
                 <button onClick={handleLogout} className="rounded px-3 py-2 text-left text-sm hover:bg-purple-100 transition-colors cursor-pointer">{t("nav.logOut")}</button>
               </>

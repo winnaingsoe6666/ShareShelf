@@ -14,7 +14,7 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 - [ ] **Phase 6: Location Search** - Spatial location search with PostGIS — pin-drop on items, distance filter, and interactive map view
 - [ ] **Phase 7: Google OAuth Signup** - Add Google OAuth signup/login so users can authenticate with their Google account instead of email/password
 - [x] **Phase 8: Photo Upload R2 Migration** - Replace local filesystem storage with Cloudflare R2 for persistent, CDN-backed image hosting ✓ 2026-06-25
-- [ ] **Phase 9: In-App Chat** - Item-scoped real-time messaging between borrowers and owners via WebSocket + STOMP
+- [x] **Phase 9: In-App Chat** - Item-scoped real-time messaging between borrowers and owners via WebSocket + STOMP ✓ 2026-06-26
 
 ## Phase Details
 
@@ -137,10 +137,10 @@ ShareShelf is a production-ready community tool library app with known bugs and 
   9. Backend and frontend tests cover chat functionality
 **Plans**: 4/4
 Plans:
-- [ ] 09-01-PLAN.md — Data model + WebSocket infrastructure: Flyway V14, ChatMessage entity, ChatRepository, WebSocket+STOMP with JWT auth
-- [ ] 09-02-PLAN.md — Backend: REST endpoints for conversation history + inbox, STOMP send/receive controller
-- [ ] 09-03-PLAN.md — Frontend: ChatWindow, /messages page, navbar badge, "Message Owner" button
-- [ ] 09-04-PLAN.md — Tests: backend + frontend chat tests
+- [x] 09-01-PLAN.md — Data model + WebSocket infrastructure: Flyway V14, ChatMessage entity, ChatRepository, WebSocket+STOMP with JWT auth ✓ 2026-06-26
+- [x] 09-02-PLAN.md — Backend: REST endpoints for conversation history + inbox, STOMP send/receive controller ✓ 2026-06-26
+- [x] 09-03-PLAN.md — Frontend: ChatWindow, /messages page, navbar badge, "Message Owner" button ✓ 2026-06-26
+- [x] 09-04-PLAN.md — Tests: backend + frontend chat tests ✓ 2026-06-26
 **UI hint**: yes
 
 ## Progress
@@ -155,4 +155,4 @@ Plans:
 | 6. Location Search | 0/5 | Not started | - |
 | 7. Google OAuth Signup | 4/4 | Complete | 2026-06-25 |
 | 8. Photo Upload R2 Migration | 2/2 | Complete | 2026-06-25 |
-| 9. In-App Chat | 4/4 | Not started | - |
+| 9. In-App Chat | 4/4 | Complete | 2026-06-26 |
