@@ -135,7 +135,12 @@ ShareShelf is a production-ready community tool library app with known bugs and 
   7. /messages page shows conversation list with unread badges
   8. Navbar shows unread message count badge
   9. Backend and frontend tests cover chat functionality
-**Plans**: 4/4 — 09-01 (data model), 09-02 (backend), 09-03 (frontend UI), 09-04 (tests)
+**Plans**: 4/4
+Plans:
+- [ ] 09-01-PLAN.md — Data model + WebSocket infrastructure: Flyway V14, ChatMessage entity, ChatRepository, WebSocket+STOMP with JWT auth
+- [ ] 09-02-PLAN.md — Backend: REST endpoints for conversation history + inbox, STOMP send/receive controller
+- [ ] 09-03-PLAN.md — Frontend: ChatWindow, /messages page, navbar badge, "Message Owner" button
+- [ ] 09-04-PLAN.md — Tests: backend + frontend chat tests
 **UI hint**: yes
 
 ## Progress
