@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Package, FileText, DollarSign, FolderTree, Image, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), { ssr: false });
@@ -14,6 +15,7 @@ import { isAuthenticated } from "@/lib/auth";
 import type { Category } from "@/types";
 
 export default function NewItemPage() {
+  const t = useTranslations();
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -73,10 +75,10 @@ export default function NewItemPage() {
         }
         router.push(`/items/${itemId}`);
       } else {
-        setError(res.data.message || "Failed to create item");
+        setError(res.data.message || t("itemNew.failed"));
       }
     } catch {
-      setError("Failed to create item. Please try again.");
+      setError(t("itemNew.failed"));
     } finally {
       setLoading(false);
     }
@@ -93,7 +95,7 @@ export default function NewItemPage() {
               <Package className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <h1 className="font-heading text-3xl font-bold text-purple-900">List a New Item</h1>
+              <h1 className="font-heading text-3xl font-bold text-purple-900">{t("itemNew.title")}</h1>
               <p className="mt-1 text-stone-600">Share a tool or piece of equipment with your community.</p>
             </div>
           </div>
@@ -110,14 +112,14 @@ export default function NewItemPage() {
               <FileText className="h-5 w-5 text-purple-500" />
               Item Details
             </h2>
-            <Input label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Cordless Drill" required />
+            <Input label={`${t("itemNew.itemTitle")} *`} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("itemNew.titlePlaceholder")} required />
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-purple-800">Description</label>
+              <label className="block text-sm font-medium text-purple-800">{t("itemNew.description")}</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                placeholder="Describe the item, condition, and what's included..."
+                placeholder={t("itemNew.descPlaceholder")}
                 className="block w-full rounded-lg border border-purple-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200"
               />
             </div>
@@ -130,8 +132,8 @@ export default function NewItemPage() {
               Pricing
             </h2>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Daily price ($)" type="number" min="0" step="0.01" value={dailyPrice} onChange={(e) => setDailyPrice(e.target.value)} placeholder="0.00" />
-              <Input label="Deposit ($)" type="number" min="0" step="0.01" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} placeholder="0.00" />
+              <Input label={t("itemNew.dailyPrice")} type="number" min="0" step="0.01" value={dailyPrice} onChange={(e) => setDailyPrice(e.target.value)} placeholder="0.00" />
+              <Input label={t("itemNew.deposit")} type="number" min="0" step="0.01" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} placeholder="0.00" />
             </div>
           </div>
 
@@ -139,7 +141,7 @@ export default function NewItemPage() {
           <div className="space-y-4">
             <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-purple-800">
               <FolderTree className="h-5 w-5 text-purple-500" />
-              Category
+              {t("itemNew.category")}
             </h2>
             <div className="space-y-1">
               <select
@@ -147,7 +149,7 @@ export default function NewItemPage() {
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="block w-full rounded-lg border border-purple-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200"
               >
-                <option value="">Select a category</option>
+                <option value="">{t("itemNew.selectCategory")}</option>
                 {catLoading ? (
                   <option disabled>Loading categories...</option>
                 ) : catError ? (
@@ -167,9 +169,9 @@ export default function NewItemPage() {
           <div className="space-y-4">
             <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-purple-800">
               <MapPin className="h-5 w-5 text-purple-500" />
-              Item Location
+              {t("itemNew.location")}
             </h2>
-            <p className="text-sm text-stone-500">Drop a pin where this item is available</p>
+            <p className="text-sm text-stone-500">{t("itemNew.locationHint")}</p>
             <LocationPicker
               latitude={latitude}
               longitude={longitude}
@@ -183,7 +185,7 @@ export default function NewItemPage() {
           <div className="space-y-4">
             <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-purple-800">
               <Image className="h-5 w-5 text-purple-500" />
-              Images
+              {t("itemNew.images")}
             </h2>
             <ImageUpload
               images={[]}
@@ -198,7 +200,7 @@ export default function NewItemPage() {
             />
           </div>
 
-          <Button type="submit" loading={loading} className="w-full">Create Listing</Button>
+          <Button type="submit" loading={loading} className="w-full">{t("itemNew.submit")}</Button>
         </form>
       </main>
     </>

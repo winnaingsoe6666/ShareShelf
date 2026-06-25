@@ -2,12 +2,14 @@
 
 import { Link } from "@/i18n/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  const locale = useLocale();
+  const t = useTranslations();
 
   return (
     <footer className="border-t border-purple-200 bg-purple-50">
@@ -16,17 +18,17 @@ export default function Footer() {
           {/* Column 1 — About */}
           <div>
             <h3 className="font-display text-lg font-semibold text-purple-800">
-              ShareShelf
+              {t("footer.about")}
             </h3>
             <p className="mt-3 text-sm text-stone-500 leading-relaxed">
-              Community-powered tool sharing. Save money, reduce waste, build community.
+              {t("footer.aboutDesc")}
             </p>
           </div>
 
           {/* Column 2 — Quick Links */}
           <div>
             <h3 className="font-heading text-lg font-semibold text-purple-800">
-              Quick Links
+              {t("footer.quickLinks")}
             </h3>
             <ul className="mt-3 space-y-2">
               <li>
@@ -34,7 +36,7 @@ export default function Footer() {
                   href="/items"
                   className="text-sm text-stone-600 hover:text-purple-700 transition-colors duration-200"
                 >
-                  Browse Tools
+                  {t("footer.browseTools")}
                 </Link>
               </li>
               <li>
@@ -42,7 +44,7 @@ export default function Footer() {
                   href="/items/new"
                   className="text-sm text-stone-600 hover:text-purple-700 transition-colors duration-200"
                 >
-                  Add Item
+                  {t("footer.addItem")}
                 </Link>
               </li>
               <li>
@@ -50,7 +52,7 @@ export default function Footer() {
                   href="/borrow"
                   className="text-sm text-stone-600 hover:text-purple-700 transition-colors duration-200"
                 >
-                  My Borrows
+                  {t("footer.myBorrows")}
                 </Link>
               </li>
             </ul>
@@ -59,13 +61,13 @@ export default function Footer() {
           {/* Column 3 — Community */}
           <div>
             <h3 className="font-heading text-lg font-semibold text-purple-800">
-              Community
+              {t("footer.community")}
             </h3>
             <p className="mt-3 text-sm text-stone-500 leading-relaxed">
-              Join your neighborhood tool-sharing network. Borrow what you need, lend what you have.
+              {t("footer.communityDesc")}
             </p>
             <p className="mt-2 text-sm text-stone-400">
-              Built with love for communities everywhere.
+              {t("footer.builtWith")}
             </p>
           </div>
         </div>

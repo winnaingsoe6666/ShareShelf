@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Navbar from "@/components/layout/Navbar";
 import ConversationList from "@/components/chat/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
@@ -10,6 +11,7 @@ import { getUser } from "@/lib/auth";
 import type { ChatMessage } from "@/types";
 
 export default function MessagesPage() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const user = getUser();
 
@@ -83,7 +85,7 @@ export default function MessagesPage() {
             } w-full md:w-80 md:border-r md:border-stone-200 flex-col shrink-0`}
           >
             <div className="px-4 py-3 border-b border-stone-200 bg-white shrink-0">
-              <h2 className="font-heading text-lg font-semibold text-purple-900">Messages</h2>
+              <h2 className="font-heading text-lg font-semibold text-purple-900">{t("messagesPage.title")}</h2>
             </div>
             <ConversationList
               onSelect={handleSelect}
@@ -109,7 +111,7 @@ export default function MessagesPage() {
               />
             ) : (
               <div className="flex-1 flex items-center justify-center text-stone-400">
-                <p className="text-sm">Select a conversation to start chatting</p>
+                <p className="text-sm">{t("messagesPage.selectConversation")}</p>
               </div>
             )}
           </div>

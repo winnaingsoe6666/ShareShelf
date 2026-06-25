@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { MarkerClusterGroup } from "react-leaflet-cluster";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import L, { type LatLngExpression } from "leaflet";
 import { Link } from "@/i18n/navigation";
 import type { Item } from "@/types";

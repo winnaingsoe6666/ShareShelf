@@ -12,7 +12,7 @@ import java.util.UUID
 
 @Service
 class FileStorageService(
-    private val s3Client: S3Client,
+    private val s3Client: S3Client?,
     @Value("\${app.r2.bucket}") private val bucket: String,
     @Value("\${app.r2.public-url}") private val publicUrl: String
 ) {
@@ -21,6 +21,9 @@ class FileStorageService(
     private val allowedExtensions = setOf("jpg", "jpeg", "png", "gif", "webp")
 
     fun store(file: MultipartFile, subPath: String = "items"): String {
+        if (s3Client == null) {
+            throw IllegalStateException("Image upload not configured. Set R2 environment variables to enable.")
+        }
         if (file.isEmpty) {
             throw IllegalArgumentException("File is empty")
         }
@@ -51,6 +54,10 @@ class FileStorageService(
     }
 
     fun delete(urlPath: String) {
+        if (s3Client == null) {
+            logger.warn("R2 not configured, skipping delete for: {}", urlPath)
+            return
+        }
         try {
             val s3Key = urlPath.removePrefix("$publicUrl/")
             val request = DeleteObjectRequest.builder()

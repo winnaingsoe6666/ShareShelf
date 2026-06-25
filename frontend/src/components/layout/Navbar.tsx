@@ -188,7 +188,7 @@ export default function Navbar() {
               {/* Messages with unread badge */}
               <Link href="/messages" className={`relative ${navLinkClass("/messages")}`}>
                 <MessageSquare className="h-4 w-4 inline mr-1" />
-                Messages
+                {t("nav.messages")}
                 {chatUnreadCount > 0 && (
                   <span className="absolute -top-1 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
                     {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
@@ -314,7 +314,7 @@ export default function Navbar() {
                 <Link href="/borrow" onClick={() => setMobileOpen(false)} className="rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors">{t("nav.myBorrows")}</Link>
                 <Link href="/messages" onClick={() => setMobileOpen(false)} className="relative rounded px-3 py-2 text-sm hover:bg-purple-100 transition-colors flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
-                  Messages
+                  {t("nav.messages")}
                   {chatUnreadCount > 0 && (
                     <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
                       {chatUnreadCount > 99 ? "99+" : chatUnreadCount}

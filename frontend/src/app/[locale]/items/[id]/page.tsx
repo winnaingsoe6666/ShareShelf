@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Image, Star, User, Shield, CheckCircle2, MessageSquare } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Button from "@/components/ui/Button";
@@ -18,6 +19,7 @@ import { formatPrice, formatDate } from "@/lib/utils";
 import type { Item } from "@/types";
 
 export default function ItemDetailPage() {
+  const t = useTranslations();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [item, setItem] = useState<Item | null>(null);
@@ -42,7 +44,7 @@ export default function ItemDetailPage() {
   useEffect(() => {
     api.get(`/items/${id}`)
       .then((res) => setItem(res.data.data))
-      .catch(() => setError("Item not found"))
+      .catch(() => setError(t("itemDetail.failedToLoad")))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -76,14 +78,14 @@ export default function ItemDetailPage() {
       setBorrowSuccess(true);
       setBorrowOpen(false);
     } catch {
-      setBorrowError("Failed to submit borrow request");
+      setBorrowError(t("itemDetail.requestFailed"));
     } finally {
       setBorrowing(false);
     }
   };
 
   if (loading) return <><Navbar /><Spinner className="py-24" /></>;
-  if (error || !item) return <><Navbar /><p className="py-24 text-center text-stone-500">{error || "Item not found"}</p></>;
+  if (error || !item) return <><Navbar /><p className="py-24 text-center text-stone-500">{error || t("itemDetail.failedToLoad")}</p></>;
 
   const user = getUser();
   const isOwner = user?.id === item.ownerId;
@@ -129,12 +131,12 @@ export default function ItemDetailPage() {
               </div>
               {item.depositAmount != null && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-stone-600">Deposit</span>
+                  <span className="text-stone-600">{t("itemDetail.deposit")}</span>
                   <span className="font-semibold text-stone-900">{formatPrice(item.depositAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-stone-600">Owner</span>
+                <span className="text-stone-600">{t("itemDetail.owner")}</span>
                 <span className="font-semibold text-stone-900 inline-flex items-center gap-1">
                   <User className="h-3.5 w-3.5 text-stone-400" />
                   {item.ownerName}
@@ -155,7 +157,7 @@ export default function ItemDetailPage() {
             {!isOwner && item.status === "available" && (
               <div className="mt-6">
                 <Button className="w-full" size="lg" onClick={() => setBorrowOpen(true)}>
-                  Request to Borrow
+                  {t("itemDetail.requestToBorrow")}
                 </Button>
                 {item.depositAmount != null && (
                   <p className="mt-3 text-xs text-stone-500 text-center">
@@ -173,7 +175,7 @@ export default function ItemDetailPage() {
                   onClick={() => setShowChat(true)}
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  Message Owner
+                  {t("itemDetail.messageOwner")}
                 </Button>
               </div>
             )}
@@ -203,13 +205,13 @@ export default function ItemDetailPage() {
             {borrowSuccess && (
               <p className="mt-4 text-center text-sm text-green-600 inline-flex items-center justify-center gap-1">
                 <CheckCircle2 className="h-4 w-4" />
-                Borrow request sent successfully!
+                {t("itemDetail.requestSent")}
               </p>
             )}
           </div>
         </div>
 
-        <Modal open={borrowOpen} onClose={() => setBorrowOpen(false)} title="Request to Borrow">
+        <Modal open={borrowOpen} onClose={() => setBorrowOpen(false)} title={t("itemDetail.requestToBorrow")}>
           <div className="space-y-4">
             <p className="text-sm text-stone-600">
               Request to borrow <strong>{item.title}</strong> from <strong>{item.ownerName}</strong>.

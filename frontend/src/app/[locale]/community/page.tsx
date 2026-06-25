@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   Package,
@@ -49,6 +50,7 @@ function AnimatedCounter({ end, duration = 2000, suffix = "" }: { end: number; d
 }
 
 export default function CommunityPage() {
+  const t = useTranslations();
   const [stats, setStats] = useState<CommunityStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -56,7 +58,7 @@ export default function CommunityPage() {
   useEffect(() => {
     api.get("/community/stats")
       .then((res) => setStats(res.data.data))
-      .catch(() => setError("Failed to load community stats"))
+      .catch(() => setError(t("communityPage.failedToLoad")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -68,15 +70,15 @@ export default function CommunityPage() {
         <div className="mb-8 rounded-2xl bg-white border border-purple-200 shadow-md p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-heading text-3xl font-bold text-purple-900">Community Dashboard</h1>
-              <p className="mt-2 text-stone-600">See what&apos;s happening in your neighborhood tool library</p>
+              <h1 className="font-heading text-3xl font-bold text-purple-900">{t("communityPage.title")}</h1>
+              <p className="mt-2 text-stone-600">{t("communityPage.subtitle")}</p>
             </div>
             <Link
               href="/items"
               className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px cursor-pointer"
             >
               <Search className="h-4 w-4" />
-              Browse Tools
+              {t("communityPage.browseTools")}
             </Link>
           </div>
         </div>
@@ -121,21 +123,21 @@ export default function CommunityPage() {
                 <p className="font-display text-3xl font-bold text-purple-900">
                   <AnimatedCounter end={stats.totalItems} />
                 </p>
-                <p className="mt-1 text-sm text-stone-500">Total Items</p>
+                <p className="mt-1 text-sm text-stone-500">{t("communityPage.totalItems")}</p>
               </Card>
               <Card className="p-6 text-center">
                 <Users className="h-6 w-6 text-purple-500 mx-auto mb-2" />
                 <p className="font-display text-3xl font-bold text-purple-900">
                   <AnimatedCounter end={stats.totalMembers} />
                 </p>
-                <p className="mt-1 text-sm text-stone-500">Community Members</p>
+                <p className="mt-1 text-sm text-stone-500">{t("communityPage.communityMembers")}</p>
               </Card>
               <Card className="p-6 text-center">
                 <ArrowRightLeft className="h-6 w-6 text-purple-500 mx-auto mb-2" />
                 <p className="font-display text-3xl font-bold text-purple-900">
                   <AnimatedCounter end={stats.activeBorrows} />
                 </p>
-                <p className="mt-1 text-sm text-stone-500">Active Borrows</p>
+                <p className="mt-1 text-sm text-stone-500">{t("communityPage.activeBorrows")}</p>
               </Card>
             </div>
 
@@ -143,15 +145,15 @@ export default function CommunityPage() {
               {/* Recent Items */}
               <div className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-heading text-xl font-semibold text-purple-900">Recently Added</h2>
+                  <h2 className="font-heading text-xl font-semibold text-purple-900">{t("communityPage.recentlyAdded")}</h2>
                   <Link href="/items" className="text-sm text-purple-600 hover:text-purple-800 transition-colors">
-                    View all
+                    {t("communityPage.viewAll")}
                   </Link>
                 </div>
                 {stats.recentItems.length === 0 ? (
                   <div className="py-12 text-center text-stone-500 rounded-xl border border-purple-100 bg-white">
                     <Package className="h-10 w-10 mx-auto mb-2 text-stone-300" />
-                    <p className="text-sm">No items available yet.</p>
+                    <p className="text-sm">{t("communityPage.noItems")}</p>
                   </div>
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -166,11 +168,11 @@ export default function CommunityPage() {
 
               {/* Top Lenders */}
               <div>
-                <h2 className="font-heading text-xl font-semibold text-purple-900 mb-4">Top Sharers</h2>
+                <h2 className="font-heading text-xl font-semibold text-purple-900 mb-4">{t("communityPage.topSharers")}</h2>
                 {stats.topLenders.length === 0 ? (
                   <div className="py-12 text-center text-stone-500 rounded-xl border border-purple-100 bg-white">
                     <Star className="h-10 w-10 mx-auto mb-2 text-stone-300" />
-                    <p className="text-sm">No lenders yet.</p>
+                    <p className="text-sm">{t("communityPage.noLenders")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -187,7 +189,7 @@ export default function CommunityPage() {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-semibold text-stone-900 truncate">{lender.name}</p>
-                            <p className="text-xs text-stone-500">{lender.itemCount} items shared</p>
+                            <p className="text-xs text-stone-500">{lender.itemCount} {t("communityPage.itemsShared")}</p>
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
                             <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
@@ -208,14 +210,14 @@ export default function CommunityPage() {
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-sm font-medium text-white hover:bg-purple-700 transition-all duration-200 hover:-translate-y-px"
               >
                 <Search className="h-4 w-4" />
-                Browse All Tools
+                {t("communityPage.browseAll")}
               </Link>
               <Link
                 href="/items/new"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-purple-600 bg-white px-6 py-3 text-sm font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200 hover:-translate-y-px"
               >
                 <Plus className="h-4 w-4" />
-                Share a Tool
+                {t("communityPage.shareTool")}
               </Link>
             </div>
           </>

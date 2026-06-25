@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { MapPin } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
@@ -10,6 +11,7 @@ import type { Item } from "@/types";
 const MapView = dynamic(() => import("@/components/map/MapView"), { ssr: false });
 
 export default function MapSearchPage() {
+  const t = useTranslations();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,27 +44,30 @@ export default function MapSearchPage() {
         <div className="mb-6">
           <h1 className="font-heading text-3xl font-bold text-purple-900 flex items-center gap-2">
             <MapPin className="h-8 w-8" />
-            Search by Map
+            {t("itemMap.title")}
           </h1>
-          <p className="mt-2 text-stone-600">Discover tools near you</p>
+          <p className="mt-2 text-stone-600">{t("itemMap.subtitle")}</p>
         </div>
 
-        {loading ? (
-          <div className="h-96 rounded-2xl bg-purple-100 animate-pulse flex items-center justify-center">
-            <p className="text-purple-400">Loading map...</p>
-          </div>
-        ) : error ? (
+        {error ? (
           <p className="py-16 text-center text-stone-500">{error}</p>
         ) : (
-          <MapView
-            items={items}
-            radius={radius}
-            onRadiusChange={setRadius}
-            onLocationFound={(lat, lng) => {
-              setUserLat(lat);
-              setUserLng(lng);
-            }}
-          />
+          <div className="relative">
+            {loading && (
+              <div className="absolute inset-0 z-10 h-[70vh] rounded-2xl bg-purple-100 animate-pulse flex items-center justify-center">
+                <p className="text-purple-400">{t("itemMap.loading")}</p>
+              </div>
+            )}
+            <MapView
+              items={items}
+              radius={radius}
+              onRadiusChange={setRadius}
+              onLocationFound={(lat, lng) => {
+                setUserLat(lat);
+                setUserLng(lng);
+              }}
+            />
+          </div>
         )}
       </main>
     </>

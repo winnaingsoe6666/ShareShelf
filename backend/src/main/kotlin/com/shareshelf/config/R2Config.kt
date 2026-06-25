@@ -1,5 +1,6 @@
 package com.shareshelf.config
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,20 +17,27 @@ class R2Config(
     @Value("\${app.r2.access-key-id}") private val accessKeyId: String,
     @Value("\${app.r2.secret-access-key}") private val secretAccessKey: String
 ) {
+    private val logger = LoggerFactory.getLogger(R2Config::class.java)
 
     @Bean
-    fun s3Client(): S3Client = S3Client.builder()
-        .endpointOverride(URI.create(endpoint))
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+    fun s3Client(): S3Client? {
+        if (endpoint.contains("YOUR_ACCOUNT_ID") || endpoint.contains("localhost:9000") && accessKeyId == "minioadmin") {
+            logger.warn("R2/S3 not configured — image upload disabled. Set R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY to enable.")
+            return null
+        }
+        return S3Client.builder()
+            .endpointOverride(URI.create(endpoint))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+                )
             )
-        )
-        .region(Region.of("auto"))
-        .serviceConfiguration(
-            S3Configuration.builder()
-                .pathStyleAccessEnabled(true)
-                .build()
-        )
-        .build()
+            .region(Region.of("auto"))
+            .serviceConfiguration(
+                S3Configuration.builder()
+                    .pathStyleAccessEnabled(true)
+                    .build()
+            )
+            .build()
+    }
 }
