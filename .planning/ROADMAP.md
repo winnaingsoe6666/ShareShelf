@@ -12,6 +12,7 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 - [ ] **Phase 4: Code Quality & Technical Debt** - Address N+1 queries, rate limiting, validation, JPA entity patterns, and logging
 - [ ] **Phase 5: Community Features** - In-app notifications, community dashboard, and enhanced search filters
 - [ ] **Phase 6: Location Search** - Spatial location search with PostGIS — pin-drop on items, distance filter, and interactive map view
+- [ ] **Phase 7: Google OAuth Signup** - Add Google OAuth signup/login so users can authenticate with their Google account instead of email/password
 
 ## Phase Details
 
@@ -91,6 +92,19 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 7: Google OAuth Signup
+**Goal**: Add Google OAuth signup/login so users can authenticate with their Google account instead of email/password
+**Depends on**: Phase 1 (auth infrastructure must exist)
+**Requirements**: OAUTH-01, OAUTH-02, OAUTH-03, OAUTH-04
+**Success Criteria** (what must be TRUE):
+  1. Users can sign up and log in with their Google account (OAuth 2.0 flow)
+  2. Google-authenticated users are created in the database with profile info (name, email, avatar)
+  3. Existing email/password users can link their Google account
+  4. Frontend has "Sign in with Google" button on login and register pages
+  5. Backend and frontend tests cover the OAuth flow
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -101,3 +115,4 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | 4. Code Quality & Technical Debt | 0/TBD | Not started | - |
 | 5. Community Features | 3/3 | Complete | 2026-06-19 |
 | 6. Location Search | 0/5 | Not started | - |
+| 7. Google OAuth Signup | 1/4 | In Progress|  |
