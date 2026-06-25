@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-06-25T03:35:43.641Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-06-25T03:49:36Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 16
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [████░░░░░░] 44%
 
 *Updated after each plan completion*
 | Phase 07-google-oauth-signup P01 | 335 | 1 tasks | 6 files |
+| Phase 07-google-oauth-signup P02 | 12 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - [Phase ?]: passwordHash made nullable to support Google-only users
 - [Phase ?]: Partial index on google_id for efficient OAuth lookups
 - [Phase ?]: Login guard checks authProvider == GOOGLE before password verification
+- [Phase 07]: OAuth2Service replicates AuthService refresh token pattern (SHA-256 hash, UUID raw token)
+- [Phase 07]: googleId changed from val to var to support account linking
+- [Phase 07]: Empty name from Google falls back to email prefix
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-25T03:35:43.620Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-06-25T03:49:36Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None

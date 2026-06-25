@@ -115,4 +115,4 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | 4. Code Quality & Technical Debt | 0/TBD | Not started | - |
 | 5. Community Features | 3/3 | Complete | 2026-06-19 |
 | 6. Location Search | 0/5 | Not started | - |
-| 7. Google OAuth Signup | 1/4 | In Progress|  |
+| 7. Google OAuth Signup | 2/4 | In Progress|  |
