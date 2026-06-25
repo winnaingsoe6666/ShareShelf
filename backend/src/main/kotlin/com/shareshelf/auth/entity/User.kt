@@ -15,8 +15,15 @@ data class User(
     @Column(nullable = false, unique = true)
     val email: String = "",
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash")
     var passwordHash: String = "",
+
+    @Column(name = "google_id", unique = true)
+    val googleId: String? = null,
+
+    @Column(name = "auth_provider", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var authProvider: AuthProvider = AuthProvider.LOCAL,
 
     @Column(length = 100)
     val community: String? = null,
