@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.vercel.app",
       },
+      {
+        // Cloudflare R2 public bucket domain
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+      },
+      {
+        // Cloudflare R2 custom domain (if configured)
+        protocol: "https",
+        hostname: "**.r2.dev",
+      },
     ],
   },
   // Backward compatibility: redirect old non-locale URLs to /en
