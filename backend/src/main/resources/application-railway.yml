@@ -34,9 +34,13 @@ spring:
 
 logging:
   level:
-    com.shareshelf: INFO
-    org.springframework.security: WARN
-    org.hibernate.SQL: WARN
+    com.shareshelf: WARN
+    org.springframework: WARN
+    org.springframework.security: ERROR
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.apache.tomcat: ERROR
+    org.apache.catalina: ERROR
 
 app:
   upload-dir: uploads
