@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { MapPin, Users } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import GoogleSignInButton from "@/components/ui/GoogleSignInButton";
+import AuthDivider from "@/components/ui/AuthDivider";
 import api from "@/lib/api";
 import { saveAuth, isAuthenticated } from "@/lib/auth";
 
@@ -20,6 +23,7 @@ const getStrength = (pwd: string): number => {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated()) {
@@ -79,7 +83,7 @@ export default function RegisterPage() {
             <div className="h-1 bg-green-600 w-full" />
             <div className="p-8">
               {/* Header */}
-              <div className="mb-8 text-center">
+              <div className="mb-6 text-center">
                 <Users className="mx-auto h-12 w-12 text-purple-300" />
                 <h1 className="mt-4 font-heading text-3xl font-bold text-purple-900">
                   Join ShareShelf
@@ -89,11 +93,19 @@ export default function RegisterPage() {
                 </p>
               </div>
 
+              <GoogleSignInButton text="Sign up with Google" />
+              <AuthDivider />
+
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                   <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
                     {error}
+                  </div>
+                )}
+                {searchParams.get("error") === "google_auth_failed" && !error && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    Google sign-in failed. Please try again.
                   </div>
                 )}
                 <Input
