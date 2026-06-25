@@ -2,16 +2,18 @@
 
 **ShareShelf** is a community-powered tool library that lets neighbors borrow, lend, and share rarely used tools and equipment within their neighborhood, university, or local community.
 
-Instead of buying a \$200 drill for one shelf or a tent for one camping trip, browse what your neighbors are already sharing — or list your own idle gear and build trust in your community.
+Instead of buying a $200 drill for one shelf or a tent for one camping trip, browse what your neighbors are already sharing — or list your own idle gear and build trust in your community.
 
 ---
 
-### Why ShareShelf?
+## Why ShareShelf?
 
-- 🌍 **Reduce Waste** — Maximize the lifespan of tools instead of manufacturing more
-- 💰 **Save Money** — Borrow what you need once or twice a year; skip the purchase
-- 🤝 **Build Community** — Every borrow builds trust between neighbors
-- 📦 **Save Space** — Declutter your garage; borrow only when you need it
+| | |
+|---|---|
+| 🌍 **Reduce Waste** | Maximize the lifespan of tools instead of manufacturing more |
+| 💰 **Save Money** | Borrow what you need once or twice a year; skip the purchase |
+| 🤝 **Build Community** | Every borrow builds trust between neighbors |
+| 📦 **Save Space** | Declutter your garage; borrow only when you need it |
 
 ---
 
@@ -25,6 +27,7 @@ Instead of buying a \$200 drill for one shelf or a tent for one camping trip, br
 | **Auth** | JWT (jjwt 0.12) + refresh tokens + JTI blacklist + account lockout |
 | **i18n** | next-intl — English + Burmese (မြန်မာ) |
 | **Testing** | JUnit 5 + MockK (backend), Vitest + React Testing Library (frontend), Playwright (E2E) |
+| **Deployment** | Railway (backend Docker) + Vercel (frontend) |
 
 ---
 
@@ -112,7 +115,33 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 - [x] **File Storage** — Photo upload with preview and removal
 - [x] **Deployment** — Railway (backend Docker) + Vercel (frontend), CI/CD configured
 - [x] **Testing** — Unit, integration, and E2E tests across backend and frontend
-- [x] **AI-Assisted Development** — MCP servers, Claude Skills & Agents documented in CLAUDE.md
+- [x] **AI-Assisted Development** — MCP servers, Claude Skills & Agents integrated
+
+---
+
+## Architecture
+
+ShareShelf follows a layered architecture with strict dependency direction:
+
+```
+Browser → Next.js (React) → Axios HTTP Client → Spring Boot REST API → PostgreSQL
+```
+
+| Layer | Responsibility | Location |
+|---|---|---|
+| **Frontend** | Browser-side UI rendering | `frontend/src/` |
+| **Controller** | HTTP request/response, route mapping, validation | `backend/.../auth/`, `item/`, `borrow/` |
+| **Service** | Business logic, orchestration, transactions | `backend/.../*/` |
+| **Repository** | Data access via Spring Data JPA | `backend/.../*/entity/` |
+| **Database** | Persistent storage (PostgreSQL + Flyway) | `backend/.../resources/db/migration/` |
+
+### Pattern Overview
+
+- **Backend:** Package-by-feature (`auth/`, `item/`, `borrow/`, `review/`, `category/`, `common/`, `config/`)
+- **Frontend:** Next.js App Router with page-per-route under `src/app/`
+- **API:** All responses wrapped in `ApiResponse<T>` — `{success, message, data, errors}`
+- **Auth:** JWT Bearer tokens, stateless sessions
+- **Migrations:** Flyway with `ddl-auto: validate`
 
 ---
 
@@ -125,7 +154,7 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | GET | `/api/auth/me` | Yes | Current user profile |
 | POST | `/api/auth/logout` | Yes | Log out (JTI blacklist) |
 | POST | `/api/auth/refresh` | No | Refresh access token |
-| GET | `/api/items` | Yes | List/search items (search, category, status, rating) |
+| GET | `/api/items` | Yes | List/search items |
 | POST | `/api/items` | Yes | Create item listing |
 | GET | `/api/items/{id}` | Yes | Item detail |
 | PUT | `/api/items/{id}` | Yes | Update item |
@@ -133,7 +162,7 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | POST | `/api/items/{id}/images` | Yes | Upload item photo |
 | DELETE | `/api/items/{id}/images` | Yes | Remove item photo |
 | POST | `/api/borrow` | Yes | Submit borrow request |
-| GET | `/api/borrow` | Yes | My borrows (borrowing + lending) |
+| GET | `/api/borrow` | Yes | My borrows |
 | PUT | `/api/borrow/{id}/approve` | Yes | Approve request |
 | PUT | `/api/borrow/{id}/reject` | Yes | Reject request |
 | PUT | `/api/borrow/{id}/return` | Yes | Mark returned |
@@ -141,12 +170,27 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | GET | `/api/review/user/{id}` | Yes | User's reviews |
 | GET | `/api/categories` | Yes | List categories |
 | GET | `/api/notifications` | Yes | User notifications |
-| GET | `/api/notifications/unread-count` | Yes | Unread notification count |
-| PUT | `/api/notifications/{id}/read` | Yes | Mark notification read |
+| GET | `/api/notifications/unread-count` | Yes | Unread count |
+| PUT | `/api/notifications/{id}/read` | Yes | Mark read |
 | PUT | `/api/notifications/read-all` | Yes | Mark all read |
 | GET | `/api/community/stats` | No | Platform statistics |
 | GET | `/api/health` | No | Health check |
 | GET | `/api/dev/seed` | No | Seed demo data |
+
+---
+
+## Borrow Request Lifecycle
+
+```
+REQUESTED → APPROVED → RETURNED
+                  ↘ REJECTED
+```
+
+1. **Borrower** submits a borrow request on an available item
+2. **Lender** (item owner) approves or rejects the request
+3. Item status transitions: `AVAILABLE` → `BORROWED` → `AVAILABLE` (upon return)
+4. After return, borrower can leave a review & rating (1–5 stars)
+5. Trust scores are recalculated after each review
 
 ---
 
@@ -165,6 +209,31 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | Variable | Default | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8080` | Backend API base URL |
+
+---
+
+## AI-Assisted Development
+
+ShareShelf was built with Claude Code assistance, using:
+
+### MCP Servers (`.mcp.json`)
+
+| Server | Purpose |
+|---|---|
+| `shareshelf-db` | PostgreSQL read-only query access |
+| `memory` | Knowledge graph memory persistence |
+| `sequential-thinking` | Structured reasoning |
+| `github` | GitHub API integration |
+| `playwright` | Browser automation & E2E testing |
+| `filesystem` | Project-scoped filesystem access |
+
+### Development Workflow
+
+The project uses the GSD (Get Shit Done) workflow system with:
+- Structured phases and plans tracked in `.planning/`
+- Quick tasks for ad-hoc fixes and improvements
+- Worktree isolation for parallel agent execution
+- Automatic STATE.md tracking
 
 ---
 
