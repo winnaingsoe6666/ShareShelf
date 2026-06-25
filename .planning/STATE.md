@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 7 complete
-last_updated: "2026-06-25T05:00:00.000Z"
-last_activity: 2026-06-25 -- Phase 7 Google OAuth Signup complete (4/4 plans)
+stopped_at: Phase 8 complete
+last_updated: "2026-06-25T20:30:00.000Z"
+last_activity: 2026-06-25 -- Phase 8 Photo Upload R2 Migration complete (2/2 plans)
 progress:
-  total_phases: 7
-  completed_phases: 1
-  total_plans: 16
-  completed_plans: 13
-  percent: 81
+  total_phases: 9
+  completed_phases: 2
+  total_plans: 22
+  completed_plans: 15
+  percent: 68
 ---
 
 # Project State
@@ -21,35 +21,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-13)
 
 **Core value:** Users can discover and borrow tools from neighbors in their community, with a trusted borrowing workflow that protects both lenders and borrowers.
-**Current focus:** Phase 1 — Fix Critical Issues & Testing Foundation
+**Current focus:** Phase 8 complete — R2 migration done, ready for Phase 9
 
 ## Current Position
 
-Phase: 7 (Google OAuth Signup) — COMPLETE
-Plan: 4 of 4 complete — all Phase 7 requirements satisfied
-Status: Phase complete — verified
+Phase: 8 (Photo Upload R2 Migration) — COMPLETE
+Plan: 2 of 2 plans complete
+Status: Phase verified and marked complete
 Last activity: 2026-06-25
 
 Progress: [██████████] 100%
+
+### Next Up
+- Phase 9: In-App Chat (4 plans) — item-scoped WebSocket + STOMP messaging
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 15
 - Average duration: --
-- Total execution time: 0 hours
+- Total execution time: --
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 08-photo-upload-r2 | 2 | -- | -- |
 
 **Recent Trend:**
 
-- Last 5 plans: (none)
-- Trend: --
+- Last 5 plans: 08-01 (R2 backend), 08-02 (frontend R2)
+- Trend: Phase 8 complete
 
 *Updated after each plan completion*
 | Phase 07-google-oauth-signup P01 | 335 | 1 tasks | 6 files |
@@ -66,15 +69,16 @@ Recent decisions affecting current work:
 - (Phase 1): TDD-first going forward via Ralpha Loop — all new code requires tests before implementation
 - (Phase 1): Photo upload uses local filesystem for v1; S3 migration deferred to v2
 - (All): Backend tests use JUnit 5 + MockK; frontend tests use Vitest + React Testing Library; E2E uses Playwright
-- [Phase ?]: AuthProvider enum uses STRING storage for database readability
-- [Phase ?]: passwordHash made nullable to support Google-only users
-- [Phase ?]: Partial index on google_id for efficient OAuth lookups
-- [Phase ?]: Login guard checks authProvider == GOOGLE before password verification
-- [Phase 07]: OAuth2Service replicates AuthService refresh token pattern (SHA-256 hash, UUID raw token)
-- [Phase 07]: googleId changed from val to var to support account linking
-- [Phase 07]: Empty name from Google falls back to email prefix
-- [Phase ?]: OAuth2 login flow endpoints are public
-- [Phase ?]: Cookie-based return URL for stateless OAuth2
+- [Phase 08]: Photo storage migrates from local filesystem to Cloudflare R2 (S3-compatible, no egress fees)
+- [Phase 08]: R2 uses AWS S3 SDK v2 — no Cloudflare-specific SDK needed
+- [Phase 08]: Replace strategy — no dual local+cloud backend; full R2 URLs stored in imageUrls JSONB
+- [Phase 08]: R2 region is "auto" (not a real AWS region)
+- [Phase 08]: S3Configuration.builder().pathStyleAccessEnabled(true) required for R2
+- [Phase 09]: Chat is item-scoped only — conversations are always about a specific item
+- [Phase 09]: WebSocket + STOMP over SockJS for real-time delivery — no RabbitMQ
+- [Phase 09]: Messages persisted to PostgreSQL first, then delivered via STOMP (offline users get history on next load)
+- [Phase 09]: STOMP topic per user: /topic/chat/{userId} — each user subscribes to their own topic
+- [Phase 09]: Chat dependencies: @stomp/stompjs + sockjs-client (frontend), spring-boot-starter-websocket (backend)
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-25T05:00:00.000Z
-Stopped at: Phase 7 complete — all 4 plans executed and verified
-Resume file: None
+Last session: 2026-06-25T20:30:00.000Z
+Stopped at: Phase 8 complete — ready for Phase 9 (In-App Chat)
+Resume file: Execute 09-01-PLAN.md to start Phase 9

@@ -13,6 +13,8 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 - [ ] **Phase 5: Community Features** - In-app notifications, community dashboard, and enhanced search filters
 - [ ] **Phase 6: Location Search** - Spatial location search with PostGIS — pin-drop on items, distance filter, and interactive map view
 - [ ] **Phase 7: Google OAuth Signup** - Add Google OAuth signup/login so users can authenticate with their Google account instead of email/password
+- [x] **Phase 8: Photo Upload R2 Migration** - Replace local filesystem storage with Cloudflare R2 for persistent, CDN-backed image hosting ✓ 2026-06-25
+- [ ] **Phase 9: In-App Chat** - Item-scoped real-time messaging between borrowers and owners via WebSocket + STOMP
 
 ## Phase Details
 
@@ -105,6 +107,37 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 8: Photo Upload R2 Migration
+**Goal**: Replace local filesystem storage with Cloudflare R2 for persistent, CDN-backed image hosting
+**Depends on**: Phase 2 (existing photo upload infrastructure)
+**Requirements**: R2-01, R2-02
+**Success Criteria** (what must be TRUE):
+  1. FileStorageService uploads to and deletes from Cloudflare R2 via S3 SDK
+  2. No local filesystem code remains in FileStorageService
+  3. Item image URLs stored in DB are full R2 public URLs
+  4. Next.js Image component renders images from R2 domain
+  5. WebConfig and SecurityConfig no longer reference /uploads/**
+  6. Backend and frontend tests updated for R2 storage
+**Plans**: 2/2 — 08-01 (R2 backend), 08-02 (frontend + cleanup)
+**UI hint**: no
+
+### Phase 9: In-App Chat
+**Goal**: Item-scoped real-time messaging between borrowers and item owners via WebSocket + STOMP
+**Depends on**: Phase 7 (auth infrastructure)
+**Requirements**: CHAT-01, CHAT-02, CHAT-03, CHAT-04
+**Success Criteria** (what must be TRUE):
+  1. chat_messages table stores messages with sender, receiver, item, and timestamps
+  2. WebSocket + STOMP configured with JWT authentication and SockJS fallback
+  3. REST endpoints serve conversation history and inbox
+  4. STOMP delivers messages in real-time to online recipients
+  5. Frontend ChatWindow component renders message thread with send capability
+  6. Item detail page has "Message Owner" button opening chat modal
+  7. /messages page shows conversation list with unread badges
+  8. Navbar shows unread message count badge
+  9. Backend and frontend tests cover chat functionality
+**Plans**: 4/4 — 09-01 (data model), 09-02 (backend), 09-03 (frontend UI), 09-04 (tests)
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -116,3 +149,5 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 | 5. Community Features | 3/3 | Complete | 2026-06-19 |
 | 6. Location Search | 0/5 | Not started | - |
 | 7. Google OAuth Signup | 4/4 | Complete | 2026-06-25 |
+| 8. Photo Upload R2 Migration | 2/2 | Not started | - |
+| 9. In-App Chat | 4/4 | Not started | - |
