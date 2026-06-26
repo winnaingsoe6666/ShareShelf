@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Package, Star, MessageSquare, MapPin } from "lucide-react";
+import { Package, Star, MessageSquare, MapPin, BadgeCheck, Globe } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Skeleton from "@/components/ui/Skeleton";
@@ -113,12 +113,32 @@ export default function ProfilePage() {
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="font-heading text-2xl font-bold text-purple-900">{user.name}</h1>
+                <h1 className="font-heading text-2xl font-bold text-purple-900 flex items-center gap-2">
+                  {user.name}
+                  {user.isIdVerified && (
+                    <span title="ID Verified" className="flex items-center">
+                      <BadgeCheck className="h-5 w-5 text-blue-500" />
+                    </span>
+                  )}
+                </h1>
                 <p className="text-sm text-stone-500">{user.email}</p>
                 {user.community && (
                   <p className="text-sm text-stone-500 inline-flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" />
                     {user.community}
+                  </p>
+                )}
+                {user.socialLink && (
+                  <p className="text-sm text-stone-500 inline-flex items-center gap-1 ml-3">
+                    <Globe className="h-3.5 w-3.5" />
+                    <a href={user.socialLink.startsWith('http') ? user.socialLink : `https://${user.socialLink}`} target="_blank" rel="noopener noreferrer" className="hover:underline text-purple-600">
+                      Social Link
+                    </a>
+                  </p>
+                )}
+                {user.bio && (
+                  <p className="mt-2 text-sm text-stone-700 max-w-md">
+                    {user.bio}
                   </p>
                 )}
                 {/* Trust score star gauge */}
@@ -137,7 +157,10 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout}>Log Out</Button>
+            <div className="flex flex-col gap-2">
+              <Button variant="primary" size="sm" onClick={() => router.push("/profile/edit")}>Edit Profile</Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>Log Out</Button>
+            </div>
           </div>
         </Card>
 

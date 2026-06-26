@@ -10,7 +10,7 @@ data class User(
     val id: Long? = null,
 
     @Column(nullable = false, length = 100)
-    val name: String = "",
+    var name: String = "",
 
     @Column(nullable = false, unique = true)
     val email: String = "",
@@ -26,7 +26,7 @@ data class User(
     var authProvider: AuthProvider = AuthProvider.LOCAL,
 
     @Column(length = 100)
-    val community: String? = null,
+    var community: String? = null,
 
     @Column(length = 20)
     val phone: String? = null,
@@ -45,6 +45,30 @@ data class User(
 
     @Column(name = "locked_until")
     var lockedUntil: LocalDateTime? = null,
+
+    @Column(columnDefinition = "TEXT")
+    var bio: String? = null,
+
+    @Column(name = "is_id_verified", nullable = false)
+    var isIdVerified: Boolean = false,
+
+    @Column(name = "address_line1")
+    var addressLine1: String? = null,
+
+    @Column(name = "address_line2")
+    var addressLine2: String? = null,
+
+    @Column(length = 100)
+    var city: String? = null,
+
+    @Column(length = 50)
+    var state: String? = null,
+
+    @Column(name = "zip_code", length = 20)
+    var zipCode: String? = null,
+
+    @Column(name = "social_link")
+    var socialLink: String? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.now(),

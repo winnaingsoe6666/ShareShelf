@@ -58,7 +58,15 @@ class AuthControllerTest {
             email = "test@example.com",
             trustScore = 5.0,
             community = null,
-            avatarUrl = null
+            avatarUrl = null,
+            bio = null,
+            isIdVerified = false,
+            addressLine1 = null,
+            addressLine2 = null,
+            city = null,
+            state = null,
+            zipCode = null,
+            socialLink = null
         )
 
         every { authService.refresh(refreshToken) } returns authResponse

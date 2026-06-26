@@ -17,7 +17,19 @@ export function saveAuth(auth: AuthResponse): void {
     trustScore: auth.trustScore,
     community: auth.community,
     avatarUrl: auth.avatarUrl,
+    bio: auth.bio,
+    isIdVerified: auth.isIdVerified,
+    addressLine1: auth.addressLine1,
+    addressLine2: auth.addressLine2,
+    city: auth.city,
+    state: auth.state,
+    zipCode: auth.zipCode,
+    socialLink: auth.socialLink,
   }));
+}
+
+export function updateUserSession(user: User): void {
+  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
 export function clearAuth(): void {

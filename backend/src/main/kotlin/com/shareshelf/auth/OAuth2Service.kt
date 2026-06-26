@@ -65,7 +65,15 @@ class OAuth2Service(
             email = user.email,
             trustScore = user.trustScore.toDouble(),
             community = user.community,
-            avatarUrl = user.avatarUrl
+            avatarUrl = user.avatarUrl,
+            bio = user.bio,
+            isIdVerified = user.isIdVerified,
+            addressLine1 = user.addressLine1,
+            addressLine2 = user.addressLine2,
+            city = user.city,
+            state = user.state,
+            zipCode = user.zipCode,
+            socialLink = user.socialLink
         )
     }
 

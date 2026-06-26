@@ -10,6 +10,14 @@ export interface User {
   trustScore: number;
   community?: string;
   avatarUrl?: string;
+  bio?: string;
+  isIdVerified: boolean;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  socialLink?: string;
 }
 
 export interface Category {
@@ -85,6 +93,14 @@ export interface AuthResponse {
   trustScore: number;
   community?: string;
   avatarUrl?: string;
+  bio?: string;
+  isIdVerified: boolean;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  socialLink?: string;
 }
 
 export interface ApiResponse<T> {

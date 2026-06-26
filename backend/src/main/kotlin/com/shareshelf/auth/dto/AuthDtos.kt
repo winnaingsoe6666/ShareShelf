@@ -44,7 +44,15 @@ data class AuthResponse(
     val email: String,
     val trustScore: Double,
     val community: String?,
-    val avatarUrl: String?
+    val avatarUrl: String?,
+    val bio: String?,
+    val isIdVerified: Boolean,
+    val addressLine1: String?,
+    val addressLine2: String?,
+    val city: String?,
+    val state: String?,
+    val zipCode: String?,
+    val socialLink: String?
 )
 
 data class RefreshRequest(

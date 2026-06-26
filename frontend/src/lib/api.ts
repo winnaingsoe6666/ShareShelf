@@ -78,6 +78,14 @@ api.interceptors.response.use(
               trustScore: data.data.trustScore,
               community: data.data.community,
               avatarUrl: data.data.avatarUrl,
+              bio: data.data.bio,
+              isIdVerified: data.data.isIdVerified,
+              addressLine1: data.data.addressLine1,
+              addressLine2: data.data.addressLine2,
+              city: data.data.city,
+              state: data.data.state,
+              zipCode: data.data.zipCode,
+              socialLink: data.data.socialLink,
             }));
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             processQueue(null, newToken);
