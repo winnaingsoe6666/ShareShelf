@@ -55,7 +55,7 @@ class SecurityConfig(
             .oauth2Login { oauth2 ->
                 oauth2
                     .authorizationEndpoint { it.baseUri("/oauth2/authorization") }
-                    .redirectionEndpoint { it.baseUri("/oauth2/callback/*") }
+                     // .redirectionEndpoint { it.baseUri("/oauth2/callback/*") }
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(oAuth2FailureHandler)
             }

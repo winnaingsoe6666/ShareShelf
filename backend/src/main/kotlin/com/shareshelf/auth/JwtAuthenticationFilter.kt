@@ -68,4 +68,11 @@ class JwtAuthenticationFilter(
         }
         return null
     }
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val path = request.servletPath
+        return path.startsWith("/login/oauth2/") ||
+            path.startsWith("/oauth2/") ||
+            path.startsWith("/api/auth/")
+}
 }
