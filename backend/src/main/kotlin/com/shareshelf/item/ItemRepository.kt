@@ -55,7 +55,7 @@ interface ItemRepository : JpaRepository<Item, Long> {
                   AND (CAST(:categoryId AS bigint) IS NULL OR i.category_id = :categoryId)
                   AND (CAST(:status AS text) IS NULL OR i.status = CAST(:status AS text))
                   AND (CAST(:minRating AS double precision) IS NULL OR u.trust_score >= :minRating)
-                  HAVING (6371000 * acos(
+                  AND (6371000 * acos(
                     cos(radians(:lat)) * cos(radians(i.latitude)) *
                     cos(radians(i.longitude) - radians(:lng)) +
                     sin(radians(:lat)) * sin(radians(i.latitude))
