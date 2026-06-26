@@ -187,7 +187,11 @@ export default function ItemDetailPage() {
                   onUpload={async (file) => {
                     const formData = new FormData();
                     formData.append("file", file);
-                    const res = await api.post(`/items/${id}/images`, formData);
+                    const res = await api.post(`/items/${id}/images`, formData, {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    });
                     setItem(res.data.data);
                   }}
                   onRemove={async (url) => {

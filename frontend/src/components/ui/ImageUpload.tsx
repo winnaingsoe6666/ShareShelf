@@ -53,12 +53,16 @@ export default function ImageUpload({
         try {
           await onUpload(file);
           // Remove preview on success
-          setPreviewUrls((prev) => prev.filter((u) => u !== previewUrl));
-          URL.revokeObjectURL(previewUrl);
+          setPreviewUrls((prev) => {
+            URL.revokeObjectURL(previewUrl);
+            return prev.filter((u) => u !== previewUrl);
+          });
         } catch {
           setErrorUrls((prev) => new Set(prev).add(file.name));
-          setPreviewUrls((prev) => prev.filter((u) => u !== previewUrl));
-          URL.revokeObjectURL(previewUrl);
+          setPreviewUrls((prev) => {
+            URL.revokeObjectURL(previewUrl);
+            return prev.filter((u) => u !== previewUrl);
+          });
         }
       }
 

@@ -65,7 +65,11 @@ export default function NewItemPage() {
           for (const file of selectedFiles) {
             const formData = new FormData();
             formData.append("file", file);
-            await api.post(`/items/${itemId}/images`, formData);
+            await api.post(`/items/${itemId}/images`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
           }
           setUploadingImages(false);
         }
