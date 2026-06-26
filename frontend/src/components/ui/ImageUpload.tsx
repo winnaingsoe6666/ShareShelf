@@ -133,15 +133,17 @@ export default function ImageUpload({
 
         {/* Add Image tile */}
         {showAddButton && (
-          <button
-            type="button"
-            aria-label="Add Image"
-            disabled={disabled}
-            onClick={() => inputRef.current?.click()}
-            className="aspect-square rounded-lg border-2 border-dashed border-purple-300 flex flex-col items-center justify-center hover:border-purple-400 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ImagePlus className="h-6 w-6 text-purple-500" />
-            <span className="text-sm text-purple-500 mt-1">Add Image</span>
+          <>
+            <button
+              type="button"
+              aria-label="Add Image"
+              disabled={disabled}
+              onClick={() => inputRef.current?.click()}
+              className="aspect-square rounded-lg border-2 border-dashed border-purple-300 flex flex-col items-center justify-center hover:border-purple-400 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ImagePlus className="h-6 w-6 text-purple-500" />
+              <span className="text-sm text-purple-500 mt-1">Add Image</span>
+            </button>
             <input
               ref={inputRef}
               type="file"
@@ -152,7 +154,7 @@ export default function ImageUpload({
               disabled={disabled}
               className="hidden"
             />
-          </button>
+          </>
         )}
       </div>
       <p className="text-xs text-stone-500 mt-1">
