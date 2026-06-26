@@ -14,11 +14,13 @@ export default function GoogleSignInButton({
   };
 
   const getAuthUrl = () => {
-    // Determine the backend host. If NEXT_PUBLIC_API_URL is not set, assume localhost:8080 for dev.
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-    // Strip "/api" from the end if it exists, as OAuth endpoints are at the root
-    const backendHost = apiUrl.replace(/\/api\/?$/, "");
-    return `${backendHost}/oauth2/authorization/google`;
+    // Use the apiUrl directly without stripping it, appending the oauth2 path
+    const base = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+    
+    // If they said /api/oauth2/authorization/google is correct, then this will evaluate to that
+    // assuming apiUrl is /api or http://localhost:8080/api
+    return `${base}/oauth2/authorization/google`;
   };
 
   return (
