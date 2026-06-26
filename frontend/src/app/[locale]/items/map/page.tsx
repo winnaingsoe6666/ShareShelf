@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { MapPin } from "lucide-react";
+import { MapPin, Loader2, AlertCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import api from "@/lib/api";
 import type { Item } from "@/types";
@@ -19,23 +19,33 @@ export default function MapSearchPage() {
   const [userLng, setUserLng] = useState<number | undefined>(undefined);
   const [radius, setRadius] = useState<number>(5000);
 
-  useEffect(() => {
+  const fetchItems = useCallback(() => {
     setLoading(true);
     setError("");
 
-    const params: Record<string, string | number> = {};
+    const params: Record<string, string | number> = { size: 50 };
+
     if (userLat != null && userLng != null) {
       params.nearLat = userLat;
       params.nearLng = userLng;
       params.nearRadius = radius;
     }
-    params.size = 50;
 
-    api.get("/items", { params })
+    api
+      .get("/items", { params })
       .then((res) => setItems(res.data.data?.content ?? []))
-      .catch(() => setError("Failed to load items"))
+      .catch(() => setError(t("itemMap.errorLoading") ?? "Failed to load items"))
       .finally(() => setLoading(false));
-  }, [userLat, userLng, radius]);
+  }, [userLat, userLng, radius, t]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  const handleLocationFound = useCallback((lat: number, lng: number) => {
+    setUserLat(lat);
+    setUserLng(lng);
+  }, []);
 
   return (
     <>
@@ -49,26 +59,34 @@ export default function MapSearchPage() {
           <p className="mt-2 text-stone-600">{t("itemMap.subtitle")}</p>
         </div>
 
-        {error ? (
-          <p className="py-16 text-center text-stone-500">{error}</p>
-        ) : (
-          <div className="relative">
-            {loading && (
-              <div className="absolute inset-0 z-10 h-[70vh] rounded-2xl bg-purple-100 animate-pulse flex items-center justify-center">
-                <p className="text-purple-400">{t("itemMap.loading")}</p>
-              </div>
-            )}
-            <MapView
-              items={items}
-              radius={radius}
-              onRadiusChange={setRadius}
-              onLocationFound={(lat, lng) => {
-                setUserLat(lat);
-                setUserLng(lng);
-              }}
-            />
+        {/* Error state */}
+        {error && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={fetchItems}
+              className="ml-auto text-sm underline hover:no-underline"
+            >
+              {t("common.retry") ?? "Retry"}
+            </button>
           </div>
         )}
+
+        {/* Loading overlay */}
+        <div className="relative">
+          {loading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+            </div>
+          )}
+          <MapView
+            items={items}
+            radius={radius}
+            onRadiusChange={setRadius}
+            onLocationFound={handleLocationFound}
+          />
+        </div>
       </main>
     </>
   );

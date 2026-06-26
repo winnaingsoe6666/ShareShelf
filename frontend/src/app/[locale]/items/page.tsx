@@ -1,4 +1,4 @@
-"use client";
+"use client"; // force HMR
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
@@ -278,9 +278,7 @@ export default function BrowseItemsPage() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
               {items.map((item) => (
-                <Link key={item.id} href={`/items/${item.id}`}>
-                  <ItemCard item={item} />
-                </Link>
+                <ItemCard key={item.id} item={item} />
               ))}
             </div>
           )}

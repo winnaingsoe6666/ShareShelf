@@ -28,6 +28,7 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID:local-dev-placeholder}
             client-secret: ${GOOGLE_CLIENT_SECRET:local-dev-placeholder}
+            redirect-uri: "${app.frontend-url}/api/oauth2/callback/{registrationId}"
             scope:
               - openid
               - profile
