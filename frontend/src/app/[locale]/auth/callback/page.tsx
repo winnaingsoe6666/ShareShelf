@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
-import { saveAuth } from "@/lib/auth";
+import { saveAuth, setToken } from "@/lib/auth";
 import Button from "@/components/ui/Button";
+import api from "@/lib/api";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -18,8 +19,17 @@ export default function AuthCallbackPage() {
     const returnUrl = searchParams.get("returnUrl");
 
     if (token && refreshToken) {
-      saveAuth({ token, refreshToken, userId: 0, name: "", email: "", trustScore: 0 });
-      router.push(returnUrl || "/items");
+      setToken(token, refreshToken);
+      api.get("/auth/me")
+        .then((res) => {
+          if (res.data.success) {
+            saveAuth(res.data.data);
+            router.push(returnUrl || "/items");
+          } else {
+            setState("error");
+          }
+        })
+        .catch(() => setState("error"));
     } else {
       setState("error");
     }
