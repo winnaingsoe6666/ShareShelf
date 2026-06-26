@@ -11,6 +11,7 @@ import com.shareshelf.item.entity.ItemStatus
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -57,10 +58,11 @@ class ItemService(
     ): Page<ItemResponse> {
         val items = when {
             nearLat != null && nearLng != null && nearRadius != null -> {
+                val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
                 itemRepository.findNearby(
                     nearLat, nearLng, nearRadius,
                     search, categoryId, status?.name, minRating,
-                    pageable
+                    unsortedPageable
                 )
             }
             search != null || categoryId != null || status != null || minRating != null -> {

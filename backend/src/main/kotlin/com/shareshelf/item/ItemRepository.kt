@@ -55,18 +55,18 @@ interface ItemRepository : JpaRepository<Item, Long> {
                   AND (CAST(:categoryId AS bigint) IS NULL OR i.category_id = :categoryId)
                   AND (CAST(:status AS text) IS NULL OR i.status = CAST(:status AS text))
                   AND (CAST(:minRating AS double precision) IS NULL OR u.trust_score >= :minRating)
-                  AND (6371000 * acos(
+                  AND (6371000 * acos(LEAST(1.0,
                     cos(radians(:lat)) * cos(radians(i.latitude)) *
                     cos(radians(i.longitude) - radians(:lng)) +
                     sin(radians(:lat)) * sin(radians(i.latitude))
-                  )) <= :radius
+                  ))) <= :radius
                   ORDER BY distance""",
         countQuery = """SELECT COUNT(*) FROM (
-                         SELECT (6371000 * acos(
+                         SELECT (6371000 * acos(LEAST(1.0,
                            cos(radians(:lat)) * cos(radians(i.latitude)) *
                            cos(radians(i.longitude) - radians(:lng)) +
                            sin(radians(:lat)) * sin(radians(i.latitude))
-                         )) AS distance
+                         ))) AS distance
                          FROM items i
                          LEFT JOIN users u ON u.id = i.owner_id
                          WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
