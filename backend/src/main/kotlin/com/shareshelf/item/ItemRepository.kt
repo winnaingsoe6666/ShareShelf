@@ -16,11 +16,11 @@ interface ItemRepository : JpaRepository<Item, Long> {
 
     @Query(
         """SELECT i FROM Item i WHERE
-          (:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%'))
-           OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
-          AND (:categoryId IS NULL OR i.categoryId = :categoryId)
-          AND (:status IS NULL OR i.status = :status)
-          AND (:minRating IS NULL OR
+          (CAST(:search AS string) IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+           OR LOWER(i.description) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
+          AND (CAST(:categoryId AS long) IS NULL OR i.categoryId = :categoryId)
+          AND (CAST(:status AS string) IS NULL OR CAST(i.status AS string) = CAST(:status AS string))
+          AND (CAST(:minRating AS double) IS NULL OR
                (SELECT u.trustScore FROM User u WHERE u.id = i.ownerId) >= :minRating)"""
     )
     fun search(
@@ -50,12 +50,16 @@ interface ItemRepository : JpaRepository<Item, Long> {
                   FROM items i
                   LEFT JOIN users u ON u.id = i.owner_id
                   WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
-                  AND (:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%'))
-                       OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
-                  AND (:categoryId IS NULL OR i.category_id = :categoryId)
-                  AND (:status IS NULL OR i.status = :status)
-                  AND (:minRating IS NULL OR u.trust_score >= :minRating)
-                  HAVING distance <= :radius
+                  AND (CAST(:search AS text) IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', CAST(:search AS text), '%'))
+                       OR LOWER(i.description) LIKE LOWER(CONCAT('%', CAST(:search AS text), '%')))
+                  AND (CAST(:categoryId AS bigint) IS NULL OR i.category_id = :categoryId)
+                  AND (CAST(:status AS text) IS NULL OR i.status = CAST(:status AS text))
+                  AND (CAST(:minRating AS double precision) IS NULL OR u.trust_score >= :minRating)
+                  HAVING (6371000 * acos(
+                    cos(radians(:lat)) * cos(radians(i.latitude)) *
+                    cos(radians(i.longitude) - radians(:lng)) +
+                    sin(radians(:lat)) * sin(radians(i.latitude))
+                  )) <= :radius
                   ORDER BY distance""",
         countQuery = """SELECT COUNT(*) FROM (
                          SELECT (6371000 * acos(
@@ -66,11 +70,11 @@ interface ItemRepository : JpaRepository<Item, Long> {
                          FROM items i
                          LEFT JOIN users u ON u.id = i.owner_id
                          WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
-                         AND (:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%'))
-                              OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
-                         AND (:categoryId IS NULL OR i.category_id = :categoryId)
-                         AND (:status IS NULL OR i.status = :status)
-                         AND (:minRating IS NULL OR u.trust_score >= :minRating)
+                         AND (CAST(:search AS text) IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', CAST(:search AS text), '%'))
+                              OR LOWER(i.description) LIKE LOWER(CONCAT('%', CAST(:search AS text), '%')))
+                         AND (CAST(:categoryId AS bigint) IS NULL OR i.category_id = :categoryId)
+                         AND (CAST(:status AS text) IS NULL OR i.status = CAST(:status AS text))
+                         AND (CAST(:minRating AS double precision) IS NULL OR u.trust_score >= :minRating)
                        ) sub
                        WHERE sub.distance <= :radius""",
         nativeQuery = true
