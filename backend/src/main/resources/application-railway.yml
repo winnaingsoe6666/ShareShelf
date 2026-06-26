@@ -1,7 +1,6 @@
 server:
   port: ${PORT:8080}
-  forward-headers-strategy: framework
-  spring.security.oauth2.client.registration.google.redirect-uri=https://shareshelf-production.up.railway.app/login/oauth2/code/google
+  
 
 spring:
   datasource:
