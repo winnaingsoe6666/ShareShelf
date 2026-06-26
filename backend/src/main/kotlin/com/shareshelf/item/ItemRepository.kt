@@ -48,17 +48,41 @@ interface ItemRepository : JpaRepository<Item, Long> {
                     sin(radians(:lat)) * sin(radians(i.latitude))
                   )) AS distance
                   FROM items i
+                  LEFT JOIN users u ON u.id = i.owner_id
                   WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
+                  AND (:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%'))
+                       OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
+                  AND (:categoryId IS NULL OR i.category_id = :categoryId)
+                  AND (:status IS NULL OR i.status = :status)
+                  AND (:minRating IS NULL OR u.trust_score >= :minRating)
                   HAVING distance <= :radius
                   ORDER BY distance""",
-        countQuery = """SELECT COUNT(*) FROM items i
-                       WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL""",
+        countQuery = """SELECT COUNT(*) FROM (
+                         SELECT (6371000 * acos(
+                           cos(radians(:lat)) * cos(radians(i.latitude)) *
+                           cos(radians(i.longitude) - radians(:lng)) +
+                           sin(radians(:lat)) * sin(radians(i.latitude))
+                         )) AS distance
+                         FROM items i
+                         LEFT JOIN users u ON u.id = i.owner_id
+                         WHERE i.latitude IS NOT NULL AND i.longitude IS NOT NULL
+                         AND (:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%'))
+                              OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
+                         AND (:categoryId IS NULL OR i.category_id = :categoryId)
+                         AND (:status IS NULL OR i.status = :status)
+                         AND (:minRating IS NULL OR u.trust_score >= :minRating)
+                       ) sub
+                       WHERE sub.distance <= :radius""",
         nativeQuery = true
     )
     fun findNearby(
         @Param("lat") lat: Double,
         @Param("lng") lng: Double,
         @Param("radius") radius: Double,
+        @Param("search") search: String?,
+        @Param("categoryId") categoryId: Long?,
+        @Param("status") status: String?,
+        @Param("minRating") minRating: Double?,
         pageable: Pageable
     ): Page<Item>
 }

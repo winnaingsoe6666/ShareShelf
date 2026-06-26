@@ -57,7 +57,11 @@ class ItemService(
     ): Page<ItemResponse> {
         val items = when {
             nearLat != null && nearLng != null && nearRadius != null -> {
-                itemRepository.findNearby(nearLat, nearLng, nearRadius, pageable)
+                itemRepository.findNearby(
+                    nearLat, nearLng, nearRadius,
+                    search, categoryId, status?.name, minRating,
+                    pageable
+                )
             }
             search != null || categoryId != null || status != null || minRating != null -> {
                 itemRepository.search(search, categoryId, status, minRating, pageable)
