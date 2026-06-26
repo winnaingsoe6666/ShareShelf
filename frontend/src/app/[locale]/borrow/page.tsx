@@ -10,7 +10,8 @@ import Skeleton from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import api from "@/lib/api";
 import { useTranslations } from "next-intl";
-import { getUser, isAuthenticated } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
+import AuthGuard from "@/components/auth/AuthGuard";
 import { formatDate } from "@/lib/utils";
 import type { BorrowRequest } from "@/types";
 
@@ -33,17 +34,13 @@ export default function BorrowPage() {
   const t = useTranslations();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !isAuthenticated()) {
-      router.push("/login");
-      return;
-    }
     api.get("/borrow")
       .then((res) => setRequests(res.data.data?.content ?? []))
       .catch(() => {
         setError(t("borrowPage.failedToLoad"));
       })
       .finally(() => setLoading(false));
-  }, [router, t]);
+  }, [t]);
 
   useEffect(() => {
     if (actionError) {
@@ -115,6 +112,7 @@ export default function BorrowPage() {
   );
 
   return (
+    <AuthGuard>
     <>
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8">
@@ -211,5 +209,6 @@ export default function BorrowPage() {
         </div>
       </main>
     </>
+    </AuthGuard>
   );
 }

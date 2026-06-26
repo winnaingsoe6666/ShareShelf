@@ -37,7 +37,8 @@ export default function LoginPage() {
       const res = await api.post("/auth/login", { email, password });
       if (res.data.success) {
         saveAuth(res.data.data);
-        router.push("/items");
+        const returnUrl = searchParams.get("returnUrl");
+        router.push(returnUrl || "/items");
       } else {
         setError(res.data.message || t("loginPage.failed"));
       }

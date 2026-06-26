@@ -11,7 +11,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ImageUpload from "@/components/ui/ImageUpload";
 import api from "@/lib/api";
-import { isAuthenticated } from "@/lib/auth";
+import AuthGuard from "@/components/auth/AuthGuard";
 import type { Category } from "@/types";
 
 export default function NewItemPage() {
@@ -40,11 +40,7 @@ export default function NewItemPage() {
       .finally(() => setCatLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && !isAuthenticated()) {
-      router.push("/login");
-    }
-  }, [router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +81,7 @@ export default function NewItemPage() {
   };
 
   return (
+    <AuthGuard>
     <>
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8">
@@ -204,5 +201,6 @@ export default function NewItemPage() {
         </form>
       </main>
     </>
+    </AuthGuard>
   );
 }

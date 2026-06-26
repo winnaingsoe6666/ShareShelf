@@ -74,5 +74,5 @@ class JwtAuthenticationFilter(
         return path.startsWith("/login/oauth2/") ||
             path.startsWith("/oauth2/") ||
             path.startsWith("/api/auth/")
-}
+    }
 }

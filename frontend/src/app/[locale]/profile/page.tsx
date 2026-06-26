@@ -9,7 +9,8 @@ import Skeleton from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import api from "@/lib/api";
 import { useTranslations } from "next-intl";
-import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
+import { getUser, clearAuth } from "@/lib/auth";
+import AuthGuard from "@/components/auth/AuthGuard";
 import type { Item, Review } from "@/types";
 
 export default function ProfilePage() {
@@ -21,10 +22,6 @@ export default function ProfilePage() {
   const t = useTranslations();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !isAuthenticated()) {
-      router.push("/login");
-      return;
-    }
     Promise.all([
       api.get("/items").catch(() => ({ data: { data: [] } })),
       api.get(`/review/user/${user?.id}`).catch(() => ({ data: { data: [] } })),
@@ -32,7 +29,7 @@ export default function ProfilePage() {
       setItems((itemsRes.data.data?.content ?? []).filter((i: Item) => i.ownerId === user?.id));
       setReviews(reviewsRes.data.data ?? []);
     }).finally(() => setLoading(false));
-  }, [router, user?.id]);
+  }, [user?.id]);
 
   if (loading) return (
     <>
@@ -85,6 +82,7 @@ export default function ProfilePage() {
   };
 
   return (
+    <AuthGuard>
     <>
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8">
@@ -194,5 +192,6 @@ export default function ProfilePage() {
         </section>
       </main>
     </>
+    </AuthGuard>
   );
 }

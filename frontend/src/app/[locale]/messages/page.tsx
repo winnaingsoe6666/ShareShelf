@@ -8,6 +8,7 @@ import ConversationList from "@/components/chat/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
 import { useChatSocket } from "@/lib/useChatSocket";
 import { getUser } from "@/lib/auth";
+import AuthGuard from "@/components/auth/AuthGuard";
 import type { ChatMessage } from "@/types";
 
 export default function MessagesPage() {
@@ -73,6 +74,7 @@ export default function MessagesPage() {
   const hasSelection = selectedItemId !== null && selectedOtherUserId !== null;
 
   return (
+    <AuthGuard>
     <>
       <Navbar />
       <main className="mx-auto max-w-6xl px-0 md:px-4 py-0 md:py-8">
@@ -118,5 +120,6 @@ export default function MessagesPage() {
         </div>
       </main>
     </>
+    </AuthGuard>
   );
 }

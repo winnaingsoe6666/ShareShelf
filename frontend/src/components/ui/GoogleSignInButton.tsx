@@ -13,9 +13,17 @@ export default function GoogleSignInButton({
     document.cookie = `oauth_return_url=${encodeURIComponent(window.location.pathname + window.location.search)};path=/;max-age=600;SameSite=Lax`;
   };
 
+  const getAuthUrl = () => {
+    // Determine the backend host. If NEXT_PUBLIC_API_URL is not set, assume localhost:8080 for dev.
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+    // Strip "/api" from the end if it exists, as OAuth endpoints are at the root
+    const backendHost = apiUrl.replace(/\/api\/?$/, "");
+    return `${backendHost}/oauth2/authorization/google`;
+  };
+
   return (
     <a
-      href="/api/oauth2/authorization/google"
+      href={getAuthUrl()}
       onClick={handleClick}
       aria-label={text}
       className={`w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${className}`}
