@@ -1,1 +1,1 @@
-CREATE EXTENSION IF NOT EXISTS postgis;
+-- No-op: PostGIS removed (was CREATE EXTENSION postgis)
