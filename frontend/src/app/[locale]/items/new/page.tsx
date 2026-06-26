@@ -25,7 +25,19 @@ export default function NewItemPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<{file: File, url: string}[]>([]);
+  const selectedFilesRef = useRef(selectedFiles);
+  
+  useEffect(() => {
+    selectedFilesRef.current = selectedFiles;
+  }, [selectedFiles]);
+
+  useEffect(() => {
+    return () => {
+      selectedFilesRef.current.forEach((f) => URL.revokeObjectURL(f.url));
+    };
+  }, []);
+
   const [uploadingImages, setUploadingImages] = useState(false);
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
@@ -62,9 +74,9 @@ export default function NewItemPage() {
         const itemId = res.data.data.id;
         if (selectedFiles.length > 0) {
           setUploadingImages(true);
-          for (const file of selectedFiles) {
+          for (const item of selectedFiles) {
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", item.file);
             await api.post(`/items/${itemId}/images`, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
@@ -189,12 +201,19 @@ export default function NewItemPage() {
               {t("itemNew.images")}
             </h2>
             <ImageUpload
-              images={[]}
+              images={selectedFiles.map((f) => f.url)}
               onUpload={async (file) => {
-                setSelectedFiles((prev) => [...prev, file]);
+                const url = URL.createObjectURL(file);
+                setSelectedFiles((prev) => [...prev, { file, url }]);
               }}
-              onRemove={(fileName) => {
-                setSelectedFiles((prev) => prev.filter((f) => f.name !== fileName));
+              onRemove={(urlToRemove) => {
+                setSelectedFiles((prev) => prev.filter((f) => {
+                  if (f.url === urlToRemove) {
+                    URL.revokeObjectURL(urlToRemove);
+                    return false;
+                  }
+                  return true;
+                }));
               }}
               disabled={loading || uploadingImages}
               uploading={false}
