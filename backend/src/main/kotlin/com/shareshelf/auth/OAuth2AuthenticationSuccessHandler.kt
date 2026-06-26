@@ -15,27 +15,50 @@ class OAuth2AuthenticationSuccessHandler(
     @Value("\${app.frontend-url}") private val frontendUrl: String
 ) : AuthenticationSuccessHandler {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
         authentication: Authentication
     ) {
-        val oAuth2User = authentication.principal as OAuth2User
-        val user = oAuth2Service.processOAuthUser(oAuth2User)
-        val authResponse = oAuth2Service.generateOAuthResponse(user)
+        try {
+            logger.info("=== OAuth2 Success Handler START ===")
+            
+            val oAuth2User = authentication.principal as OAuth2User
+            logger.info("OAuth2User attributes: ${oAuth2User.attributes}")
 
-        val returnUrl = request.cookies?.firstOrNull { it.name == "oauth_return_url" }?.value ?: ""
+            logger.info("Calling processOAuthUser...")
+            val user = oAuth2Service.processOAuthUser(oAuth2User)
+            logger.info("processOAuthUser SUCCESS: userId=${user.id}")
 
-        val redirectUrl = buildString {
-            append(frontendUrl)
-            append("/auth/callback")
-            append("?token=").append(authResponse.token)
-            append("&refreshToken=").append(authResponse.refreshToken)
-            if (returnUrl.isNotBlank()) {
-                append("&returnUrl=").append(returnUrl)
+            logger.info("Calling generateOAuthResponse...")
+            val authResponse = oAuth2Service.generateOAuthResponse(user)
+            logger.info("generateOAuthResponse SUCCESS")
+
+            val returnUrl = request.cookies
+                ?.firstOrNull { it.name == "oauth_return_url" }
+                ?.value ?: ""
+
+            val redirectUrl = buildString {
+                append(frontendUrl)
+                append("/auth/callback")
+                append("?token=").append(authResponse.token)
+                append("&refreshToken=").append(authResponse.refreshToken)
+                if (returnUrl.isNotBlank()) {
+                    append("&returnUrl=").append(returnUrl)
+                }
             }
-        }
 
-        response.sendRedirect(redirectUrl)
+            logger.info("Redirecting to: $redirectUrl")
+            response.sendRedirect(redirectUrl)
+
+        } catch (e: Exception) {
+            logger.error("=== OAuth2 FAILED at: ${e.javaClass.simpleName} ===", e)
+            logger.error("Message: ${e.message}")
+            logger.error("Cause: ${e.cause}")
+            // frontend error page ကို redirect လုပ်
+            response.sendRedirect("$frontendUrl/auth/error?reason=oauth_failed")
+        }
     }
 }
