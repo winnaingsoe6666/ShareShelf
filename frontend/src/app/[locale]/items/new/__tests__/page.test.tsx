@@ -93,7 +93,7 @@ describe("NewItemPage", () => {
   });
 
   it("shows loading state while categories load", async () => {
-    let r: (v: unknown) => void;
+    let r!: (v: unknown) => void;
     const d = new Promise((res) => { r = res; });
     mockApiGet.mockReturnValue(d);
     renderPage();
