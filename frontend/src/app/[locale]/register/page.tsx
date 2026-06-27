@@ -56,7 +56,7 @@ export default function RegisterPage() {
           <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-lg mb-2 transform hover:scale-105 transition-transform duration-300">
             <Library className="w-5 h-5 text-white" />
           </div>
-          <span className="font-display text-lg tracking-widest text-green-500 font-semibold">
+          <span className="font-display text-lg tracking-widest text-green-400 font-semibold">
             SHARE SHELF
           </span>
           <span className="text-[9px] uppercase tracking-widest text-green-600/70 font-bold mt-1">
@@ -66,16 +66,16 @@ export default function RegisterPage() {
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
         <div className="mb-5 p-4 rounded-xl bg-white/3 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
-          <span className="absolute -top-1 left-3 text-4xl text-green-700 font-serif pointer-events-none select-none">“</span>
-          <CommunityQuotes locale={locale} variant="dark" />
+          <span className="absolute -top-1 left-3 text-4xl text-green-400/20 font-serif pointer-events-none select-none">“</span>
+          <CommunityQuotes locale={locale} variant="green" />
         </div>
 
         {/* Card Header & Description */}
         <div className="text-center mb-5">
-          <h1 className="font-heading text-xl font-bold text-white-600">
+          <h1 className="font-heading text-xl font-bold text-white">
             {t("registerPage.title")}
           </h1>
-          <p className="text-xs text-white-400 mt-1">
+          <p className="text-xs text-stone-300 mt-1">
             {locale === "my"
               ? "သင့်လူမှုအသိုင်းအဝိုင်း ကိရိယာစာကြည့်တိုက်သို့ ပါဝင်ပါ"
               : "Join your community tool library"}
@@ -95,7 +95,7 @@ export default function RegisterPage() {
 
           {/* Error display */}
           {searchParams.get("error") === "google_auth_failed" && (
-            <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-xs text-red-700 text-center font-medium shadow-sm animate-fade-in">
+            <div className="rounded-xl bg-red-500/20 backdrop-blur-md border border-red-500/30 px-4 py-3 text-xs text-red-200 text-center font-medium shadow-sm animate-fade-in">
               {locale === "my"
                 ? "Google ဖြင့် စာရင်းသွင်းခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။"
                 : "Google sign-up failed. Please try again."}
@@ -104,11 +104,11 @@ export default function RegisterPage() {
         </div>
 
         {/* Login link */}
-        <div className="mt-6 text-center text-xs text-white-600">
+        <div className="mt-6 text-center text-xs text-stone-300">
           {t("registerPage.haveAccount")}{" "}
           <Link
             href="/login"
-            className="font-semibold text-green-700 hover:text-purple-600 underline underline-offset-4 decoration-purple-200 hover:decoration-purple-500 transition-all duration-200"
+            className="font-semibold text-green-400 hover:text-green-300 underline underline-offset-4 decoration-green-500/50 hover:decoration-green-400 transition-all duration-200"
           >
             {t("registerPage.login")}
           </Link>

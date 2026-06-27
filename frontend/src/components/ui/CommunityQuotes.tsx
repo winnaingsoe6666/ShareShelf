@@ -39,7 +39,7 @@ const quotesMy: Quote[] = [
 
 interface CommunityQuotesProps {
   locale?: string;
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "green";
 }
 
 export default function CommunityQuotes({ locale = "en", variant = "light" }: CommunityQuotesProps) {
@@ -65,6 +65,24 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
 
   const quote = quotes[currentIndex];
   const isDark = variant === "dark";
+  const isGreen = variant === "green";
+
+  const getDotClass = (i: number) => {
+    const isActive = i === currentIndex;
+    if (isGreen) {
+      return isActive
+        ? "w-5 h-1.5 bg-emerald-400"
+        : "w-1.5 h-1.5 bg-emerald-500/30 hover:bg-emerald-400/50";
+    }
+    if (isDark) {
+      return isActive
+        ? "w-5 h-1.5 bg-purple-600"
+        : "w-1.5 h-1.5 bg-purple-200 hover:bg-purple-300";
+    }
+    return isActive
+      ? "w-5 h-1.5 bg-white"
+      : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60";
+  };
 
   return (
     <div
@@ -80,14 +98,16 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
           fade ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
         }`}
       >
-        <span className={`block ${isDark ? "text-2xl mb-1" : "text-3xl mb-2"}`} role="img" aria-hidden="true">
+        <span className={`block ${isDark || isGreen ? "text-2xl mb-1" : "text-3xl mb-2"}`} role="img" aria-hidden="true">
           {quote.icon}
         </span>
         <p
           className={`font-heading font-semibold leading-relaxed italic transition-colors duration-300 ${
-            isDark
-              ? "text-base text-purple-950/80"
-              : "text-base sm:text-lg text-white/90"
+            isGreen
+              ? "text-base sm:text-lg text-emerald-300"
+              : isDark
+                ? "text-base text-purple-950/80"
+                : "text-base sm:text-lg text-white/90"
           }`}
         >
           &ldquo;{quote.text}&rdquo;
@@ -107,15 +127,7 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
                 setFade(true);
               }, 300);
             }}
-            className={`rounded-full transition-all duration-300 ${
-              i === currentIndex
-                ? isDark
-                  ? "w-5 h-1.5 bg-purple-600"
-                  : "w-5 h-1.5 bg-white"
-                : isDark
-                  ? "w-1.5 h-1.5 bg-purple-200 hover:bg-purple-300"
-                  : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60"
-            }`}
+            className={`rounded-full transition-all duration-300 ${getDotClass(i)}`}
             aria-label={`Go to quote ${i + 1}`}
           />
         ))}

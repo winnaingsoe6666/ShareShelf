@@ -56,26 +56,26 @@ export default function LoginPage() {
           <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-lg mb-2 transform hover:scale-105 transition-transform duration-300">
             <Library className="w-5 h-5 text-white" />
           </div>
-          <span className="font-display text-lg tracking-widest text-purple-900 font-semibold">
+          <span className="font-display text-lg tracking-widest text-green-400 font-semibold">
             SHARE SHELF
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-purple-600/70 font-bold mt-1">
+          <span className="text-[9px] uppercase tracking-widest text-green-600/70 font-bold mt-1">
             {locale === "my" ? "ရပ်ကွက်ကိရိယာမျှဝေခြင်း" : "Community Tool Library"}
           </span>
         </div>
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
         <div className="mb-5 p-4 rounded-xl bg-white/3 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
-          <span className="absolute -top-1 left-3 text-4xl text-purple-200/20 font-serif pointer-events-none select-none">“</span>
-          <CommunityQuotes locale={locale} variant="dark" />
+          <span className="absolute -top-1 left-3 text-4xl text-green-400/20 font-serif pointer-events-none select-none">“</span>
+          <CommunityQuotes locale={locale} variant="green" />
         </div>
 
         {/* Card Header & Description */}
         <div className="text-center mb-5">
-          <h1 className="font-heading text-xl font-bold text-stone-900">
+          <h1 className="font-heading text-xl font-bold text-white">
             {t("loginPage.title")}
           </h1>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-300 mt-1">
             {locale === "my"
               ? "ဆက်လက်ဆောင်ရွက်ရန် သင့်အကောင့်သို့ ဝင်ရောက်ပါ"
               : "Sign in to your account to continue"}
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
           {/* Error display */}
           {searchParams.get("error") === "google_auth_failed" && (
-            <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-xs text-red-700 text-center font-medium shadow-sm animate-fade-in">
+            <div className="rounded-xl bg-red-500/20 backdrop-blur-md border border-red-500/30 px-4 py-3 text-xs text-red-200 text-center font-medium shadow-sm animate-fade-in">
               {locale === "my"
                 ? "Google ဖြင့် ဝင်ရောက်ခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။"
                 : "Google sign-in failed. Please try again."}
@@ -104,11 +104,11 @@ export default function LoginPage() {
         </div>
 
         {/* Register link */}
-        <div className="mt-6 text-center text-xs text-stone-500">
+        <div className="mt-6 text-center text-xs text-stone-300">
           {t("loginPage.noAccount")}{" "}
           <Link
             href="/register"
-            className="font-semibold text-purple-700 hover:text-purple-600 underline underline-offset-4 decoration-purple-200 hover:decoration-purple-500 transition-all duration-200"
+            className="font-semibold text-green-400 hover:text-green-300 underline underline-offset-4 decoration-green-500/50 hover:decoration-green-400 transition-all duration-200"
           >
             {t("loginPage.register")}
           </Link>
