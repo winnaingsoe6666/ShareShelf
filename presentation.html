@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShareShelf — Community Tool Library</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --emerald-400: #34d399;
+    --emerald-500: #10b981;
+    --emerald-600: #059669;
+    --emerald-700: #047857;
+    --emerald-900: #064e3b;
+    --dark-950: #0a0a0a;
+    --dark-900: #111111;
+    --dark-800: #1a1a1a;
+    --dark-700: #262626;
+    --dark-600: #333333;
+    --stone-300: #d6d3d1;
+    --stone-400: #a8a29e;
+    --stone-500: #78716c;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--dark-950);
+    color: #f5f5f4;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Progress Bar ───────────────────────────────────── */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    z-index: 1000;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .progress-bar .fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--emerald-600), var(--emerald-400));
+    transition: width 0.1s linear;
+    box-shadow: 0 0 12px var(--emerald-500);
+  }
+
+  /* ── Slide Counter ──────────────────────────────────── */
+  .slide-counter {
+    position: fixed;
+    bottom: 32px;
+    right: 40px;
+    z-index: 1000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--stone-500);
+    letter-spacing: 0.08em;
+    user-select: none;
+  }
+
+  .slide-counter .current {
+    color: var(--emerald-400);
+    font-size: 20px;
+  }
+
+  /* ── Dot Navigation ─────────────────────────────────── */
+  .dot-nav {
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .dot-nav button {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--stone-500);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .dot-nav button:hover {
+    border-color: var(--emerald-400);
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+  }
+
+  .dot-nav button.active {
+    background: var(--emerald-400);
+    border-color: var(--emerald-400);
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    transform: scale(1.3);
+  }
+
+  /* ── Slides Container ───────────────────────────────── */
+  .slides-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s 0.7s;
+    padding: 80px 80px 80px 80px;
+    overflow: hidden;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s,
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s,
+                visibility 0s 0s;
+  }
+
+  /* ── Animated Children ──────────────────────────────── */
+  .slide .anim {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .slide.active .anim {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .slide.active .anim:nth-child(1) { transition-delay: 0.15s; }
+  .slide.active .anim:nth-child(2) { transition-delay: 0.30s; }
+  .slide.active .anim:nth-child(3) { transition-delay: 0.45s; }
+  .slide.active .anim:nth-child(4) { transition-delay: 0.60s; }
+  .slide.active .anim:nth-child(5) { transition-delay: 0.75s; }
+  .slide.active .anim:nth-child(6) { transition-delay: 0.90s; }
+
+  /* ── Common Slide Typography ────────────────────────── */
+  .slide-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--emerald-400);
+    margin-bottom: 20px;
+  }
+
+  .slide h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 28px;
+  }
+
+  .slide h2 {
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin-bottom: 24px;
+  }
+
+  .slide .tagline {
+    font-size: clamp(18px, 2.2vw, 28px);
+    font-weight: 300;
+    color: var(--stone-300);
+    line-height: 1.5;
+    max-width: 680px;
+    border-left: 3px solid var(--emerald-500);
+    padding-left: 20px;
+    margin-top: 32px;
+  }
+
+  .slide .tagline em {
+    color: var(--emerald-400);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .accent { color: var(--emerald-400); }
+  .dim { color: var(--stone-400); }
+
+  /* ── Bullet Lists ───────────────────────────────────── */
+  .point-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 8px;
+  }
+
+  .point-list li {
+    font-size: clamp(16px, 1.6vw, 22px);
+    font-weight: 400;
+    color: var(--stone-300);
+    line-height: 1.55;
+    padding-left: 28px;
+    position: relative;
+  }
+
+  .point-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--emerald-500);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+
+  /* ── Slide Backgrounds & Unique Styling ─────────────── */
+
+  /* Slide 1 — The Everyday Borrower */
+  .slide--borrower {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 20%, rgba(52, 211, 153, 0.04) 0%, transparent 50%),
+      var(--dark-950);
+  }
+
+  .slide--borrower .slide-inner {
+    max-width: 900px;
+  }
+
+  .slide--borrower h1 {
+    background: linear-gradient(135deg, #ffffff 0%, var(--stone-300) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .persona-icons {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+
+  .persona-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    padding: 10px 20px 10px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--stone-300);
+    backdrop-filter: blur(8px);
+  }
+
+  .persona-chip .chip-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: rgba(16, 185, 129, 0.15);
+    flex-shrink: 0;
+  }
+
+  /* Slide 2 — The Problem */
+  .slide--problem {
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 70%, rgba(239, 68, 68, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 30%, rgba(5, 150, 105, 0.05) 0%, transparent 50%),
+      var(--dark-950);
+  }
+
+  .slide--problem .slide-inner {
+    max-width: 880px;
+  }
+
+  .slide--problem h2 {
+    color: #fca5a5;
+  }
+
+  .waste-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+
+  .waste-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+  }
+
+  .waste-card:hover {
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .waste-card .waste-emoji {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .waste-card .waste-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--stone-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .waste-card .waste-detail {
+    font-size: 15px;
+    color: var(--stone-300);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .slide--problem .tagline {
+    border-left-color: #ef4444;
+  }
+
+  .slide--problem .tagline em {
+    color: #fca5a5;
+  }
+
+  /* Slide 3 — ShareShelf */
+  .slide--product {
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%, rgba(5, 150, 105, 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(52, 211, 153, 0.06) 0%, transparent 50%),
+      var(--dark-950);
+  }
+
+  .slide--product .slide-inner {
+    max-width: 960px;
+    width: 100%;
+  }
+
+  .slide--product h2 {
+    background: linear-gradient(135deg, var(--emerald-400) 0%, #6ee7b7 50%, #a7f3d0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 28px;
+    margin-bottom: 20px;
+  }
+
+  .feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--emerald-500), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(52, 211, 153, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+
+  .feature-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #f5f5f4;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    color: var(--stone-400);
+    line-height: 1.55;
+  }
+
+  /* ── Keyboard hint ──────────────────────────────────── */
+  .key-hint {
+    position: fixed;
+    bottom: 32px;
+    left: 40px;
+    z-index: 1000;
+    font-size: 12px;
+    color: var(--stone-500);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+
+  .key-hint kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 22px;
+    padding: 0 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--stone-400);
+  }
+
+  /* Slide 4 — Built With AI */
+  .slide--ai {
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 60%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 70% 30%, rgba(52, 211, 153, 0.05) 0%, transparent 50%),
+      var(--dark-950);
+  }
+
+  .slide--ai .slide-inner { max-width: 880px; }
+
+  .slide--ai strong {
+    color: var(--emerald-400);
+    font-weight: 600;
+  }
+
+  /* Slide 5 — Impact */
+  .slide--impact {
+    background:
+      radial-gradient(ellipse 70% 60% at 60% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 20% 80%, rgba(52, 211, 153, 0.06) 0%, transparent 50%),
+      var(--dark-950);
+  }
+
+  .slide--impact .slide-inner { max-width: 960px; width: 100%; }
+
+  .slide--impact h2 {
+    background: linear-gradient(135deg, #ffffff 0%, var(--emerald-400) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Slide 6 — Live */
+  .slide--live {
+    background:
+      radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 150, 105, 0.12) 0%, transparent 60%),
+      var(--dark-950);
+  }
+
+  .slide--live .slide-inner { max-width: 880px; }
+
+  .slide--live h2 {
+    background: linear-gradient(135deg, var(--emerald-400) 0%, #6ee7b7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* CTA Button */
+  .cta-button {
+    display: inline-block;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 12px;
+    letter-spacing: 0.02em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.45);
+    background: linear-gradient(135deg, var(--emerald-500), var(--emerald-400));
+  }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .slide { padding: 60px 32px; }
+    .waste-grid, .feature-grid { grid-template-columns: 1fr; }
+    .persona-icons { flex-wrap: wrap; }
+    .dot-nav { right: 16px; }
+    .slide-counter { right: 20px; bottom: 20px; }
+    .key-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Progress Bar ──────────────────────────────── -->
+<div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+
+<!-- ── Dot Navigation ───────────────────────────── -->
+<nav class="dot-nav" id="dotNav">
+  <button data-slide="0" class="active" aria-label="Slide 1"></button>
+  <button data-slide="1" aria-label="Slide 2"></button>
+  <button data-slide="2" aria-label="Slide 3"></button>
+  <button data-slide="3" aria-label="Slide 4"></button>
+  <button data-slide="4" aria-label="Slide 5"></button>
+  <button data-slide="5" aria-label="Slide 6"></button>
+</nav>
+
+<!-- ── Slide Counter ────────────────────────────── -->
+<div class="slide-counter">
+  <span class="current" id="counterCurrent">1</span>
+  <span>/</span>
+  <span id="counterTotal">6</span>
+</div>
+
+<!-- ── Keyboard Hint ────────────────────────────── -->
+<div class="key-hint">
+  <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- SLIDES                                         -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="slides-wrapper" id="slidesWrapper">
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 1 — The Everyday Borrower                  -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--borrower active" data-slide="0">
+    <div class="slide-inner">
+      <div class="slide-label anim">Who is this for?</div>
+      <h1 class="anim">The Everyday<br><span class="accent">Borrower</span></h1>
+
+      <div class="persona-icons anim">
+        <div class="persona-chip">
+          <span class="chip-icon">&#x1F6E0;</span>
+          DIY-ers
+        </div>
+        <div class="persona-chip">
+          <span class="chip-icon">&#x26FA;</span>
+          Campers
+        </div>
+        <div class="persona-chip">
+          <span class="chip-icon">&#x1F393;</span>
+          Students
+        </div>
+      </div>
+
+      <ul class="point-list anim">
+        <li>Occasional DIY-ers, campers, students &mdash; people who need tools <strong>once or twice a year</strong></li>
+        <li>Neighbors tired of buying a <strong>$200 drill</strong> for a single shelf-install job</li>
+        <li>Community members who want to connect locally but <strong>lack a reason</strong> to reach out</li>
+      </ul>
+
+      <div class="tagline anim">
+        "They don't need to <em>own</em> it &mdash;<br>they just need to <em>use</em> it."
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 2 — The Problem                            -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--problem" data-slide="1">
+    <div class="slide-inner">
+      <div class="slide-label anim">The reality</div>
+      <h2 class="anim">We buy too much.<br>We share too little.</h2>
+
+      <div class="waste-grid anim">
+        <div class="waste-card">
+          <span class="waste-emoji">&#x1F527;</span>
+          <div class="waste-label">Drills</div>
+          <div class="waste-detail">Bought for one task,<br>buried in the closet</div>
+        </div>
+        <div class="waste-card">
+          <span class="waste-emoji">&#x26FA;</span>
+          <div class="waste-label">Tents</div>
+          <div class="waste-detail">One camping trip a year,<br>stored the other 364 days</div>
+        </div>
+        <div class="waste-card">
+          <span class="waste-emoji">&#x1F4FA;</span>
+          <div class="waste-label">Projectors</div>
+          <div class="waste-detail">Movie night twice,<br>then collect dust forever</div>
+        </div>
+      </div>
+
+      <ul class="point-list anim">
+        <li>Every neighbor buys the <strong>same gear</strong>; none of them share &mdash; money wasted, homes cluttered</li>
+        <li>No simple, <strong>trustworthy way</strong> to borrow from someone nearby without awkward DMs</li>
+      </ul>
+
+      <div class="tagline anim">
+        "We buy too much and share too little &mdash;<br><em>and it costs everyone.</em>"
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 3 — ShareShelf                             -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--product" data-slide="2">
+    <div class="slide-inner">
+      <div class="slide-label anim">The solution</div>
+      <h2 class="anim">ShareShelf &mdash; A Community<br>Tool Library</h2>
+
+      <div class="feature-grid anim">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4E6;</div>
+          <h3>List &amp; Browse</h3>
+          <p>List tools you rarely use; browse what neighbors are sharing nearby</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F504;</div>
+          <h3>Full Lifecycle</h3>
+          <p>Request &rarr; Approve &rarr; Pickup &rarr; Return &rarr; Review &mdash; every step tracked</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F6E1;</div>
+          <h3>Trust &amp; Safety</h3>
+          <p>User ratings, reviews, and trust scores power every interaction</p>
+        </div>
+      </div>
+
+      <div class="tagline anim">
+        "A complete borrowing platform that makes<br><em>sharing as easy as scrolling.</em>"
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 4 — Built With AI                         -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--ai" data-slide="3">
+    <div class="slide-inner">
+      <div class="slide-label anim">How it was built</div>
+      <h2 class="anim">Built With AI,<br><span class="accent">Ship With Confidence</span></h2>
+
+      <ul class="point-list anim">
+        <li>MCP server <strong>shareshelf-db</strong> &mdash; AI reads PostgreSQL schema and live data in real time</li>
+        <li>Skill <strong>analyze-shareshelf-db</strong> &mdash; safe, read-only DB inspection directly from chat</li>
+        <li>Agent <strong>db-assistant</strong> &mdash; expert DBA optimizing queries and debugging data models</li>
+      </ul>
+
+      <div class="tagline anim">
+        "AI tooling didn't just help write code &mdash;<br><em>it helped understand the data underneath.</em>"
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 5 — Less Waste, More Neighbors             -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--impact" data-slide="4">
+    <div class="slide-inner">
+      <div class="slide-label anim">The impact</div>
+      <h2 class="anim">Less Waste,<br><span class="accent">More Neighbors</span></h2>
+
+      <div class="feature-grid anim">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4B0;</div>
+          <h3>Save Money</h3>
+          <p>Every borrow means one fewer purchase &mdash; savings across the whole community</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F331;</div>
+          <h3>Reduce Waste</h3>
+          <p>Fewer idle tools manufactured, shipped, and thrown away &mdash; real environmental impact</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F91D;</div>
+          <h3>Build Trust</h3>
+          <p>Every completed borrow builds a trust score &mdash; neighbors become collaborators</p>
+        </div>
+      </div>
+
+      <div class="tagline anim">
+        "Sharing tools shrinks waste, grows savings, and<br><em>weaves stronger neighborhoods.</em>"
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────── -->
+  <!-- SLIDE 6 — What's Live & What's Next              -->
+  <!-- ──────────────────────────────────────────────── -->
+  <section class="slide slide--live" data-slide="5">
+    <div class="slide-inner">
+      <div class="slide-label anim">Status</div>
+      <h2 class="anim">What's Live &amp;<br><span class="accent">What's Next</span></h2>
+
+      <ul class="point-list anim">
+        <li>Repo public, deployed on <strong>Railway + Vercel</strong> &mdash; anyone can sign up and browse today</li>
+        <li>Full workflow working: <strong>list &rarr; borrow &rarr; approve &rarr; return &rarr; review &rarr; trust score</strong></li>
+        <li>MCP + Skill + Agent used throughout development</li>
+      </ul>
+
+      <div class="tagline anim">
+        "Six slides. Twenty seconds each.<br><em>One working platform &mdash; live now.</em>"
+      </div>
+
+      <div class="anim" style="margin-top: 36px;">
+        <a href="https://shareshelf.up.railway.app" class="cta-button" target="_blank" rel="noopener">Explore ShareShelf &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /slides-wrapper -->
+
+<script>
+(function () {
+  const TOTAL_SLIDES = 6;
+  const AUTO_ADVANCE_MS = 20000;
+
+  let currentSlide = 0;
+  let isPaused = false;
+  let autoAdvanceTimer = null;
+
+  const slides = document.querySelectorAll('.slide');
+  const dotButtons = document.querySelectorAll('#dotNav button');
+  const counterCurrent = document.getElementById('counterCurrent');
+  const progressFill = document.getElementById('progressFill');
+
+  function setActiveSlide(index) {
+    currentSlide = index;
+
+    // Hide all slides, show active
+    slides.forEach(function (slide, i) {
+      slide.classList.toggle('active', i === index);
+    });
+
+    // Update dots
+    dotButtons.forEach(function (dot, i) {
+      dot.classList.toggle('active', i === index);
+    });
+
+    // Update counter
+    counterCurrent.textContent = index + 1;
+
+    // Reset progress bar
+    resetProgress();
+
+    // Reset auto-advance
+    resetAutoAdvance();
+  }
+
+  function resetProgress() {
+    progressFill.style.transition = 'none';
+    progressFill.style.width = '0%';
+    progressFill.offsetHeight; // force reflow
+    progressFill.style.transition = 'width ' + (AUTO_ADVANCE_MS / 1000) + 's linear';
+    progressFill.style.width = '100%';
+  }
+
+  function resetAutoAdvance() {
+    if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
+    if (!isPaused) {
+      autoAdvanceTimer = setInterval(function () {
+        setActiveSlide((currentSlide + 1) % TOTAL_SLIDES);
+      }, AUTO_ADVANCE_MS);
+    }
+  }
+
+  function nextSlide() {
+    setActiveSlide((currentSlide + 1) % TOTAL_SLIDES);
+  }
+
+  function prevSlide() {
+    setActiveSlide((currentSlide - 1 + TOTAL_SLIDES) % TOTAL_SLIDES);
+  }
+
+  function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+      if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+      var computed = getComputedStyle(progressFill).width;
+      progressFill.style.transition = 'none';
+      progressFill.style.width = computed;
+    } else {
+      resetProgress();
+      resetAutoAdvance();
+    }
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') nextSlide();
+    else if (e.key === 'ArrowLeft') prevSlide();
+    else if (e.key === ' ') { e.preventDefault(); togglePause(); }
+  });
+
+  // Dot click navigation
+  dotButtons.forEach(function (dot) {
+    dot.addEventListener('click', function () {
+      setActiveSlide(parseInt(dot.dataset.slide));
+    });
+  });
+
+  // Pause on hover
+  document.querySelector('.slides-wrapper').addEventListener('mouseenter', function () {
+    if (!isPaused) {
+      if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+      var computed = getComputedStyle(progressFill).width;
+      progressFill.style.transition = 'none';
+      progressFill.style.width = computed;
+    }
+  });
+
+  document.querySelector('.slides-wrapper').addEventListener('mouseleave', function () {
+    if (!isPaused) {
+      resetProgress();
+      resetAutoAdvance();
+    }
+  });
+
+  // Initialize
+  setActiveSlide(0);
+})();
+</script>
+
+</body>
+</html>
