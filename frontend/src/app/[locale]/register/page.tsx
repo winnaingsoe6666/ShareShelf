@@ -49,33 +49,33 @@ export default function RegisterPage() {
       </div>
 
       {/* ── Main Glassmorphic Popup Card ── */}
-      <div className="relative w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-8 sm:p-12 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
+      <div className="relative w-full max-w-sm bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
         
         {/* Brand Logo and Name */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-transform duration-300">
-            <Library className="w-7 h-7 text-white" />
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-lg mb-2 transform hover:scale-105 transition-transform duration-300">
+            <Library className="w-5 h-5 text-white" />
           </div>
-          <span className="font-display text-2xl tracking-widest text-white font-medium">
+          <span className="font-display text-lg tracking-widest text-white font-medium">
             SHARE SHELF
           </span>
-          <span className="text-[10px] uppercase tracking-widest text-purple-200/80 font-bold mt-1.5">
+          <span className="text-[9px] uppercase tracking-widest text-purple-200/80 font-bold mt-1">
             {locale === "my" ? "ရပ်ကွက်ကိရိယာမျှဝေခြင်း" : "Community Tool Library"}
           </span>
         </div>
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
-        <div className="mb-8 p-5 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
-          <span className="absolute -top-1 left-3 text-5xl text-white/10 font-serif pointer-events-none select-none">“</span>
+        <div className="mb-5 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
+          <span className="absolute -top-1 left-3 text-4xl text-white/10 font-serif pointer-events-none select-none">“</span>
           <CommunityQuotes locale={locale} variant="light" />
         </div>
 
         {/* Card Header & Description */}
-        <div className="text-center mb-6">
-          <h1 className="font-heading text-2xl font-bold text-white">
+        <div className="text-center mb-5">
+          <h1 className="font-heading text-xl font-bold text-white">
             {t("registerPage.title")}
           </h1>
-          <p className="text-sm text-stone-200 mt-1.5">
+          <p className="text-xs text-stone-200 mt-1">
             {locale === "my"
               ? "သင့်လူမှုအသိုင်းအဝိုင်း ကိရိယာစာကြည့်တိုက်သို့ ပါဝင်ပါ"
               : "Join your community tool library"}
@@ -104,7 +104,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Login link */}
-        <div className="mt-8 text-center text-sm text-stone-300">
+        <div className="mt-6 text-center text-xs text-stone-300">
           {t("registerPage.haveAccount")}{" "}
           <Link
             href="/login"

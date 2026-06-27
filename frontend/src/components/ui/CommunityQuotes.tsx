@@ -80,14 +80,14 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
           fade ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
         }`}
       >
-        <span className={`block ${isDark ? "text-3xl mb-2" : "text-4xl mb-4"}`} role="img" aria-hidden="true">
+        <span className={`block ${isDark ? "text-2xl mb-1" : "text-3xl mb-2"}`} role="img" aria-hidden="true">
           {quote.icon}
         </span>
         <p
-          className={`font-heading font-bold leading-snug italic transition-colors duration-300 ${
+          className={`font-heading font-semibold leading-relaxed italic transition-colors duration-300 ${
             isDark
-              ? "text-lg md:text-xl text-purple-950/80"
-              : "text-2xl md:text-3xl text-white/95"
+              ? "text-base text-purple-950/80"
+              : "text-base sm:text-lg text-white/90"
           }`}
         >
           &ldquo;{quote.text}&rdquo;
@@ -95,7 +95,7 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
       </div>
 
       {/* Dots indicator */}
-      <div className={`flex items-center justify-center gap-1.5 ${isDark ? "mt-5" : "mt-8"}`}>
+      <div className="flex items-center justify-center gap-1.5 mt-4">
         {quotes.map((_, i) => (
           <button
             key={i}
@@ -111,10 +111,10 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
               i === currentIndex
                 ? isDark
                   ? "w-5 h-1.5 bg-purple-600"
-                  : "w-6 h-2 bg-white"
+                  : "w-5 h-1.5 bg-white"
                 : isDark
                   ? "w-1.5 h-1.5 bg-purple-200 hover:bg-purple-300"
-                  : "w-2 h-2 bg-white/40 hover:bg-white/60"
+                  : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60"
             }`}
             aria-label={`Go to quote ${i + 1}`}
           />
