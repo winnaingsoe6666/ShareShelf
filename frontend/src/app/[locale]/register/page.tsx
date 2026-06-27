@@ -24,92 +24,81 @@ export default function RegisterPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* ── Left Panel: Quote Showcase ── */}
-      <div className="relative lg:w-1/2 bg-gradient-to-br from-purple-800 via-purple-700 to-indigo-900 flex items-center justify-center p-8 lg:p-16 min-h-[280px] lg:min-h-screen">
-        {/* Decorative circles */}
-        <div className="absolute top-10 left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-56 h-56 bg-indigo-400/15 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-green-400/10 rounded-full blur-2xl" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-stone-50/50 relative overflow-hidden font-body">
+      {/* ── Background Ambient Glows & Patterns ── */}
+      <div className="absolute inset-0 bg-pattern-dots opacity-[0.25] pointer-events-none" />
+      
+      {/* Soft color blobs */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-purple-200/40 blur-3xl mix-blend-multiply filter pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-indigo-200/40 blur-3xl mix-blend-multiply filter pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-50/20 blur-3xl pointer-events-none" />
 
-        {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-[length:24px_24px]" />
-
-        <div className="relative z-10 max-w-md text-center">
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-3 mb-10">
-            <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <Library className="w-7 h-7 text-white" />
-            </div>
-            <span className="font-display text-xl tracking-wide text-white/90">
-              ShareShelf
-            </span>
+      {/* ── Main Glassmorphic Card ── */}
+      <div className="relative w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/80 shadow-2xl rounded-3xl p-8 sm:p-12 transition-all duration-500 hover:shadow-purple-900/5 animate-slide-up z-10">
+        
+        {/* Brand Logo and Name */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/25 mb-4 transform hover:scale-105 transition-transform duration-300">
+            <Library className="w-7 h-7 text-white" />
           </div>
+          <span className="font-display text-2xl tracking-widest bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent font-medium">
+            SHARE SHELF
+          </span>
+          <span className="text-[10px] uppercase tracking-widest text-purple-600/60 font-semibold mt-1.5">
+            {locale === "my" ? "ရပ်ကွက်ကိရိယာမျှဝေခြင်း" : "Community Tool Library"}
+          </span>
+        </div>
 
-          {/* Rotating Quote */}
-          <CommunityQuotes locale={locale} />
+        {/* Rotating Testimonials/Quotes container */}
+        <div className="mb-8 p-5 rounded-2xl bg-purple-50/40 border border-purple-100/50 text-center relative overflow-hidden">
+          <span className="absolute -top-1 left-3 text-5xl text-purple-200/40 font-serif pointer-events-none select-none">“</span>
+          <CommunityQuotes locale={locale} variant="dark" />
+        </div>
 
-          {/* Tagline */}
-          <p className="mt-10 text-sm text-white/50 font-body tracking-wide">
+        {/* Card Header & Description */}
+        <div className="text-center mb-6">
+          <h1 className="font-heading text-2xl font-bold text-stone-900">
+            {t("registerPage.title")}
+          </h1>
+          <p className="text-sm text-stone-500 mt-1.5">
             {locale === "my"
-              ? "ဒီနေ့ပဲ သင့်အိမ်နီးချင်းတွေနဲ့ မျှဝေစပါ"
-              : "Start sharing with your neighbors today"}
+              ? "သင့်လူမှုအသိုင်းအဝိုင်း ကိရိယာစာကြည့်တိုက်သို့ ပါဝင်ပါ"
+              : "Join your community tool library"}
           </p>
         </div>
-      </div>
 
-      {/* ── Right Panel: Register Form ── */}
-      <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo (hidden on lg+) */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
-            <Library className="w-8 h-8 text-purple-600" />
-            <span className="font-display text-lg tracking-wide text-purple-900">
-              ShareShelf
-            </span>
-          </div>
-
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-heading text-3xl font-bold text-stone-900">
-              {t("registerPage.title")}
-            </h1>
-            <p className="mt-2 text-stone-500">
-              {locale === "my"
-                ? "သင့်လူမှုအသိုင်းအဝိုင်း ကိရိယာစာကြည့်တိုက်သို့ ပါဝင်ပါ"
-                : "Join your community tool library"}
-            </p>
-          </div>
-
-          {/* Google Sign Up */}
+        {/* Google OAuth Button */}
+        <div className="space-y-4">
           <GoogleSignInButton
             text={
               locale === "my"
                 ? "Google ဖြင့် စာရင်းသွင်းပါ"
                 : "Sign up with Google"
             }
+            className="border-stone-200 hover:border-purple-300 hover:bg-stone-50 shadow-sm"
           />
 
-          {/* Error from Google OAuth */}
+          {/* Error display */}
           {searchParams.get("error") === "google_auth_failed" && (
-            <div className="mt-4 rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-xl bg-red-50/80 border border-red-100/80 px-4 py-3 text-xs text-red-700 text-center font-medium shadow-sm animate-fade-in">
               {locale === "my"
                 ? "Google ဖြင့် စာရင်းသွင်းခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။"
                 : "Google sign-up failed. Please try again."}
             </div>
           )}
-
-          {/* Login link */}
-          <p className="mt-8 text-center text-sm text-stone-500">
-            {t("registerPage.haveAccount")}{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-purple-700 hover:text-purple-800 transition-colors duration-200"
-            >
-              {t("registerPage.login")}
-            </Link>
-          </p>
         </div>
+
+        {/* Login link */}
+        <div className="mt-8 text-center text-sm text-stone-500">
+          {t("registerPage.haveAccount")}{" "}
+          <Link
+            href="/login"
+            className="font-semibold text-purple-700 hover:text-purple-600 underline underline-offset-4 decoration-purple-200 hover:decoration-purple-500 transition-all duration-200"
+          >
+            {t("registerPage.login")}
+          </Link>
+        </div>
+        
       </div>
     </div>
   );
