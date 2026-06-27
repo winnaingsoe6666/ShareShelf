@@ -11,7 +11,7 @@ interface AuthGuardProps {
 
 /**
  * Client-side auth guard.
- * Wraps protected pages — redirects to /login if no JWT token is found in sessionStorage.
+ * Wraps protected pages — redirects to /login if no JWT token is found in localStorage.
  * Passes the current path as returnUrl so the user is redirected back after login.
  */
 export default function AuthGuard({ children }: AuthGuardProps) {

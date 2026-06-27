@@ -5,11 +5,10 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Request interceptor — inject JWT token from sessionStorage
-// (sessionStorage auto-clears on tab close, logging the user out)
+// Request interceptor — inject JWT token from localStorage
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = sessionStorage.getItem("shareshelf_token");
+    const token = localStorage.getItem("shareshelf_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -58,7 +57,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = sessionStorage.getItem("shareshelf_refresh_token");
+      const refreshToken = localStorage.getItem("shareshelf_refresh_token");
       if (refreshToken) {
         try {
           const { data } = await axios.post(
@@ -68,10 +67,10 @@ api.interceptors.response.use(
           if (data.success && data.data) {
             const newToken = data.data.token;
             const newRefreshToken = data.data.refreshToken;
-            sessionStorage.setItem("shareshelf_token", newToken);
-            sessionStorage.setItem("shareshelf_refresh_token", newRefreshToken);
+            localStorage.setItem("shareshelf_token", newToken);
+            localStorage.setItem("shareshelf_refresh_token", newRefreshToken);
             // Update stored user info
-            sessionStorage.setItem("shareshelf_user", JSON.stringify({
+            localStorage.setItem("shareshelf_user", JSON.stringify({
               id: data.data.userId,
               name: data.data.name,
               email: data.data.email,
@@ -102,9 +101,9 @@ api.interceptors.response.use(
 
     // On 401 (auth endpoint or refresh failed), clear session and redirect
     if (error.response?.status === 401) {
-      sessionStorage.removeItem("shareshelf_token");
-      sessionStorage.removeItem("shareshelf_refresh_token");
-      sessionStorage.removeItem("shareshelf_user");
+      localStorage.removeItem("shareshelf_token");
+      localStorage.removeItem("shareshelf_refresh_token");
+      localStorage.removeItem("shareshelf_user");
       if (!window.location.pathname.startsWith("/login")) {
         window.location.href = "/login";
       }

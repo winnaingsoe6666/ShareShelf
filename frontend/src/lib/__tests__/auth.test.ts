@@ -3,7 +3,7 @@ import { saveAuth, clearAuth, getToken, getRefreshToken, getUser, isAuthenticate
 
 describe("auth", () => {
   beforeEach(() => {
-    sessionStorage.clear();
+    localStorage.clear();
   });
 
   const mockAuth = {
@@ -15,22 +15,23 @@ describe("auth", () => {
     trustScore: 4.5,
     community: "Downtown",
     avatarUrl: undefined as string | undefined,
+    isIdVerified: true,
   };
 
   describe("saveAuth", () => {
-    it("stores token in sessionStorage", () => {
+    it("stores token in localStorage", () => {
       saveAuth(mockAuth);
-      expect(sessionStorage.getItem("shareshelf_token")).toBe("eyJhbGciOiJIUzI1NiJ9.test");
+      expect(localStorage.getItem("shareshelf_token")).toBe("eyJhbGciOiJIUzI1NiJ9.test");
     });
 
-    it("stores refresh token in sessionStorage", () => {
+    it("stores refresh token in localStorage", () => {
       saveAuth(mockAuth);
-      expect(sessionStorage.getItem("shareshelf_refresh_token")).toBe("eyJhbGciOiJIUzI1NiJ9.refresh");
+      expect(localStorage.getItem("shareshelf_refresh_token")).toBe("eyJhbGciOiJIUzI1NiJ9.refresh");
     });
 
-    it("stores serialized user in sessionStorage", () => {
+    it("stores serialized user in localStorage", () => {
       saveAuth(mockAuth);
-      const userStr = sessionStorage.getItem("shareshelf_user");
+      const userStr = localStorage.getItem("shareshelf_user");
       expect(userStr).not.toBeNull();
       const parsed = JSON.parse(userStr!);
       expect(parsed.id).toBe(42);
@@ -47,7 +48,7 @@ describe("auth", () => {
     });
 
     it("returns the stored token", () => {
-      sessionStorage.setItem("shareshelf_token", "my-token");
+      localStorage.setItem("shareshelf_token", "my-token");
       expect(getToken()).toBe("my-token");
     });
   });
@@ -58,7 +59,7 @@ describe("auth", () => {
     });
 
     it("returns the stored refresh token", () => {
-      sessionStorage.setItem("shareshelf_refresh_token", "my-refresh");
+      localStorage.setItem("shareshelf_refresh_token", "my-refresh");
       expect(getRefreshToken()).toBe("my-refresh");
     });
   });
@@ -69,7 +70,7 @@ describe("auth", () => {
     });
 
     it("parses and returns the stored user", () => {
-      sessionStorage.setItem("shareshelf_user", JSON.stringify({ id: 1, name: "Test", email: "t@t.com", trustScore: 3 }));
+      localStorage.setItem("shareshelf_user", JSON.stringify({ id: 1, name: "Test", email: "t@t.com", trustScore: 3 }));
       const user = getUser();
       expect(user).not.toBeNull();
       expect(user!.id).toBe(1);
@@ -77,18 +78,18 @@ describe("auth", () => {
     });
 
     it("returns null for invalid JSON", () => {
-      sessionStorage.setItem("shareshelf_user", "not-json");
+      localStorage.setItem("shareshelf_user", "not-json");
       expect(getUser()).toBeNull();
     });
   });
 
   describe("clearAuth", () => {
-    it("removes token, refresh token, and user from sessionStorage", () => {
+    it("removes token, refresh token, and user from localStorage", () => {
       saveAuth(mockAuth);
       clearAuth();
-      expect(sessionStorage.getItem("shareshelf_token")).toBeNull();
-      expect(sessionStorage.getItem("shareshelf_refresh_token")).toBeNull();
-      expect(sessionStorage.getItem("shareshelf_user")).toBeNull();
+      expect(localStorage.getItem("shareshelf_token")).toBeNull();
+      expect(localStorage.getItem("shareshelf_refresh_token")).toBeNull();
+      expect(localStorage.getItem("shareshelf_user")).toBeNull();
     });
   });
 
@@ -98,17 +99,17 @@ describe("auth", () => {
     });
 
     it("returns true when token exists", () => {
-      sessionStorage.setItem("shareshelf_token", "exists");
+      localStorage.setItem("shareshelf_token", "exists");
       expect(isAuthenticated()).toBe(true);
     });
   });
 
   describe("setToken", () => {
-    it("updates token and refresh token in sessionStorage", () => {
+    it("updates token and refresh token in localStorage", () => {
       saveAuth(mockAuth);
       setToken("new-token", "new-refresh");
-      expect(sessionStorage.getItem("shareshelf_token")).toBe("new-token");
-      expect(sessionStorage.getItem("shareshelf_refresh_token")).toBe("new-refresh");
+      expect(localStorage.getItem("shareshelf_token")).toBe("new-token");
+      expect(localStorage.getItem("shareshelf_refresh_token")).toBe("new-refresh");
     });
   });
 });

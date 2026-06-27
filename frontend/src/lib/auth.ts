@@ -4,13 +4,12 @@ const TOKEN_KEY = "shareshelf_token";
 const REFRESH_KEY = "shareshelf_refresh_token";
 const USER_KEY = "shareshelf_user";
 
-// sessionStorage auto-clears when the browser tab closes, logging the user out.
-// localStorage would persist the session across tab/window lifetime,
-// defeating the "logout on tab close" requirement.
+// We use localStorage to persist the session across browser tab/window closes,
+// keeping the user logged in even if they close and reopen the app.
 export function saveAuth(auth: AuthResponse): void {
-  sessionStorage.setItem(TOKEN_KEY, auth.token);
-  sessionStorage.setItem(REFRESH_KEY, auth.refreshToken);
-  sessionStorage.setItem(USER_KEY, JSON.stringify({
+  localStorage.setItem(TOKEN_KEY, auth.token);
+  localStorage.setItem(REFRESH_KEY, auth.refreshToken);
+  localStorage.setItem(USER_KEY, JSON.stringify({
     id: auth.userId,
     name: auth.name,
     email: auth.email,
@@ -29,33 +28,33 @@ export function saveAuth(auth: AuthResponse): void {
 }
 
 export function updateUserSession(user: User): void {
-  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
 export function clearAuth(): void {
-  sessionStorage.removeItem(TOKEN_KEY);
-  sessionStorage.removeItem(REFRESH_KEY);
-  sessionStorage.removeItem(USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem(USER_KEY);
 }
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  return sessionStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function getRefreshToken(): string | null {
   if (typeof window === "undefined") return null;
-  return sessionStorage.getItem(REFRESH_KEY);
+  return localStorage.getItem(REFRESH_KEY);
 }
 
 export function setToken(token: string, refreshToken: string): void {
-  sessionStorage.setItem(TOKEN_KEY, token);
-  sessionStorage.setItem(REFRESH_KEY, refreshToken);
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(REFRESH_KEY, refreshToken);
 }
 
 export function getUser(): User | null {
   if (typeof window === "undefined") return null;
-  const raw = sessionStorage.getItem(USER_KEY);
+  const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as User;
