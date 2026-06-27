@@ -12,8 +12,8 @@ The user requested a redesign of the login and register pages, incorporating bac
 ### 2. Glassmorphic Popup Block
 - Replace the solid white container with a glassmorphic popup card.
 - Styling: `backdrop-blur-md bg-white/[0.005] border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)]`.
-- Logo & Text: Convert brand name and typography to primary theme colors (`text-purple-900`, `text-stone-900`, `text-stone-500`, etc.) to match the brand identity.
-- Integrate the `CommunityQuotes` component using its `dark` variant (deep purple quote text and purple indicator dots) to sit elegantly inside the glass block.
+- Logo & Text: Convert brand name and typography to green and emerald colors (`text-green-400`, `text-green-600/70`, `text-stone-300`, etc.) to match the village forest aesthetic.
+- Integrate the `CommunityQuotes` component using its `sunset` variant (warm sunset peach/rose `#fca3a0` quote text and matching indicator dots) to sit elegantly inside the glass block.
 - Adjust the Google Sign In Button to match with clean borders and active feedback.
 
 ---

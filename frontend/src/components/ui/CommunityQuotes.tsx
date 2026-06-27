@@ -39,7 +39,7 @@ const quotesMy: Quote[] = [
 
 interface CommunityQuotesProps {
   locale?: string;
-  variant?: "light" | "dark" | "green";
+  variant?: "light" | "dark" | "green" | "sunset";
 }
 
 export default function CommunityQuotes({ locale = "en", variant = "light" }: CommunityQuotesProps) {
@@ -66,9 +66,15 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
   const quote = quotes[currentIndex];
   const isDark = variant === "dark";
   const isGreen = variant === "green";
+  const isSunset = variant === "sunset";
 
   const getDotClass = (i: number) => {
     const isActive = i === currentIndex;
+    if (isSunset) {
+      return isActive
+        ? "w-5 h-1.5 bg-[#fca3a0]"
+        : "w-1.5 h-1.5 bg-[#fca3a0]/30 hover:bg-[#fca3a0]/50";
+    }
     if (isGreen) {
       return isActive
         ? "w-5 h-1.5 bg-emerald-400"
@@ -98,16 +104,18 @@ export default function CommunityQuotes({ locale = "en", variant = "light" }: Co
           fade ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
         }`}
       >
-        <span className={`block ${isDark || isGreen ? "text-2xl mb-1" : "text-3xl mb-2"}`} role="img" aria-hidden="true">
+        <span className={`block ${isDark || isGreen || isSunset ? "text-2xl mb-1" : "text-3xl mb-2"}`} role="img" aria-hidden="true">
           {quote.icon}
         </span>
         <p
           className={`font-heading font-semibold leading-relaxed italic transition-colors duration-300 ${
-            isGreen
-              ? "text-base sm:text-lg text-emerald-300"
-              : isDark
-                ? "text-base text-purple-950/80"
-                : "text-base sm:text-lg text-white/90"
+            isSunset
+              ? "text-base sm:text-lg text-[#fca3a0]"
+              : isGreen
+                ? "text-base sm:text-lg text-emerald-300"
+                : isDark
+                  ? "text-base text-purple-950/80"
+                  : "text-base sm:text-lg text-white/90"
           }`}
         >
           &ldquo;{quote.text}&rdquo;

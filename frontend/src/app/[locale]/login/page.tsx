@@ -66,8 +66,8 @@ export default function LoginPage() {
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
         <div className="mb-5 p-4 rounded-xl bg-white/3 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
-          <span className="absolute -top-1 left-3 text-4xl text-green-400/20 font-serif pointer-events-none select-none">“</span>
-          <CommunityQuotes locale={locale} variant="green" />
+          <span className="absolute -top-1 left-3 text-4xl text-[#fca3a0]/20 font-serif pointer-events-none select-none">“</span>
+          <CommunityQuotes locale={locale} variant="sunset" />
         </div>
 
         {/* Card Header & Description */}
