@@ -194,7 +194,8 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 | Component | Responsibility | File |
 |-----------|----------------|------|
 | AuthController | Register, login, current user endpoints | `backend/.../auth/AuthController.kt` |
-| AuthService | User registration with bcrypt, login authentication, JWT generation | `backend/.../auth/AuthService.kt` |
+| AuthService | Google OAuth registration/login, re-registration for unverified users, JWT generation | `backend/.../auth/AuthService.kt` |
+| EmailService | Async email verification via Resend API (REST-based, replaces SMTP) | `backend/.../auth/EmailService.kt` |
 | JwtTokenProvider | JWT creation, parsing, validation with HMAC-SHA | `backend/.../auth/JwtTokenProvider.kt` |
 | JwtAuthenticationFilter | Extract Bearer token, validate, set SecurityContext | `backend/.../auth/JwtAuthenticationFilter.kt` |
 | CustomUserDetailsService | Load UserDetails by email or ID for Spring Security | `backend/.../auth/CustomUserDetailsService.kt` |
@@ -275,12 +276,12 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 ## Entry Points
 - Location: `backend/.../ShareShelfApplication.kt`
 - Triggers: JVM startup via `gradle bootRun` or `java -jar`
-- Responsibilities: Bootstrap Spring Boot context with all auto-configurations, component scanning
+- Responsibilities: Bootstrap Spring Boot context with all auto-configurations, component scanning. Enables `@EnableScheduling` and `@EnableAsync` for scheduled tasks and async email sending.
 - Location: `backend/.../common/HealthController.kt`
 - Triggers: `GET /api/health` HTTP request
 - Responsibilities: Return `{"status": "UP"}` for liveness checks
 ## Architectural Constraints
-- **Threading:** Single-threaded per-request model (Spring Boot default with Tomcat). No explicit coroutines or reactive streams used.
+- **Threading:** Single-threaded per-request model (Spring Boot default with Tomcat). `@EnableAsync` on `ShareShelfApplication` enables async method execution — `EmailService.sendVerificationEmail()` runs on Spring's async thread pool, not the request thread.
 - **Global state:** No module-level singletons or shared mutable state. All service beans are stateless singletons managed by Spring DI.
 - **Circular imports:** No circular dependency chains detected. Dependency direction is strict: Controller -> Service -> Repository -> Entity with no back-edges.
 - **Frontend routing:** All pages use `"use client"` directive. No React Server Components, no Server Actions. Data fetching happens in `useEffect` hooks.

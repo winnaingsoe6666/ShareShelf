@@ -53,6 +53,7 @@
 - **Springdoc OpenAPI 2.8.5** (`springdoc-openapi-starter-webmvc-ui:2.8.5`) — Swagger UI at `/swagger-ui.html` and OpenAPI spec at `/api-docs`. Enabled in dev, disabled in railway profile (`application-railway.yml`).
 - **Axios 1.7.9** — HTTP client for frontend API calls. Singleton instance at `frontend/src/lib/api.ts` with request/response interceptors for JWT injection and 401 handling.
 - **Flyway** (`flyway-core`, `flyway-database-postgresql`) — Database migrations. Migrations at `backend/src/main/resources/db/migration/V1`-`V5`. `ddl-auto: validate` ensures schema matches migrations.
+- **Resend API** (via `RestTemplate`) — Email verification service. `EmailService` at `backend/src/main/kotlin/com/shareshelf/auth/EmailService.kt` sends verification emails via REST API. Replaces SMTP (JavaMailSender). Marked `@Async` for non-blocking execution.
 
 **Infrastructure:**
 - **PostgreSQL JDBC Driver** (`org.postgresql:postgresql`) — Database connectivity. Runtime scope.
@@ -71,6 +72,9 @@
 | `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Railway Postgres connection | `application-railway.yml` |
 | `PORT` | Server port on Railway | `application-railway.yml` (defaults 8080) |
 | `NEXT_PUBLIC_API_URL` | Backend URL for frontend API calls | Frontend env at deploy |
+| `RESEND_API_KEY` | Resend API key for sending verification emails | Backend env (required for email) |
+| `GOOGLE_CLIENT_ID` | Google OAuth2 client ID | Backend env (required for auth) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret | Backend env (required for auth) |
 
 **Build:**
 - Backend: `backend/build.gradle.kts` (Gradle Kotlin DSL).

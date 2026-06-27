@@ -172,6 +172,9 @@ export default nextConfig;
    | `SPRING_DATASOURCE_URL` | `jdbc:postgresql://ep-shy-rain-...neon.tech/shareshelf?sslmode=require` |
    | `SPRING_DATASOURCE_USERNAME` | *(from Neon connection string)* |
    | `CORS_ORIGINS` | `https://shareshelf.vercel.app` *(update after frontend deploys)* |
+   | `RESEND_API_KEY` | *(from resend.com dashboard — required for email verification)* |
+   | `GOOGLE_CLIENT_ID` | *(from Google Cloud Console — required for OAuth)* |
+   | `GOOGLE_CLIENT_SECRET` | *(from Google Cloud Console — required for OAuth)* |
 
 6. Click **Create Web Service** — it will build and deploy (~5 min first time)
 
@@ -448,6 +451,8 @@ jobs:
 - [ ] **Flyway clean disabled** (`spring.flyway.clean-disabled: true`)
 - [ ] **HTTPS enabled** (auto with all providers above)
 - [ ] **DB password** is strong and unique
+- [ ] **RESEND_API_KEY** is set (required for email verification)
+- [ ] **GOOGLE_CLIENT_ID** and **GOOGLE_CLIENT_SECRET** are set (required for OAuth)
 
 ### Configuration
 

@@ -74,7 +74,7 @@
 | Real-time chat | Borrow flow is async via request/approve; chat adds high complexity |
 | Mobile apps (iOS/Android) | Web-first with responsive design; PWA possible later |
 | Payment processing | Free community sharing model |
-| OAuth/Social login | Email/password sufficient for community-scale use |
+| ~~OAuth/Social login~~ | ~~Email/password sufficient for community-scale use~~ — *Implemented in Phase 7: Google OAuth is now the primary auth method* |
 | Cloud photo storage (S3) | Local filesystem for v1; S3 migration deferred |
 
 ## Traceability

@@ -101,7 +101,7 @@ ShareShelf is a production-ready community tool library app with known bugs and 
 **Success Criteria** (what must be TRUE):
   1. Users can sign up and log in with their Google account (OAuth 2.0 flow)
   2. Google-authenticated users are created in the database with profile info (name, email, avatar)
-  3. Existing email/password users can link their Google account
+  3. ~~Existing email/password users can link their Google account~~ *(Updated: login/register pages are now Google-only — no credential forms remain)*
   4. Frontend has "Sign in with Google" button on login and register pages
   5. Backend and frontend tests cover the OAuth flow
 **Plans**: TBD
@@ -143,6 +143,19 @@ Plans:
 - [x] 09-04-PLAN.md — Tests: backend + frontend chat tests ✓ 2026-06-26
 **UI hint**: yes
 
+### Phase 10: Email Service & Auth Simplification
+**Goal**: Migrate email from SMTP to Resend API, enable async email sending, simplify login/register to Google-only
+**Depends on**: Phase 7 (Google OAuth)
+**Requirements**: EMAIL-01, AUTH-05
+**Success Criteria** (what must be TRUE):
+  1. EmailService sends verification emails via Resend REST API (no SMTP dependency)
+  2. Email sending is async (@EnableAsync + @Async) — non-blocking registration response
+  3. Login and register pages show only Google sign-in button (no credential forms)
+  4. Unverified users can re-register (old tokens cleaned up, details overwritten)
+  5. User.phone field is mutable (val → var) for profile updates
+**Plans**: N/A (completed in main branch)
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -156,3 +169,4 @@ Plans:
 | 7. Google OAuth Signup | 4/4 | Complete | 2026-06-25 |
 | 8. Photo Upload R2 Migration | 2/2 | Complete | 2026-06-25 |
 | 9. In-App Chat | 4/4 | Complete | 2026-06-26 |
+| 10. Email Service & Auth Simplification | N/A | Complete | 2026-06-27 |

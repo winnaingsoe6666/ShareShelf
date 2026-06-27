@@ -99,11 +99,13 @@ npm run dev                         # http://localhost:3000
 
 Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (password: `password123`)
 
+> **Note:** Login and registration now use Google OAuth. Demo accounts with password login are no longer available on the login page.
+
 ---
 
 ## Features
 
-- [x] **User Authentication** — Register, login, JWT, refresh tokens, account lockout, JTI blacklist, logout
+- [x] **User Authentication** — Google OAuth sign-in/sign-up, JWT, email verification (Resend API), JTI blacklist, logout
 - [x] **Item Management** — Create, edit, delete listings with photo uploads and image galleries
 - [x] **Borrowing Workflow** — Request → Approve/Reject → Mark Returned, with full lifecycle tracking
 - [x] **Reviews & Trust Scores** — 1–5 star ratings after each borrow, trust score recalculated automatically
@@ -149,8 +151,10 @@ Browser → Next.js (React) → Axios HTTP Client → Spring Boot REST API → P
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | No | Create account |
-| POST | `/api/auth/login` | No | Log in, get JWT + refresh token |
+| POST | `/api/auth/register` | No | Register with email/password (sends verification email) |
+| POST | `/api/auth/login` | No | Log in with email/password, get JWT |
+| POST | `/api/auth/google` | No | Google OAuth login/register, get JWT |
+| GET | `/api/auth/verify-email` | No | Verify email address with token |
 | GET | `/api/auth/me` | Yes | Current user profile |
 | POST | `/api/auth/logout` | Yes | Log out (JTI blacklist) |
 | POST | `/api/auth/refresh` | No | Refresh access token |
@@ -202,6 +206,9 @@ REQUESTED → APPROVED → RETURNED
 |---|---|---|
 | `DB_PASSWORD` | `shareshelf_dev` | PostgreSQL password |
 | `JWT_SECRET` | (dev value) | JWT HMAC-SHA signing key |
+| `RESEND_API_KEY` | *(empty)* | Resend API key for sending verification emails |
+| `GOOGLE_CLIENT_ID` | *(required)* | Google OAuth2 client ID |
+| `GOOGLE_CLIENT_SECRET` | *(required)* | Google OAuth2 client secret |
 | `SPRING_PROFILES_ACTIVE` | `dev` | Spring profile (`dev` or `railway`) |
 
 ### Frontend

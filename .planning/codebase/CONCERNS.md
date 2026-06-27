@@ -115,15 +115,7 @@
 
 **Fix approach:** Remove the function.
 
-### IN-03: Inconsistent error handling between Login and Register pages
-
-**Issue:** Login page (`login/page.tsx:31`) uses a generic catch that always displays "Invalid email or password". Register page (`register/page.tsx:38-44`) has detailed catch logic that extracts the server error message.
-
-**Files:**
-- `frontend/src/app/login/page.tsx:31`
-- `frontend/src/app/register/page.tsx:38-44`
-
-**Fix approach:** Make login error handling consistent with register's pattern.
+### IN-03: ~~Inconsistent error handling between Login and Register pages~~ *(Resolved — both pages are now Google-only, no credential forms)*
 
 ### IN-04: Data class entities with mutable var fields (JPA anti-pattern)
 
@@ -176,23 +168,9 @@ This is a well-known JPA anti-pattern, though not currently causing bugs.
 
 **Recommendations:** Add a startup validation that rejects weak or default secrets in non-dev profiles. Consider adding a health check that verifies the JWT secret is set.
 
-### Password validation at registration
+### ~~Password validation at registration~~ *(No longer relevant — registration is now Google-only, no password field on register page)*
 
-**Issue:** Minimum password length is enforced at 6 characters (`AuthDtos.kt:17`). This is below modern security recommendations (NIST recommends 8+ characters, OWASP recommends 8+).
-
-**Files:** `backend/src/main/kotlin/com/shareshelf/auth/dto/AuthDtos.kt:17`
-
-**Risk:** Weak passwords make brute-force attacks easier.
-
-**Recommendations:** Increase minimum to 8 characters. Consider adding complexity requirements (uppercase, digit, etc.) or integrating with a password strength library like zxcvbn.
-
-### Missing password confirmation field on registration
-
-**Issue:** The registration form (`register/page.tsx`) has a single password field with no confirmation. The backend does not require or validate a password confirmation.
-
-**Files:** `frontend/src/app/register/page.tsx:65`
-
-**Risk:** Users can accidentally mistype their password during registration with no way to detect the error, resulting in a locked account.
+### ~~Missing password confirmation field on registration~~ *(No longer relevant — registration is now Google-only)*
 
 ### Rate limiting absent
 

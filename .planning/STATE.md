@@ -21,20 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-13)
 
 **Core value:** Users can discover and borrow tools from neighbors in their community, with a trusted borrowing workflow that protects both lenders and borrowers.
-**Current focus:** Phase 8 complete — R2 migration done, ready for Phase 9
+**Current focus:** Phase 10 complete — Email service migrated to Resend, auth simplified to Google-only
 
 ## Current Position
 
-Phase: 8 (Photo Upload R2 Migration) — COMPLETE
-Plan: 2 of 2 plans complete
+Phase: 10 (Email Service & Auth Simplification) — COMPLETE
+Plan: N/A (completed directly in main)
 Status: Phase verified and marked complete
-Last activity: 2026-06-25
+Last activity: 2026-06-27
 
 Progress: [██████████] 100%
 
 ### Next Up
 
-- Phase 9: In-App Chat (4 plans) — item-scoped WebSocket + STOMP messaging
+- Phase 3: E2E Tests & CI/CD Pipeline (not started)
+- Phase 4: Code Quality & Technical Debt (not started)
 
 ## Performance Metrics
 
@@ -80,6 +81,11 @@ Recent decisions affecting current work:
 - [Phase 09]: Messages persisted to PostgreSQL first, then delivered via STOMP (offline users get history on next load)
 - [Phase 09]: STOMP topic per user: /topic/chat/{userId} — each user subscribes to their own topic
 - [Phase 09]: Chat dependencies: @stomp/stompjs + sockjs-client (frontend), spring-boot-starter-websocket (backend)
+- [Phase 10]: Google OAuth is primary auth — login/register pages show only Google sign-in button (no credential forms)
+- [Phase 10]: Email service migrated from SMTP (JavaMailSender) to Resend API (REST-based via RestTemplate)
+- [Phase 10]: @EnableAsync on ShareShelfApplication — EmailService.sendVerificationEmail() runs on async thread pool
+- [Phase 10]: Re-registration allowed for unverified users — old tokens deleted, user details overwritten
+- [Phase 10]: User.phone changed from val to var for profile update support
 
 ### Pending Todos
 

@@ -44,13 +44,13 @@
 ## Authentication & Identity
 
 **Auth Provider:**
-- **Custom JWT** — No external OAuth provider (no Google, GitHub, or Auth0 imports).
+- **Google OAuth 2.0** — Primary authentication method. Users sign in/up via Google account.
   - Implementation: Spring Security filter chain at `backend/src/main/kotlin/com/shareshelf/config/SecurityConfig.kt`.
   - `CustomUserDetailsService` loads users by email.
   - `JwtAuthenticationFilter` (extends `OncePerRequestFilter`) extracts Bearer token and sets `SecurityContextHolder`.
-  - Public endpoints: `/api/auth/register`, `/api/auth/login`, `/api/health`, `/api-docs/**`, `/swagger-ui/**`.
+  - Public endpoints: `/api/auth/register`, `/api/auth/login`, `/api/auth/google`, `/api/auth/verify-email`, `/api/health`, `/api-docs/**`, `/swagger-ui/**`.
   - All other `/api/**` endpoints require authentication.
-  - Password hashing: `BCryptPasswordEncoder` (Spring Security).
+  - Password hashing: `BCryptPasswordEncoder` (Spring Security) — still used for credential-based registration fallback.
   - Quality: **Well-integrated** — standard Spring Security pattern with stateless sessions, CSRF disabled, CORS enabled.
 
 **Frontend Auth:**
@@ -102,6 +102,9 @@
 | `PGPASSWORD` | Backend `application-railway.yml` | Railway Postgres password | Railway managed |
 | `PORT` | Backend `application-railway.yml` | Server port (default 8080) | Optional |
 | `NEXT_PUBLIC_API_URL` | Frontend `api.ts` | Backend base URL | Required for prod |
+| `RESEND_API_KEY` | Backend `EmailService.kt` | Resend API key for sending verification emails | Required for prod |
+| `GOOGLE_CLIENT_ID` | Backend `application.yml` | Google OAuth2 client ID | Required |
+| `GOOGLE_CLIENT_SECRET` | Backend `application.yml` | Google OAuth2 client secret | Required |
 
 **Secrets location:**
 - Railway dashboard (environment variables). No `.env` file committed to repo — correct practice.
@@ -112,7 +115,8 @@
 - **None detected** — No webhook endpoints found in the source tree.
 
 **Outgoing:**
-- **None detected** — No webhook dispatch logic found. The app operates as a closed system without external API calls to third-party services.
+- **Resend API** — Email verification service. `EmailService` at `backend/src/main/kotlin/com/shareshelf/auth/EmailService.kt` sends verification emails via REST API (`https://api.resend.com/emails`). Uses `RestTemplate` with Bearer token auth. Marked `@Async` for non-blocking execution.
+- **Google OAuth** — Frontend redirects users to Google for authentication. Backend validates Google credentials via Spring Security OAuth2 client.
 
 ## CORS Configuration
 

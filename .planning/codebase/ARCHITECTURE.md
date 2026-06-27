@@ -54,7 +54,8 @@
 | Component | Responsibility | File |
 |-----------|----------------|------|
 | AuthController | Register, login, current user endpoints | `backend/.../auth/AuthController.kt` |
-| AuthService | User registration with bcrypt, login authentication, JWT generation | `backend/.../auth/AuthService.kt` |
+| AuthService | Google OAuth registration/login, re-registration for unverified users, JWT generation | `backend/.../auth/AuthService.kt` |
+| EmailService | Async email verification via Resend API (REST-based, replaces SMTP) | `backend/.../auth/EmailService.kt` |
 | JwtTokenProvider | JWT creation, parsing, validation with HMAC-SHA | `backend/.../auth/JwtTokenProvider.kt` |
 | JwtAuthenticationFilter | Extract Bearer token, validate, set SecurityContext | `backend/.../auth/JwtAuthenticationFilter.kt` |
 | CustomUserDetailsService | Load UserDetails by email or ID for Spring Security | `backend/.../auth/CustomUserDetailsService.kt` |
@@ -124,23 +125,34 @@
 
 ## Data Flow
 
-### User Registration Flow
+### User Registration Flow (Google OAuth)
 
-1. User submits name, email, password on `/register` page (`frontend/src/app/register/page.tsx`)
-2. Axios client posts to `POST /api/auth/register` (`backend/.../auth/AuthController.kt:19`)
-3. `AuthService.register()` checks email uniqueness, hashes password with BCrypt, saves `User` entity (`backend/.../auth/AuthService.kt:21-38`)
-4. `JwtTokenProvider.generateToken()` creates a JWT with userId subject and email claim (`backend/.../auth/JwtTokenProvider.kt:20-31`)
-5. Returns `ApiResponse<AuthResponse>` with JWT token and user profile
-6. Frontend calls `saveAuth()` from `auth.ts`, stores token in localStorage and user object (`frontend/src/lib/auth.ts:6-16`)
-7. User is redirected to `/items`
+1. User clicks "Sign up with Google" on `/register` page (`frontend/src/app/[locale]/register/page.tsx`)
+2. Browser redirects to Google OAuth consent screen
+3. Google callback hits `POST /api/auth/google` with credential (`backend/.../auth/AuthController.kt`)
+4. `AuthService` verifies Google token, creates or finds `User` entity with `isEmailVerified=true`
+5. If user already exists but is unverified, old verification tokens are deleted and user details are overwritten
+6. `JwtTokenProvider.generateToken()` creates a JWT with userId subject and email claim
+7. Returns `ApiResponse<AuthResponse>` with JWT token and user profile
+8. Frontend calls `saveAuth()` from `auth.ts`, stores token in localStorage and user object
+9. User is redirected to `/items`
 
-### User Login Flow
+### User Login Flow (Google OAuth)
 
-1. User submits email and password on `/login` page (`frontend/src/app/login/page.tsx`)
-2. Axios client posts to `POST /api/auth/login`
-3. `AuthService.login()` looks up user by email, verifies password with `passwordEncoder.matches()` (`backend/.../auth/AuthService.kt:40-49`)
-4. JWT token generated and returned in `AuthResponse`
+1. User clicks "Sign in with Google" on `/login` page (`frontend/src/app/[locale]/login/page.tsx`)
+2. Browser redirects to Google OAuth consent screen
+3. Google callback hits `POST /api/auth/google` with credential
+4. `AuthService` verifies Google token, finds existing `User`, generates JWT
 5. Frontend saves auth to localStorage, redirects to `/items`
+
+### Email Verification Flow (Async via Resend)
+
+1. During registration, `AuthService.register()` generates a UUID verification token and saves `EmailVerificationToken` entity
+2. `EmailService.sendVerificationEmail()` is called with `@Async` — runs on Spring's async thread pool, not the request thread
+3. EmailService sends email via Resend REST API (`https://api.resend.com/emails`) using `RestTemplate`
+4. If Resend API key is not configured (local dev), email is skipped and verification URL is logged
+5. User clicks verification link, frontend calls `GET /api/auth/verify-email?token=...`
+6. Backend validates token, marks `User.isEmailVerified = true`
 
 ### Authenticated Request Flow (JWT)
 
@@ -214,7 +226,7 @@
 **ShareShelfApplication:**
 - Location: `backend/.../ShareShelfApplication.kt`
 - Triggers: JVM startup via `gradle bootRun` or `java -jar`
-- Responsibilities: Bootstrap Spring Boot context with all auto-configurations, component scanning
+- Responsibilities: Bootstrap Spring Boot context with all auto-configurations, component scanning. Enables `@EnableScheduling` and `@EnableAsync` for scheduled tasks and async email sending.
 
 **HealthController:**
 - Location: `backend/.../common/HealthController.kt`
@@ -223,7 +235,7 @@
 
 ## Architectural Constraints
 
-- **Threading:** Single-threaded per-request model (Spring Boot default with Tomcat). No explicit coroutines or reactive streams used.
+- **Threading:** Single-threaded per-request model (Spring Boot default with Tomcat). `@EnableAsync` on `ShareShelfApplication` enables async method execution — `EmailService.sendVerificationEmail()` runs on Spring's async thread pool, not the request thread.
 - **Global state:** No module-level singletons or shared mutable state. All service beans are stateless singletons managed by Spring DI.
 - **Circular imports:** No circular dependency chains detected. Dependency direction is strict: Controller -> Service -> Repository -> Entity with no back-edges.
 - **Frontend routing:** All pages use `"use client"` directive. No React Server Components, no Server Actions. Data fetching happens in `useEffect` hooks.

@@ -14,8 +14,8 @@ Users can discover and borrow tools from neighbors in their community, with a tr
 
 *Existing capabilities shipped and confirmed working.*
 
-- ✓ **AUTH-01**: User can register with email and password (BCrypt hashed)
-- ✓ **AUTH-02**: User can log in and receive JWT token
+- ✓ **AUTH-01**: User can register and log in via Google OAuth (JWT issued on success)
+- ✓ **AUTH-02**: User can log in via Google and receive JWT token
 - ✓ **AUTH-03**: User session authenticated via JWT Bearer token on subsequent requests
 - ✓ **AUTH-04**: User profile includes name, email, community, phone, trust score
 - ✓ **ITEM-01**: User can create item listings with name, description, category
@@ -62,12 +62,12 @@ Users can discover and borrow tools from neighbors in their community, with a tr
 - **Mobile apps (iOS/Android)**: Web-first; responsive design sufficient for initial release
 - **Payment processing**: Free community sharing model; no payment integration
 - **Admin dashboard**: Community moderation is trust-score based for v1
-- **OAuth/Social login**: Email/password sufficient for community-scale use
+- **Credential-based login (email/password)**: Google OAuth is the primary auth method; email/password registration may be re-enabled later if needed
 
 ## Context
 
 **Current codebase state:**
-- Backend: Spring Boot 3.4.3 + Kotlin, complete with 5 domain modules (auth, item, borrow, review, category)
+- Backend: Spring Boot 3.4.3 + Kotlin, complete with 5 domain modules (auth, item, borrow, review, category) + email service (Resend API)
 - Frontend: Next.js 15 + React 19 + TypeScript, 7 pages, reusable UI component library
 - Database: PostgreSQL with 5 Flyway migrations
 - Deployment: Docker multi-stage build, Railway (backend), Vercel (frontend with API proxy)
@@ -102,6 +102,10 @@ The project will adopt a test-first, spec-driven iterative development cycle whe
 | ApiResponse<T> wrapper | Consistent error handling across all endpoints | ✓ Good |
 | TDD-first going forward (Ralpha Loop) | Catch regressions early, enable safe refactoring | — Pending |
 | Photo upload to local filesystem | Simple v1; cloud storage (S3) can be added later | — Pending |
+| Google OAuth as primary auth | Simplifies UX, no password management, leverages Google's security | ✓ Good |
+| Resend API for email (replaces SMTP) | Simpler integration, no SMTP server needed, REST-based | ✓ Good |
+| @EnableAsync for email sending | Non-blocking email delivery, faster registration response | ✓ Good |
+| Re-registration for unverified users | Allows users to re-register if they never verified, cleans up old tokens | ✓ Good |
 
 ---
 
