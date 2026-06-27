@@ -3,64 +3,25 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Library, ArrowLeft } from "lucide-react";
+import { Library } from "lucide-react";
 import GoogleSignInButton from "@/components/ui/GoogleSignInButton";
 import CommunityQuotes from "@/components/ui/CommunityQuotes";
-import api from "@/lib/api";
-import { saveAuth, isAuthenticated } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  const locale = (params.locale as string) || "en";
 
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated()) {
       router.push("/items");
     }
   }, [router]);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const res = await api.post("/auth/login", { email, password });
-      if (res.data.success) {
-        saveAuth(res.data.data);
-        const returnUrl = searchParams.get("returnUrl");
-        router.push(returnUrl || "/items");
-      } else {
-        setError(res.data.message || t("loginPage.failed"));
-      }
-    } catch (err: unknown) {
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosErr = err as {
-          response?: { status?: number; data?: { message?: string } };
-        };
-        const status = axiosErr.response?.status;
-        if (status === 429) {
-          setError(t("loginPage.failed"));
-        } else if (status === 401) {
-          setError(axiosErr.response?.data?.message || t("loginPage.failed"));
-        } else {
-          setError(t("loginPage.failed"));
-        }
-      } else {
-        setError(t("loginPage.failed"));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -86,26 +47,19 @@ export default function LoginPage() {
           </div>
 
           {/* Rotating Quote */}
-          <CommunityQuotes />
+          <CommunityQuotes locale={locale} />
 
           {/* Tagline */}
           <p className="mt-10 text-sm text-white/50 font-body tracking-wide">
-            Community-powered tool sharing
+            {locale === "my"
+              ? "လူမှုအသိုင်းအဝိုင်းမှ ကိရိယာမျှဝေခြင်း"
+              : "Community-powered tool sharing"}
           </p>
         </div>
       </div>
 
       {/* ── Right Panel: Login Form ── */}
-      <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white relative">
-        {/* Back to home link */}
-        <Link
-          href="/"
-          className="absolute top-6 left-6 lg:top-8 lg:left-8 flex items-center gap-1.5 text-sm text-stone-400 hover:text-purple-600 transition-colors duration-200"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Home</span>
-        </Link>
-
+      <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
         <div className="w-full max-w-sm">
           {/* Mobile logo (hidden on lg+) */}
           <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
@@ -121,106 +75,29 @@ export default function LoginPage() {
               {t("loginPage.title")}
             </h1>
             <p className="mt-2 text-stone-500">
-              Sign in to your account to continue
+              {locale === "my"
+                ? "ဆက်လက်ဆောင်ရွက်ရန် သင့်အကောင့်သို့ ဝင်ရောက်ပါ"
+                : "Sign in to your account to continue"}
             </p>
           </div>
 
           {/* Google Sign In */}
-          <GoogleSignInButton text="Sign in with Google" />
+          <GoogleSignInButton
+            text={
+              locale === "my"
+                ? "Google ဖြင့် ဝင်ရောက်ပါ"
+                : "Sign in with Google"
+            }
+          />
 
           {/* Error from Google OAuth */}
           {searchParams.get("error") === "google_auth_failed" && (
             <div className="mt-4 rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700">
-              Google sign-in failed. Please try again.
+              {locale === "my"
+                ? "Google ဖြင့် ဝင်ရောက်ခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ။"
+                : "Google sign-in failed. Please try again."}
             </div>
           )}
-
-          {/* General error */}
-          {error && (
-            <div className="mt-4 rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
-          {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stone-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-stone-400">or</span>
-            </div>
-          </div>
-
-          {/* Email/Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-stone-700 mb-1.5"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all duration-200"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-stone-700 mb-1.5"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all duration-200"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-purple-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-800 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                  Signing in…
-                </span>
-              ) : (
-                "Sign in"
-              )}
-            </button>
-          </form>
 
           {/* Register link */}
           <p className="mt-8 text-center text-sm text-stone-500">

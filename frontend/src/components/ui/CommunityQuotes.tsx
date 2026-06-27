@@ -2,58 +2,48 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const quotes = [
-  {
-    text: "Every tool shared is a neighbor helped.",
-    icon: "🤝",
-  },
-  {
-    text: "Building community, one tool at a time.",
-    icon: "🛠️",
-  },
-  {
-    text: "Sharing is caring — together we grow stronger.",
-    icon: "💚",
-  },
-  {
-    text: "A neighborhood that shares, thrives.",
-    icon: "🏘️",
-  },
-  {
-    text: "Less buying, more sharing. Better for everyone.",
-    icon: "♻️",
-  },
-  {
-    text: "Your unused tool could be your neighbor's lifeline.",
-    icon: "🔧",
-  },
-  {
-    text: "Community is not a place — it's a practice.",
-    icon: "🌱",
-  },
-  {
-    text: "When neighbors share, everyone has more.",
-    icon: "✨",
-  },
-  {
-    text: "The best things in life are shared.",
-    icon: "💛",
-  },
-  {
-    text: "Small acts of sharing build great communities.",
-    icon: "🏡",
-  },
-  {
-    text: "A tool borrowed is a friendship strengthened.",
-    icon: "🤝",
-  },
-  {
-    text: "Together we have everything we need.",
-    icon: "🌟",
-  },
+interface Quote {
+  text: string;
+  icon: string;
+}
+
+const quotesEn: Quote[] = [
+  { text: "Every tool shared is a neighbor helped.", icon: "🤝" },
+  { text: "Building community, one tool at a time.", icon: "🛠️" },
+  { text: "Sharing is caring — together we grow stronger.", icon: "💚" },
+  { text: "A neighborhood that shares, thrives.", icon: "🏘️" },
+  { text: "Less buying, more sharing. Better for everyone.", icon: "♻️" },
+  { text: "Your unused tool could be your neighbor's lifeline.", icon: "🔧" },
+  { text: "Community is not a place — it's a practice.", icon: "🌱" },
+  { text: "When neighbors share, everyone has more.", icon: "✨" },
+  { text: "The best things in life are shared.", icon: "💛" },
+  { text: "Small acts of sharing build great communities.", icon: "🏡" },
+  { text: "A tool borrowed is a friendship strengthened.", icon: "🤝" },
+  { text: "Together we have everything we need.", icon: "🌟" },
 ];
 
-export default function CommunityQuotes() {
+const quotesMy: Quote[] = [
+  { text: "တစ်ယောက်ချင်းစီ မျှဝေခြင်းက အိမ်နီးချင်းကို ကူညီခြင်းပါပဲ။", icon: "🤝" },
+  { text: "လူမှုအသိုင်းအဝိုင်းကို တစ်ခုပြီးတစ်ခု တည်ဆောက်ကြပါစို့။", icon: "🛠️" },
+  { text: "မျှဝေခြင်းက ဂရုစိုက်ခြင်းပါ — အတူတကွ ပိုမိုခိုင်မာကြပါစို့။", icon: "💚" },
+  { text: "မျှဝေတတ်သော ရပ်ကွက်က တိုးတက်ပါတယ်။", icon: "🏘️" },
+  { text: "ဝယ်ယူခြင်းထက် မျှဝေခြင်းက ပိုကောင်းပါတယ်။", icon: "♻️" },
+  { text: "သင်မသုံးတော့တဲ့ ကိရိယာက အိမ်နီးချင်းအတွက် အသက်သွေးကြော ဖြစ်နိုင်ပါတယ်။", icon: "🔧" },
+  { text: "လူမှုအသိုင်းအဝိုင်းဆိုတာ နေရာမဟုတ်ပါ — လက်တွေ့လုပ်ဆောင်ခြင်းပါ။", icon: "🌱" },
+  { text: "အိမ်နီးချင်းတွေ မျှဝေကြရင် လူတိုင်းပိုရပါတယ်။", icon: "✨" },
+  { text: "ဘဝရဲ့ အကောင်းဆုံးအရာတွေက မျှဝေထားတာပါ။", icon: "💛" },
+  { text: "မျှဝေခြင်း အသေးအမွှားလေးတွေက ကြီးမားတဲ့ လူမှုအသိုင်းအဝိုင်းကို တည်ဆောက်ပါတယ်။", icon: "🏡" },
+  { text: "ငှားယူထားတဲ့ ကိရိယာက ခိုင်မာတဲ့ ခင်မင်မှုကို တည်ဆောက်ပါတယ်။", icon: "🤝" },
+  { text: "အတူတကွဆိုရင် လိုအပ်တာအားလုံး ရှိပါတယ်။", icon: "🌟" },
+];
+
+interface CommunityQuotesProps {
+  locale?: string;
+}
+
+export default function CommunityQuotes({ locale = "en" }: CommunityQuotesProps) {
+  const quotes = locale === "my" ? quotesMy : quotesEn;
+
   const [currentIndex, setCurrentIndex] = useState(() =>
     Math.floor(Math.random() * quotes.length)
   );
@@ -65,7 +55,7 @@ export default function CommunityQuotes() {
       setCurrentIndex((prev) => (prev + 1) % quotes.length);
       setFade(true);
     }, 500);
-  }, []);
+  }, [quotes.length]);
 
   useEffect(() => {
     const interval = setInterval(nextQuote, 6000);
