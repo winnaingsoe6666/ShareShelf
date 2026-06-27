@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { MapPin, MapPinOff } from "lucide-react";
 import type { LeafletMouseEvent } from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 interface LocationPickerProps {
   latitude?: number | null;
@@ -14,7 +15,7 @@ interface LocationPickerProps {
   disabled?: boolean;
 }
 
-const DEFAULT_CENTER: [number, number] = [16.84, 96.17];
+const DEFAULT_CENTER: [number, number] = [16.84, 96.20]; // Yangon
 const DEFAULT_ZOOM = 13;
 
 function MapClickHandler({ onClick, disabled }: { onClick: (lat: number, lng: number) => void; disabled?: boolean }) {
