@@ -28,7 +28,7 @@ export default function GoogleSignInButton({
       href={getAuthUrl()}
       onClick={handleClick}
       aria-label={text}
-      className={`w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${className}`}
+      className={`w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl border border-stone-200 bg-white text-stone-800 text-sm font-semibold shadow-sm hover:bg-stone-50 hover:border-purple-300 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${className}`}
     >
       <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <path
