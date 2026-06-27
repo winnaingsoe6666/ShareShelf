@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import {
   Share2,
   Search,
@@ -23,7 +24,9 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import CommunityQuotes from "@/components/ui/CommunityQuotes";
 import api from "@/lib/api";
+import { isAuthenticated } from "@/lib/auth";
 
 function AnimatedCounter({ end, duration = 2000, suffix = "" }: { end: number; duration?: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -44,7 +47,16 @@ const FALLBACK_STATS = { totalItems: 1250, totalMembers: 840, activeBorrows: 320
 
 export default function HomePage() {
   const t = useTranslations();
+  const params = useParams();
+  const locale = (params.locale as string) || "en";
+  const [loggedIn, setLoggedIn] = useState(false);
   const [communityStats, setCommunityStats] = useState(FALLBACK_STATS);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLoggedIn(isAuthenticated());
+    }
+  }, []);
 
   useEffect(() => {
     api.get("/community/stats")
@@ -89,22 +101,28 @@ export default function HomePage() {
               {t("home.hero.subtitle")}
             </p>
 
-            {/* Search CTA + Join */}
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/items"
-                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-base font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px shadow-md hover:shadow-lg"
-              >
-                <Search className="h-5 w-5" />
-                {t("home.hero.browseTools")}
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-purple-600 bg-white px-6 py-3 text-base font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200 hover:-translate-y-px"
-              >
-                {t("home.hero.joinNow")}
-              </Link>
-            </div>
+            {/* CTA: buttons for guests, quotes for logged-in users */}
+            {loggedIn ? (
+              <div className="mt-10 mx-auto max-w-lg">
+                <CommunityQuotes locale={locale} />
+              </div>
+            ) : (
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/items"
+                  className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-base font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px shadow-md hover:shadow-lg"
+                >
+                  <Search className="h-5 w-5" />
+                  {t("home.hero.browseTools")}
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-purple-600 bg-white px-6 py-3 text-base font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200 hover:-translate-y-px"
+                >
+                  {t("home.hero.joinNow")}
+                </Link>
+              </div>
+            )}
 
             {/* Floating tool icons */}
             <div className="mt-12 flex items-center justify-center gap-6 text-purple-300">
@@ -210,13 +228,29 @@ export default function HomePage() {
         {/* Bottom CTA */}
         <section className="bg-purple-50 py-16 text-center border-t border-purple-200">
           <div className="mx-auto max-w-2xl px-4">
-            <h2 className="font-heading text-3xl font-bold text-purple-900">{t("home.cta.title")}</h2>
-            <p className="mt-3 text-stone-600">{t("home.cta.subtitle")}</p>
+            <h2 className="font-heading text-3xl font-bold text-purple-900">
+              {loggedIn
+                ? locale === "my"
+                  ? "ကိရိယာများ ရှာဖွေရန် အဆင်သင့်ဖြစ်ပြီလား?"
+                  : "Ready to find your next tool?"
+                : t("home.cta.title")}
+            </h2>
+            <p className="mt-3 text-stone-600">
+              {loggedIn
+                ? locale === "my"
+                  ? "သင့်အိမ်နီးချင်းတွေဆီကနေ ငှားယူနိုင်တဲ့ ကိရိယာတွေကို ရှာဖွေပါ"
+                  : "Browse tools available from your neighbors"
+                : t("home.cta.subtitle")}
+            </p>
             <Link
-              href="/login"
+              href={loggedIn ? "/items" : "/login"}
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-green-600 px-8 py-3.5 text-base font-semibold text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px shadow-md hover:shadow-lg"
             >
-              {t("home.cta.button")}
+              {loggedIn
+                ? locale === "my"
+                  ? "ကိရိယာများ ရှာဖွေပါ"
+                  : "Browse Tools"
+                : t("home.cta.button")}
               <ArrowRight className="h-5 w-5" />
             </Link>
           </div>
