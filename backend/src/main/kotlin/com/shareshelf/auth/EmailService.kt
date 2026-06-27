@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,6 +15,7 @@ class EmailService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    @Async
     fun sendVerificationEmail(toEmail: String, token: String) {
         val verificationUrl = "$frontendUrl/auth/verify-email?token=$token"
         val subject = "Please verify your email address - ShareShelf"
