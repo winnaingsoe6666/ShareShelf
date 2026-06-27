@@ -86,40 +86,13 @@ export default function LoginPage() {
               </div>
 
               <GoogleSignInButton text="Sign in with Google" />
-              <AuthDivider />
+              <GoogleSignInButton text="Sign in with Google" />
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {error}
-                  </div>
-                )}
-                {searchParams.get("error") === "google_auth_failed" && !error && (
-                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                    Google sign-in failed. Please try again.
-                  </div>
-                )}
-                <Input
-                  label={t("loginPage.email")}
-                  type="email"
-                  placeholder={t("loginPage.emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Input
-                  label={t("loginPage.password")}
-                  type="password"
-                  placeholder={t("loginPage.passwordPlaceholder")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <Button type="submit" loading={loading} className="w-full">
-                  {loading ? t("loginPage.loggingIn") : t("loginPage.submit")}
-                </Button>
-              </form>
+              {searchParams.get("error") === "google_auth_failed" && (
+                <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                  Google sign-in failed. Please try again.
+                </div>
+              )}
 
               <p className="mt-6 text-center text-sm text-stone-600">
                 {t("loginPage.noAccount")}{" "}
