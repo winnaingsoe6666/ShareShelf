@@ -56,23 +56,23 @@ export default function RegisterPage() {
           <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-lg mb-2 transform hover:scale-105 transition-transform duration-300">
             <Library className="w-5 h-5 text-white" />
           </div>
-          <span className="font-display text-lg tracking-widest text-purple-900 font-semibold">
+          <span className="font-display text-lg tracking-widest text-green-500 font-semibold">
             SHARE SHELF
           </span>
-          <span className="text-[9px] uppercase tracking-widest text-purple-600/70 font-bold mt-1">
+          <span className="text-[9px] uppercase tracking-widest text-green-600/70 font-bold mt-1">
             {locale === "my" ? "ရပ်ကွက်ကိရိယာမျှဝေခြင်း" : "Community Tool Library"}
           </span>
         </div>
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
         <div className="mb-5 p-4 rounded-xl bg-white/3 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
-          <span className="absolute -top-1 left-3 text-4xl text-purple-200/20 font-serif pointer-events-none select-none">“</span>
+          <span className="absolute -top-1 left-3 text-4xl text-green-200/20 font-serif pointer-events-none select-none">“</span>
           <CommunityQuotes locale={locale} variant="dark" />
         </div>
 
         {/* Card Header & Description */}
         <div className="text-center mb-5">
-          <h1 className="font-heading text-xl font-bold text-stone-900">
+          <h1 className="font-heading text-xl font-bold text-black-600">
             {t("registerPage.title")}
           </h1>
           <p className="text-xs text-stone-500 mt-1">
