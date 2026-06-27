@@ -280,16 +280,16 @@ export default function Navbar() {
           ) : (
             <>
               <Link
-                href="/login"
+                href="/register"
                 className={`rounded-lg px-3 py-1.5 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-stone-600 hover:bg-purple-100 transition-colors`}
               >
-                {t("nav.logIn")}
+                {t("nav.signUp")}
               </Link>
               <Link
-                href="/register"
+                href="/login"
                 className={`rounded-lg bg-green-600 px-4 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} font-medium text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px`}
               >
-                {t("nav.signUp")}
+                {t("nav.logIn")}
               </Link>
             </>
           )}
@@ -333,8 +333,8 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.logIn")}</Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)} className={`rounded bg-green-600 px-3 py-2 text-center ${locale === 'my' ? 'text-xs' : 'text-sm'} text-white`}>{t("nav.signUp")}</Link>
+                <Link href="/register" onClick={() => setMobileOpen(false)} className={`rounded px-3 py-2 ${locale === 'my' ? 'text-xs' : 'text-sm'} hover:bg-purple-100 transition-colors`}>{t("nav.signUp")}</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)} className={`rounded bg-green-600 px-3 py-2 text-center ${locale === 'my' ? 'text-xs' : 'text-sm'} text-white`}>{t("nav.logIn")}</Link>
               </>
             )}
 

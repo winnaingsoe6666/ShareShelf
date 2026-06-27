@@ -99,7 +99,7 @@ export default function HomePage() {
                 {t("home.hero.browseTools")}
               </Link>
               <Link
-                href="/register"
+                href="/login"
                 className="inline-flex items-center gap-2 rounded-lg border-2 border-purple-600 bg-white px-6 py-3 text-base font-medium text-purple-700 hover:bg-purple-50 transition-all duration-200 hover:-translate-y-px"
               >
                 {t("home.hero.joinNow")}
@@ -213,7 +213,7 @@ export default function HomePage() {
             <h2 className="font-heading text-3xl font-bold text-purple-900">{t("home.cta.title")}</h2>
             <p className="mt-3 text-stone-600">{t("home.cta.subtitle")}</p>
             <Link
-              href="/register"
+              href="/login"
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-green-600 px-8 py-3.5 text-base font-semibold text-white hover:bg-green-700 transition-all duration-200 hover:-translate-y-px shadow-md hover:shadow-lg"
             >
               {t("home.cta.button")}
