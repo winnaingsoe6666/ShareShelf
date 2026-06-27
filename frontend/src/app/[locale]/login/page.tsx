@@ -49,7 +49,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Main Glassmorphic Popup Card ── */}
-      <div className="relative w-full max-w-sm bg-white/[0.05] backdrop-blur-md border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
+      <div className="relative w-full max-w-sm bg-white/[0.005] backdrop-blur-md border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
         
         {/* Brand Logo and Name */}
         <div className="flex flex-col items-center mb-6">
