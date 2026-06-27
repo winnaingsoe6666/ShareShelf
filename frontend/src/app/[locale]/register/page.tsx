@@ -38,6 +38,7 @@ export default function RegisterPage() {
   const [community, setCommunity] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const strength = password ? getStrength(password) : 0;
 
@@ -54,8 +55,7 @@ export default function RegisterPage() {
         community: community || undefined,
       });
       if (res.data.success) {
-        saveAuth(res.data.data);
-        router.push("/items");
+        setIsSuccess(true);
       } else {
         setError(res.data.message || t("registerPage.failed"));
       }
@@ -98,8 +98,23 @@ export default function RegisterPage() {
               <GoogleSignInButton text="Sign up with Google" />
               <AuthDivider />
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {isSuccess ? (
+                <div className="text-center space-y-4">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Check your email</h3>
+                  <p className="text-sm text-gray-500">
+                    We've sent a verification link to <strong>{email}</strong>. Please check your inbox and click the link to activate your account.
+                  </p>
+                  <Button onClick={() => router.push("/login")} className="mt-4 w-full">
+                    Go to Login
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                   <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
                     {error}
@@ -185,6 +200,7 @@ export default function RegisterPage() {
                   {loading ? t("registerPage.creating") : t("registerPage.submit")}
                 </Button>
               </form>
+              )}
 
               <p className="mt-6 text-center text-sm text-stone-600">
                 {t("registerPage.haveAccount")}{" "}

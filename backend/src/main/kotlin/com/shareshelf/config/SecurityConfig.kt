@@ -37,6 +37,7 @@ class SecurityConfig(
                         "/api/auth/register",
                         "/api/auth/login",
                         "/api/auth/refresh",
+                        "/api/auth/verify-email",
                         "/api/health",
                         "/api-docs/**",
                         "/swagger-ui/**",

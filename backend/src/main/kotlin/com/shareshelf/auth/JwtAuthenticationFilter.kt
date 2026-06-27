@@ -75,6 +75,7 @@ class JwtAuthenticationFilter(
             path.startsWith("/oauth2/") ||
             path == "/api/auth/login" ||
             path == "/api/auth/register" ||
-            path == "/api/auth/refresh"
+            path == "/api/auth/refresh" ||
+            path == "/api/auth/verify-email"
     }
 }

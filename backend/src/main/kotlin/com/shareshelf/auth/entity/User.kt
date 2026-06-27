@@ -52,6 +52,9 @@ data class User(
     @Column(name = "is_id_verified", nullable = false)
     var isIdVerified: Boolean = false,
 
+    @Column(name = "is_email_verified", nullable = false)
+    var isEmailVerified: Boolean = false,
+
     @Column(name = "address_line1")
     var addressLine1: String? = null,
 

@@ -47,4 +47,10 @@ class AuthController(
         val result = authService.refresh(request.refreshToken)
         return ResponseEntity.ok(ApiResponse.success(result))
     }
+
+    @GetMapping("/verify-email")
+    fun verifyEmail(@RequestParam token: String): ResponseEntity<ApiResponse<AuthResponse>> {
+        val result = authService.verifyEmail(token)
+        return ResponseEntity.ok(ApiResponse.success(result, message = "Email verified successfully"))
+    }
 }

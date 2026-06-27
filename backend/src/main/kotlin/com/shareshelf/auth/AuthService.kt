@@ -5,6 +5,8 @@ import com.shareshelf.auth.dto.LoginRequest
 import com.shareshelf.auth.dto.RegisterRequest
 import com.shareshelf.auth.entity.RefreshToken
 import com.shareshelf.auth.entity.RefreshTokenRepository
+import com.shareshelf.auth.entity.EmailVerificationToken
+import com.shareshelf.auth.entity.EmailVerificationTokenRepository
 import com.shareshelf.auth.entity.AuthProvider
 import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
@@ -24,9 +26,12 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val jtiBlacklist: JtiBlacklist,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    private val emailService: EmailService,
     @Value("\${jwt.refresh-expiration-ms}") private val refreshExpirationMs: Long
 ) {
 
+    @Transactional
     fun register(request: RegisterRequest): AuthResponse {
         if (userRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("Email already registered")
@@ -37,19 +42,23 @@ class AuthService(
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
             community = request.community,
-            phone = request.phone
+            phone = request.phone,
+            isEmailVerified = false
         )
 
         val savedUser = userRepository.save(user)
-        val token = jwtTokenProvider.generateToken(
-            savedUser.id ?: throw IllegalStateException("User was saved but no ID was generated"),
-            savedUser.email
-        )
-        val refreshToken = createRefreshToken(
-            savedUser.id ?: throw IllegalStateException("User was saved but no ID was generated")
-        )
 
-        return toAuthResponse(savedUser, token, refreshToken)
+        val tokenString = UUID.randomUUID().toString()
+        val verificationToken = EmailVerificationToken(
+            token = tokenString,
+            user = savedUser,
+            expiresAt = LocalDateTime.now().plusHours(24)
+        )
+        emailVerificationTokenRepository.save(verificationToken)
+        
+        emailService.sendVerificationEmail(savedUser.email, tokenString)
+
+        return toAuthResponse(savedUser, "", "")
     }
 
     @Transactional
@@ -57,18 +66,19 @@ class AuthService(
         val user = userRepository.findByEmail(request.email)
             ?: throw BadCredentialsException("Invalid email or password")
 
-        // Check if account is temporarily locked
+        if (!user.isEmailVerified) {
+            throw BadCredentialsException("Please verify your email address before logging in.")
+        }
+
         if (user.lockedUntil?.isAfter(LocalDateTime.now()) == true) {
             throw BadCredentialsException("Account is temporarily locked due to too many failed login attempts. Please try again later.")
         }
 
-        // Reject password login for Google-only users
         if (user.authProvider == AuthProvider.GOOGLE && user.passwordHash.isNullOrEmpty()) {
             throw BadCredentialsException("This account uses Google Sign-In. Please use Google to log in.")
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            // Track failed login attempts
             user.failedLoginAttempts++
             if (user.failedLoginAttempts >= 5) {
                 user.lockedUntil = LocalDateTime.now().plusMinutes(30)
@@ -77,7 +87,6 @@ class AuthService(
             throw BadCredentialsException("Invalid email or password")
         }
 
-        // Reset failed attempts and lock status on successful login
         if (user.failedLoginAttempts > 0) {
             user.failedLoginAttempts = 0
             user.lockedUntil = null
@@ -119,7 +128,6 @@ class AuthService(
             throw BadCredentialsException("Refresh token has expired")
         }
 
-        // Revoke the old refresh token (single-use rotation)
         storedToken.revoked = true
         refreshTokenRepository.save(storedToken)
 
@@ -150,6 +158,27 @@ class AuthService(
         )
 
         return toAuthResponse(user, token, refreshToken)
+    }
+
+    @Transactional
+    fun verifyEmail(token: String): AuthResponse {
+        val verificationToken = emailVerificationTokenRepository.findByToken(token)
+            ?: throw IllegalArgumentException("Invalid verification token")
+
+        if (verificationToken.expiresAt.isBefore(LocalDateTime.now())) {
+            throw IllegalArgumentException("Verification token has expired")
+        }
+
+        val user = verificationToken.user
+        user.isEmailVerified = true
+        userRepository.save(user)
+        
+        emailVerificationTokenRepository.delete(verificationToken)
+
+        val newAccessToken = jwtTokenProvider.generateToken(user.id!!, user.email)
+        val newRefreshToken = createRefreshToken(user.id!!)
+
+        return toAuthResponse(user, newAccessToken, newRefreshToken)
     }
 
     private fun createRefreshToken(userId: Long): String {

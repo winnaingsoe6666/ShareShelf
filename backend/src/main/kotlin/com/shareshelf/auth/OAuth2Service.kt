@@ -38,6 +38,7 @@ class OAuth2Service(
             if (existingUser.avatarUrl == null && picture != null) {
                 existingUser.avatarUrl = picture
             }
+            existingUser.isEmailVerified = true
             return userRepository.save(existingUser)
         }
 
@@ -48,7 +49,8 @@ class OAuth2Service(
             passwordHash = "",
             googleId = googleId,
             authProvider = AuthProvider.GOOGLE,
-            avatarUrl = picture
+            avatarUrl = picture,
+            isEmailVerified = true
         )
         return userRepository.save(newUser)
     }
