@@ -30,6 +30,7 @@ The user requested a redesign of the login and register pages, incorporating bac
 
 ### `frontend/src/app/[locale]/page.tsx`
 - Style the logged-in user Quotes container with a light frosted glass layout (`bg-white/50 backdrop-blur-sm border border-rose-100 shadow-sm rounded-2xl`) and decorative quotes mark matching the sunset theme.
+- Fixed dimensions size to `w-full max-w-lg h-[180px] sm:h-[160px] flex flex-col justify-center` to prevent layout shifts as quote text changes.
 
 ---
 
