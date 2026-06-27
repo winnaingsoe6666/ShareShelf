@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface EmailVerificationTokenRepository : JpaRepository<EmailVerificationToken, Long> {
     fun findByToken(token: String): EmailVerificationToken?
+    fun deleteByUser(user: User)
 }

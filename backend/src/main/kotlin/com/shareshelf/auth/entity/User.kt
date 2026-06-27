@@ -29,7 +29,7 @@ data class User(
     var community: String? = null,
 
     @Column(length = 20)
-    val phone: String? = null,
+    var phone: String? = null,
 
     @Column(name = "avatar_url", length = 500)
     var avatarUrl: String? = null,

@@ -33,18 +33,31 @@ class AuthService(
 
     @Transactional
     fun register(request: RegisterRequest): AuthResponse {
-        if (userRepository.existsByEmail(request.email)) {
-            throw IllegalArgumentException("Email already registered")
+        var user = userRepository.findByEmail(request.email)
+        
+        if (user != null) {
+            if (user.isEmailVerified) {
+                throw IllegalArgumentException("Email already registered")
+            }
+            
+            // Delete old verification tokens so we can generate a fresh one
+            emailVerificationTokenRepository.deleteByUser(user)
+            
+            // Overwrite existing unverified details with the new ones
+            user.name = request.name
+            user.passwordHash = passwordEncoder.encode(request.password)
+            user.community = request.community
+            user.phone = request.phone
+        } else {
+            user = User(
+                name = request.name,
+                email = request.email,
+                passwordHash = passwordEncoder.encode(request.password),
+                community = request.community,
+                phone = request.phone,
+                isEmailVerified = false
+            )
         }
-
-        val user = User(
-            name = request.name,
-            email = request.email,
-            passwordHash = passwordEncoder.encode(request.password),
-            community = request.community,
-            phone = request.phone,
-            isEmailVerified = false
-        )
 
         val savedUser = userRepository.save(user)
 
