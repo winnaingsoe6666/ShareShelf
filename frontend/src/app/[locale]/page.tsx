@@ -103,8 +103,9 @@ export default function HomePage() {
 
             {/* CTA: buttons for guests, quotes for logged-in users */}
             {loggedIn ? (
-              <div className="mt-10 mx-auto max-w-lg">
-                <CommunityQuotes locale={locale} variant="sunset"/>
+              <div className="mt-10 mx-auto max-w-lg p-5 rounded-2xl bg-white/50 backdrop-blur-sm border border-rose-100 text-center relative overflow-hidden shadow-sm">
+                <span className="absolute -top-1 left-3 text-4xl text-[#fca3a0]/30 font-serif pointer-events-none select-none">“</span>
+                <CommunityQuotes locale={locale} variant="sunset" />
               </div>
             ) : (
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
