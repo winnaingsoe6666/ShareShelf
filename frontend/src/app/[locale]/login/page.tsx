@@ -86,7 +86,7 @@ export default function LoginPage() {
               </div>
 
               <GoogleSignInButton text="Sign in with Google" />
-              <GoogleSignInButton text="Sign in with Google" />
+
 
               {searchParams.get("error") === "google_auth_failed" && (
                 <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
