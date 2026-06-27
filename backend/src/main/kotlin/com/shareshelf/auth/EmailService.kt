@@ -2,18 +2,20 @@ package com.shareshelf.auth
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 
 @Service
 class EmailService(
-    private val mailSender: JavaMailSender,
     @Value("\${app.frontend-url}") private val frontendUrl: String,
-    @Value("\${app.mail.from:\${spring.mail.username}}") private val fromAddress: String
+    @Value("\${RESEND_API_KEY:}") private val resendApiKey: String
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val restTemplate = RestTemplate()
 
     @Async
     fun sendVerificationEmail(toEmail: String, token: String) {
@@ -32,20 +34,34 @@ class EmailService(
         """.trimIndent()
 
         try {
-            val message = SimpleMailMessage()
-            message.setTo(toEmail)
-            message.subject = subject
-            message.text = text
-            message.from = fromAddress
+            if (resendApiKey.isBlank() || resendApiKey == "re_dummy_api_key_for_local_testing") {
+                logger.warn("Resend API key is not configured. Email will not be sent.")
+                logger.info("Verification link for manual testing: $verificationUrl")
+                return
+            }
 
-            mailSender.send(message)
-            logger.info("Verification email sent to $toEmail")
+            val headers = HttpHeaders()
+            headers.setBearerAuth(resendApiKey)
+            headers.contentType = MediaType.APPLICATION_JSON
+
+            val body = mapOf(
+                "from" to "onboarding@resend.dev",
+                "to" to toEmail,
+                "subject" to subject,
+                "html" to text.replace("\n", "<br>")
+            )
+
+            val request = HttpEntity(body, headers)
+            val response = restTemplate.postForEntity("https://api.resend.com/emails", request, String::class.java)
+
+            if (response.statusCode.is2xxSuccessful) {
+                logger.info("Verification email sent successfully via Resend API to $toEmail")
+            } else {
+                logger.error("Failed to send email via Resend API. Status: ${response.statusCode}, Body: ${response.body}")
+            }
         } catch (e: Exception) {
-            logger.error("Failed to send verification email to $toEmail", e)
-            // Even if email fails, we log it. During local dev without proper SMTP, this will throw an exception,
-            // but the token is still saved and can be extracted from the logs if needed for manual testing.
+            logger.error("Exception while sending email via Resend API to $toEmail", e)
             logger.info("Verification link for manual testing: $verificationUrl")
-            throw e
         }
     }
 }
