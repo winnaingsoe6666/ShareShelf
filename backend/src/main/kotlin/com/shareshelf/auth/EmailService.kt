@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 class EmailService(
     private val mailSender: JavaMailSender,
     @Value("\${app.frontend-url}") private val frontendUrl: String,
-    @Value("\${app.mail.from:onboarding@resend.dev}") private val fromAddress: String
+    @Value("\${app.mail.from:\${spring.mail.username}}") private val fromAddress: String
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
