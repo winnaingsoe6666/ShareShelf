@@ -73,6 +73,8 @@ class JwtAuthenticationFilter(
         val path = request.servletPath
         return path.startsWith("/login/oauth2/") ||
             path.startsWith("/oauth2/") ||
-            path.startsWith("/api/auth/")
+            path == "/api/auth/login" ||
+            path == "/api/auth/register" ||
+            path == "/api/auth/refresh"
     }
 }
