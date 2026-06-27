@@ -49,7 +49,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Main Glassmorphic Popup Card ── */}
-      <div className="relative w-full max-w-sm bg-white/25 backdrop-blur-2xl border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
+      <div className="relative w-full max-w-sm bg-white/3 backdrop-blur-2xl border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)] rounded-3xl p-6 sm:p-8 transition-all duration-500 hover:shadow-purple-500/10 hover:border-white/30 animate-slide-up z-10">
         
         {/* Brand Logo and Name */}
         <div className="flex flex-col items-center mb-6">
@@ -65,7 +65,7 @@ export default function LoginPage() {
         </div>
 
         {/* Rotating Testimonials/Quotes container (Glass Variant) */}
-        <div className="mb-5 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
+        <div className="mb-5 p-4 rounded-xl bg-white/3 backdrop-blur-sm border border-white/10 text-center relative overflow-hidden">
           <span className="absolute -top-1 left-3 text-4xl text-white/10 font-serif pointer-events-none select-none">“</span>
           <CommunityQuotes locale={locale} variant="light" />
         </div>

@@ -11,7 +11,7 @@ The user requested a redesign of the login and register pages, incorporating bac
 
 ### 2. Glassmorphic Popup Block
 - Replace the solid white container with a glassmorphic popup card.
-- Styling: `backdrop-blur-2xl bg-white/25 border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)]`.
+- Styling: `backdrop-blur-2xl bg-white/5 border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.30)]`.
 - Logo & Text: Convert brand name and typography to high-contrast white and light stone shades (`text-white`, `text-stone-300`, etc.) to stand out beautifully against the blurred background.
 - Integrate the `CommunityQuotes` component using its `light` variant (white text, white indicator dots) to sit elegantly inside the glass block.
 - Adjust the Google Sign In Button to match with clean borders and active feedback.
