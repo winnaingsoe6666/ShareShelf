@@ -45,14 +45,14 @@ class ItemRepositoryTest {
         val item = testItem()
         val page = PageImpl(listOf(item), pageable, 1)
 
-        every { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) } returns page
+        every { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, pageable)
+        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable)
 
         assertEquals(1, result.totalElements)
         assertEquals("Test Item", result.content.first().title)
 
-        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) }
     }
 
     @Test
@@ -60,14 +60,14 @@ class ItemRepositoryTest {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(emptyList<Item>(), pageable, 0)
 
-        every { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) } returns page
+        every { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, pageable)
+        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable)
 
         assertEquals(0, result.totalElements)
         assertTrue(result.content.isEmpty())
 
-        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) }
     }
 
     @Test
@@ -75,13 +75,13 @@ class ItemRepositoryTest {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(emptyList<Item>(), pageable, 0)
 
-        every { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) } returns page
+        every { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, pageable)
+        val result = itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable)
 
         assertEquals(0, result.totalElements)
 
-        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 5000.0, null, null, null, null, pageable) }
     }
 
     @Test
@@ -91,15 +91,15 @@ class ItemRepositoryTest {
         val farItem = testItem(id = 2L, title = "Far Item")
         val page = PageImpl(listOf(nearbyItem, farItem), pageable, 2)
 
-        every { itemRepository.findNearby(16.84, 96.17, 10000.0, pageable) } returns page
+        every { itemRepository.findNearby(16.84, 96.17, 10000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(16.84, 96.17, 10000.0, pageable)
+        val result = itemRepository.findNearby(16.84, 96.17, 10000.0, null, null, null, null, pageable)
 
         assertEquals(2, result.totalElements)
         assertEquals("Nearby Item", result.content[0].title)
         assertEquals("Far Item", result.content[1].title)
 
-        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 10000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 10000.0, null, null, null, null, pageable) }
     }
 
     @Test
@@ -107,15 +107,15 @@ class ItemRepositoryTest {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(emptyList<Item>(), pageable, 0)
 
-        every { itemRepository.findNearby(0.0, 0.0, 1000.0, pageable) } returns page
+        every { itemRepository.findNearby(0.0, 0.0, 1000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(0.0, 0.0, 1000.0, pageable)
+        val result = itemRepository.findNearby(0.0, 0.0, 1000.0, null, null, null, null, pageable)
 
         assertNotNull(result)
         assertEquals(0, result.totalElements)
         assertTrue(result.content.isEmpty())
 
-        verify(exactly = 1) { itemRepository.findNearby(0.0, 0.0, 1000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(0.0, 0.0, 1000.0, null, null, null, null, pageable) }
     }
 
     @Test
@@ -125,12 +125,12 @@ class ItemRepositoryTest {
         val page = PageImpl(listOf(item), pageable, 1)
 
         // lat=16.84, lng=96.17 — verify the method is called with these exact params
-        every { itemRepository.findNearby(16.84, 96.17, 3000.0, pageable) } returns page
+        every { itemRepository.findNearby(16.84, 96.17, 3000.0, null, null, null, null, pageable) } returns page
 
-        val result = itemRepository.findNearby(16.84, 96.17, 3000.0, pageable)
+        val result = itemRepository.findNearby(16.84, 96.17, 3000.0, null, null, null, null, pageable)
 
         assertEquals(1, result.totalElements)
 
-        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 3000.0, pageable) }
+        verify(exactly = 1) { itemRepository.findNearby(16.84, 96.17, 3000.0, null, null, null, null, pageable) }
     }
 }
