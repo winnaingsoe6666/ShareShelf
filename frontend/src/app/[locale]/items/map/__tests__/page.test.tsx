@@ -15,6 +15,8 @@ const mapTranslations: Record<string, string> = {
   "itemMap.title": "Search by Map",
   "itemMap.subtitle": "Discover tools near you",
   "itemMap.loading": "Loading map...",
+  "itemMap.errorLoading": "Failed to load items",
+  "common.retry": "Retry",
 };
 
 vi.mock("next-intl", () => ({

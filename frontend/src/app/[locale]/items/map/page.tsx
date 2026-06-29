@@ -78,6 +78,7 @@ export default function MapSearchPage() {
           {loading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm">
               <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+              <span className="ml-2 text-sm text-purple-700">{t("itemMap.loading")}</span>
             </div>
           )}
           <MapView
