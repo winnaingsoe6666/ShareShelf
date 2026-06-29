@@ -107,7 +107,7 @@ export default function DistanceFilter({ onLocationChange }: DistanceFilterProps
           onClick={() => handleRadiusSelect(preset.value)}
           disabled={geoDenied}
           className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
-            selectedRadius === preset.value && activeLocation
+            selectedRadius === preset.value
               ? "bg-purple-600 text-white shadow-md"
               : "bg-white border border-purple-200 text-stone-500 hover:bg-purple-50"
           } disabled:opacity-50`}
