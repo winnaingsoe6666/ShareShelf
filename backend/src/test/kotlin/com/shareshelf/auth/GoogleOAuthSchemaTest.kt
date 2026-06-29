@@ -17,6 +17,8 @@ class GoogleOAuthSchemaTest {
     private val jwtTokenProvider = mockk<JwtTokenProvider>()
     private val jtiBlacklist = mockk<JtiBlacklist>(relaxed = true)
     private val refreshTokenRepository = mockk<com.shareshelf.auth.entity.RefreshTokenRepository>()
+    private val emailVerificationTokenRepository = mockk<com.shareshelf.auth.entity.EmailVerificationTokenRepository>(relaxed = true)
+    private val emailService = mockk<EmailService>(relaxed = true)
 
     private val authService = AuthService(
         userRepository = userRepository,
@@ -24,6 +26,8 @@ class GoogleOAuthSchemaTest {
         jwtTokenProvider = jwtTokenProvider,
         jtiBlacklist = jtiBlacklist,
         refreshTokenRepository = refreshTokenRepository,
+        emailVerificationTokenRepository = emailVerificationTokenRepository,
+        emailService = emailService,
         refreshExpirationMs = 604800000
     )
 
