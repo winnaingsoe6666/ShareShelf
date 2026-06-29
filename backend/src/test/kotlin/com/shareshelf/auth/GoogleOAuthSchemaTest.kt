@@ -91,7 +91,8 @@ class GoogleOAuthSchemaTest {
             email = "google@example.com",
             passwordHash = "",
             googleId = "google-123",
-            authProvider = AuthProvider.GOOGLE
+            authProvider = AuthProvider.GOOGLE,
+            isEmailVerified = true
         )
 
         every { userRepository.findByEmail("google@example.com") } returns googleUser
@@ -113,7 +114,8 @@ class GoogleOAuthSchemaTest {
             name = "Local User",
             email = "local@example.com",
             passwordHash = "hashed_password",
-            authProvider = AuthProvider.LOCAL
+            authProvider = AuthProvider.LOCAL,
+            isEmailVerified = true
         )
 
         every { userRepository.findByEmail("local@example.com") } returns localUser
