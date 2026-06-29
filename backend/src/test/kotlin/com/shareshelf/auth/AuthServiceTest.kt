@@ -2,6 +2,7 @@ package com.shareshelf.auth
 
 import com.shareshelf.auth.entity.RefreshToken
 import com.shareshelf.auth.entity.RefreshTokenRepository
+import com.shareshelf.auth.entity.EmailVerificationTokenRepository
 import com.shareshelf.auth.entity.User
 import com.shareshelf.auth.entity.UserRepository
 import io.mockk.*
@@ -20,6 +21,8 @@ class AuthServiceTest {
     private val jwtTokenProvider = mockk<JwtTokenProvider>()
     private val jtiBlacklist = mockk<JtiBlacklist>(relaxed = true)
     private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val emailVerificationTokenRepository = mockk<EmailVerificationTokenRepository>(relaxed = true)
+    private val emailService = mockk<EmailService>(relaxed = true)
 
     private val authService = AuthService(
         userRepository = userRepository,
@@ -27,6 +30,8 @@ class AuthServiceTest {
         jwtTokenProvider = jwtTokenProvider,
         jtiBlacklist = jtiBlacklist,
         refreshTokenRepository = refreshTokenRepository,
+        emailVerificationTokenRepository = emailVerificationTokenRepository,
+        emailService = emailService,
         refreshExpirationMs = 604800000 // 7 days
     )
 
