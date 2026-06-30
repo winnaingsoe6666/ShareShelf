@@ -28,7 +28,42 @@ export function saveAuth(auth: AuthResponse): void {
 }
 
 export function updateUserSession(user: User): void {
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(USER_KEY, JSON.stringify({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    trustScore: user.trustScore,
+    community: user.community,
+    avatarUrl: user.avatarUrl,
+    bio: user.bio,
+    isIdVerified: user.isIdVerified,
+    addressLine1: user.addressLine1,
+    addressLine2: user.addressLine2,
+    city: user.city,
+    state: user.state,
+    zipCode: user.zipCode,
+    socialLink: user.socialLink,
+  }));
+}
+
+/** Convert an AuthResponse (from API) to a User-shaped object for localStorage. */
+export function authResponseToUser(auth: AuthResponse): User {
+  return {
+    id: auth.userId,
+    name: auth.name,
+    email: auth.email,
+    trustScore: auth.trustScore,
+    community: auth.community,
+    avatarUrl: auth.avatarUrl,
+    bio: auth.bio,
+    isIdVerified: auth.isIdVerified,
+    addressLine1: auth.addressLine1,
+    addressLine2: auth.addressLine2,
+    city: auth.city,
+    state: auth.state,
+    zipCode: auth.zipCode,
+    socialLink: auth.socialLink,
+  };
 }
 
 export function clearAuth(): void {
