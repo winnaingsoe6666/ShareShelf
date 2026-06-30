@@ -44,6 +44,7 @@ class ChatControllerTest {
                 itemImageUrl = null,
                 otherUserId = 2L,
                 otherUserName = "Borrower",
+                otherUserAvatarUrl = null,
                 lastMessage = "Is this available?",
                 lastMessageAt = now,
                 unreadCount = 2L
@@ -87,6 +88,7 @@ class ChatControllerTest {
             itemImageUrl = null,
             otherUserId = 2L,
             otherUserName = "Borrower",
+            otherUserAvatarUrl = null,
             messages = listOf(
                 MessageResponse(
                     id = 1L,
@@ -129,6 +131,7 @@ class ChatControllerTest {
             itemImageUrl = null,
             otherUserId = 2L,
             otherUserName = "User",
+            otherUserAvatarUrl = null,
             messages = emptyList()
         )
 
@@ -154,6 +157,7 @@ class ChatControllerTest {
             itemImageUrl = null,
             otherUserId = 2L,
             otherUserName = "User",
+            otherUserAvatarUrl = null,
             messages = emptyList()
         )
 
