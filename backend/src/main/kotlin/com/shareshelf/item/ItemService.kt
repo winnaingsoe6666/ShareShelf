@@ -99,6 +99,11 @@ class ItemService(
         request.depositAmount?.let { item.depositAmount = it }
         request.status?.let { item.status = it }
 
+        if (request.latitude != null && request.longitude != null) {
+            item.latitude = request.latitude
+            item.longitude = request.longitude
+        }
+
         val saved = itemRepository.save(item)
         val user = userRepository.findById(saved.ownerId)
         return toResponse(saved, user.map { it.name }.orElse("Unknown"), user.map { it.trustScore.toDouble() }.orElse(0.0))

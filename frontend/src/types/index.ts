@@ -1,7 +1,7 @@
 // Types
 export type BorrowStatus = "pending" | "approved" | "rejected" | "returned" | "cancelled";
 export type ItemStatus = "available" | "borrowed" | "unavailable";
-export type NotificationType = "borrow_requested" | "borrow_approved" | "borrow_rejected" | "borrow_returned" | "review_received";
+export type NotificationType = "borrow_requested" | "borrow_approved" | "borrow_rejected" | "borrow_returned" | "borrow_cancelled" | "review_received";
 
 export interface User {
   id: number;

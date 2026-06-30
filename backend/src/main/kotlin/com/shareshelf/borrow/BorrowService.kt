@@ -41,6 +41,14 @@ class BorrowService(
             throw IllegalArgumentException("You cannot borrow your own item")
         }
 
+        // Prevent duplicate pending requests
+        val existingRequests = borrowRepository.findByItemIdAndBorrowerIdAndStatus(
+            request.itemId, borrowerId, BorrowStatus.pending
+        )
+        if (existingRequests.isNotEmpty()) {
+            throw IllegalStateException("You already have a pending request for this item")
+        }
+
         val borrow = BorrowRequest(
             itemId = request.itemId,
             borrowerId = borrowerId,
@@ -140,12 +148,16 @@ class BorrowService(
         borrow.status = BorrowStatus.rejected
         val saved = borrowRepository.save(borrow)
 
-        // Make item available again (safety net in case item was borrowed by another request)
+        // Only reset item to available if no other approved borrow exists for this item
         val item = itemRepository.findById(borrow.itemId)
         val itemTitle = item.map { it.title }.orElse("an item")
         item.ifPresent {
-            it.status = ItemStatus.available
-            itemRepository.save(it)
+            val hasOtherApprovedBorrow = borrowRepository.findByItemId(borrow.itemId)
+                .any { it.status == BorrowStatus.approved && it.id != borrow.id }
+            if (!hasOtherApprovedBorrow) {
+                it.status = ItemStatus.available
+                itemRepository.save(it)
+            }
         }
 
         // Notify borrower that their request was rejected
@@ -199,6 +211,37 @@ class BorrowService(
         // Award trust score bonus to both parties for successful transaction
         reviewService.addTrustScoreBonus(borrow.borrowerId, 0.1)
         reviewService.addTrustScoreBonus(borrow.ownerId, 0.1)
+
+        return toResponse(saved)
+    }
+
+    @Transactional
+    fun cancel(id: Long, borrowerId: Long): BorrowResponse {
+        val borrow = borrowRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("Borrow request not found") }
+
+        if (borrow.borrowerId != borrowerId) {
+            throw org.springframework.security.access.AccessDeniedException("Only the borrower can cancel their request")
+        }
+        if (borrow.status != BorrowStatus.pending) {
+            throw IllegalStateException("Only pending requests can be cancelled")
+        }
+
+        borrow.status = BorrowStatus.cancelled
+        val saved = borrowRepository.save(borrow)
+
+        // Notify owner that the borrow request was cancelled
+        val borrower = userRepository.findById(borrowerId)
+        val borrowerName = borrower.map { it.name }.orElse("Someone")
+        val item = itemRepository.findById(borrow.itemId)
+        val itemTitle = item.map { it.title }.orElse("an item")
+        notificationService.create(
+            userId = borrow.ownerId,
+            type = NotificationType.borrow_cancelled,
+            message = "$borrowerName cancelled their request for $itemTitle",
+            relatedItemId = borrow.itemId,
+            relatedBorrowId = saved.id
+        )
 
         return toResponse(saved)
     }

@@ -284,6 +284,26 @@ class ItemServiceTest {
         verify(exactly = 1) { categoryRepository.findById(2L) }
     }
 
+    @Test
+    fun `update applies latitude and longitude when both provided`() {
+        val item = testItem()
+        val request = UpdateItemRequest(latitude = 16.86, longitude = 96.19)
+        val updatedItem = testItem().apply {
+            latitude = 16.86
+            longitude = 96.19
+        }
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { itemRepository.save(any()) } returns updatedItem
+        every { userRepository.findById(1L) } returns Optional.of(testUser)
+
+        val result = itemService.update(1L, request, userId = 1L)
+
+        assertEquals(16.86, item.latitude)
+        assertEquals(96.19, item.longitude)
+        verify(exactly = 1) { itemRepository.save(any()) }
+    }
+
     // --- delete ---
 
     @Test

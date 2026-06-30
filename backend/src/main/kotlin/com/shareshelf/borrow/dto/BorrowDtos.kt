@@ -1,6 +1,7 @@
 package com.shareshelf.borrow.dto
 
 import com.shareshelf.borrow.entity.BorrowStatus
+import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -14,7 +15,13 @@ data class CreateBorrowRequest(
     val startDate: LocalDate? = null,
 
     val endDate: LocalDate? = null
-)
+) {
+    @AssertTrue(message = "End date must be on or after start date")
+    private fun isDateRangeValid(): Boolean {
+        if (startDate == null || endDate == null) return true
+        return !endDate.isBefore(startDate)
+    }
+}
 
 data class BorrowResponse(
     val id: Long,

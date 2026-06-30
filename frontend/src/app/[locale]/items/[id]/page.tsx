@@ -27,6 +27,8 @@ export default function ItemDetailPage() {
   const [error, setError] = useState("");
   const [borrowOpen, setBorrowOpen] = useState(false);
   const [borrowMsg, setBorrowMsg] = useState("");
+  const [borrowStartDate, setBorrowStartDate] = useState("");
+  const [borrowEndDate, setBorrowEndDate] = useState("");
   const [borrowing, setBorrowing] = useState(false);
   const [borrowError, setBorrowError] = useState("");
   const [borrowSuccess, setBorrowSuccess] = useState(false);
@@ -74,6 +76,8 @@ export default function ItemDetailPage() {
       await api.post("/borrow", {
         itemId: Number(id),
         message: borrowMsg || undefined,
+        startDate: borrowStartDate || undefined,
+        endDate: borrowEndDate || undefined,
       });
       setBorrowSuccess(true);
       setBorrowOpen(false);
@@ -156,7 +160,7 @@ export default function ItemDetailPage() {
 
             {!isOwner && item.status === "available" && (
               <div className="mt-6">
-                <Button className="w-full" size="lg" onClick={() => setBorrowOpen(true)}>
+                <Button className="w-full" size="lg" onClick={() => { setBorrowOpen(true); setBorrowStartDate(""); setBorrowEndDate(""); setBorrowMsg(""); setBorrowError(""); }}>
                   {t("itemDetail.requestToBorrow")}
                 </Button>
                 {item.depositAmount != null && (
@@ -220,6 +224,34 @@ export default function ItemDetailPage() {
             <p className="text-sm text-stone-600">
               Request to borrow <strong>{item.title}</strong> from <strong>{item.ownerName}</strong>.
             </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-1">Start date</label>
+                <input
+                  type="date"
+                  value={borrowStartDate}
+                  onChange={(e) => setBorrowStartDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-1">End date</label>
+                <input
+                  type="date"
+                  value={borrowEndDate}
+                  onChange={(e) => setBorrowEndDate(e.target.value)}
+                  min={borrowStartDate || new Date().toISOString().split("T")[0]}
+                  className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+            {item.dailyPrice && borrowStartDate && borrowEndDate && (
+              <p className="text-sm text-stone-600">
+                Estimated cost: <span className="font-semibold text-purple-700">{formatPrice(item.dailyPrice * Math.max(1, Math.ceil((new Date(borrowEndDate).getTime() - new Date(borrowStartDate).getTime()) / 86400000)))}</span>
+                <span className="text-stone-400"> ({Math.max(1, Math.ceil((new Date(borrowEndDate).getTime() - new Date(borrowStartDate).getTime()) / 86400000))} day{Math.ceil((new Date(borrowEndDate).getTime() - new Date(borrowStartDate).getTime()) / 86400000) !== 1 ? "s" : ""})</span>
+              </p>
+            )}
             <Input
               label="Message (optional)"
               value={borrowMsg}

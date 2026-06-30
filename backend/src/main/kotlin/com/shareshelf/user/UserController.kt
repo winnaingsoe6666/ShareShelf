@@ -7,10 +7,8 @@ import com.shareshelf.user.dto.UpdateProfileRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,27 +22,42 @@ class UserController(
         @RequestBody @Valid request: UpdateProfileRequest
     ): ResponseEntity<ApiResponse<AuthResponse>> {
         val updatedUser = userService.updateProfile(principal.getId(), request)
-        
-        // Convert to AuthResponse (similar to what AuthService does)
-        val response = AuthResponse(
-            token = "", // Not needed for profile update response, or frontend can ignore it
-            refreshToken = "",
-            userId = updatedUser.id!!,
-            name = updatedUser.name,
-            email = updatedUser.email,
-            trustScore = updatedUser.trustScore.toDouble(),
-            community = updatedUser.community,
-            avatarUrl = updatedUser.avatarUrl,
-            bio = updatedUser.bio,
-            isIdVerified = updatedUser.isIdVerified,
-            addressLine1 = updatedUser.addressLine1,
-            addressLine2 = updatedUser.addressLine2,
-            city = updatedUser.city,
-            state = updatedUser.state,
-            zipCode = updatedUser.zipCode,
-            socialLink = updatedUser.socialLink
-        )
-        
+
+        val response = toAuthResponse(updatedUser)
         return ResponseEntity.ok(ApiResponse.success(response, message = "Profile updated successfully"))
+    }
+
+    @PostMapping("/avatar", consumes = ["multipart/form-data"])
+    fun uploadAvatar(
+        @AuthenticationPrincipal principal: UserPrincipal,
+        @RequestParam("file") file: MultipartFile
+    ): ResponseEntity<ApiResponse<AuthResponse>> {
+        if (file.isEmpty) {
+            throw IllegalArgumentException("File is empty")
+        }
+        val updatedUser = userService.uploadAvatar(principal.getId(), file)
+        val response = toAuthResponse(updatedUser)
+        return ResponseEntity.ok(ApiResponse.success(response, message = "Avatar uploaded"))
+    }
+
+    private fun toAuthResponse(user: com.shareshelf.auth.entity.User): AuthResponse {
+        return AuthResponse(
+            token = "",
+            refreshToken = "",
+            userId = user.id!!,
+            name = user.name,
+            email = user.email,
+            trustScore = user.trustScore.toDouble(),
+            community = user.community,
+            avatarUrl = user.avatarUrl,
+            bio = user.bio,
+            isIdVerified = user.isIdVerified,
+            addressLine1 = user.addressLine1,
+            addressLine2 = user.addressLine2,
+            city = user.city,
+            state = user.state,
+            zipCode = user.zipCode,
+            socialLink = user.socialLink
+        )
     }
 }

@@ -2,14 +2,17 @@ package com.shareshelf.user
 
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.auth.entity.User
+import com.shareshelf.storage.FileStorageService
 import jakarta.persistence.EntityNotFoundException
 import com.shareshelf.user.dto.UpdateProfileRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val fileStorageService: FileStorageService
 ) {
     @Transactional
     fun updateProfile(userId: Long, request: UpdateProfileRequest): User {
@@ -26,6 +29,23 @@ class UserService(
         request.socialLink?.let { user.socialLink = it }
         request.community?.let { user.community = it }
 
+        return userRepository.save(user)
+    }
+
+    @Transactional
+    fun uploadAvatar(userId: Long, file: MultipartFile): User {
+        val user = userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("User not found") }
+
+        // Delete old avatar if it exists
+        user.avatarUrl?.let { oldUrl ->
+            try {
+                fileStorageService.delete(oldUrl)
+            } catch (_: Exception) { /* ignore cleanup failures */ }
+        }
+
+        val imageUrl = fileStorageService.store(file, "avatars")
+        user.avatarUrl = imageUrl
         return userRepository.save(user)
     }
 }
