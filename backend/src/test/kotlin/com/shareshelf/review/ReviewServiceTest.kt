@@ -229,7 +229,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    fun `trust score is not updated when average returns null`() {
+    fun `trust score is set to profile bonus when average returns null`() {
         val borrow = testBorrow(status = BorrowStatus.returned)
         val request = CreateReviewRequest(borrowRequestId = 1L, rating = 3)
         val review = testReview(reviewerId = 2L, revieweeId = 1L, rating = 3)
@@ -238,17 +238,18 @@ class ReviewServiceTest {
         every { reviewRepository.findByBorrowRequestId(1L) } returns emptyList()
         every { reviewRepository.save(any()) } returns review
         every { reviewRepository.averageRatingByRevieweeId(1L) } returns null
+        every { userRepository.findById(1L) } returns Optional.of(owner)
+        every { userRepository.save(any()) } answers { firstArg() }
         // toResponse lookups
         every { userRepository.findById(2L) } returns Optional.of(borrower)
-        every { userRepository.findById(1L) } returns Optional.of(owner)
 
         val result = reviewService.create(request, reviewerId = 2L)
 
         assertEquals(3, result.rating)
-        // Trust score should NOT have been updated (stays at original 4.0)
-        assertEquals(BigDecimal.valueOf(4.0), owner.trustScore)
+        // When average is null, score = 0.0 + profileBonus (0.0 since no verification)
+        assertEquals(BigDecimal.valueOf(0.0), owner.trustScore)
 
         verify(exactly = 1) { reviewRepository.averageRatingByRevieweeId(1L) }
-        verify(exactly = 0) { userRepository.save(any()) }
+        verify(exactly = 1) { userRepository.save(any()) }
     }
 }
