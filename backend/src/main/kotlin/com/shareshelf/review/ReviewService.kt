@@ -76,14 +76,26 @@ class ReviewService(
         return reviewRepository.findByRevieweeId(userId).map { toResponse(it) }
     }
 
-    private fun updateTrustScore(userId: Long) {
-        val avg = reviewRepository.averageRatingByRevieweeId(userId)
-        if (avg != null) {
-            val user = userRepository.findById(userId)
-                .orElseThrow { EntityNotFoundException("User not found") }
-            user.trustScore = java.math.BigDecimal.valueOf(Math.round(avg * 100.0) / 100.0)
-            userRepository.save(user)
-        }
+    fun updateTrustScore(userId: Long) {
+        val user = userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("User not found") }
+        val avg = reviewRepository.averageRatingByRevieweeId(userId) ?: 0.0
+        val profileBonus = calculateProfileBonus(user)
+        val newScore = (avg + profileBonus).coerceAtMost(5.0)
+        user.trustScore = java.math.BigDecimal.valueOf(Math.round(newScore * 100.0) / 100.0)
+        userRepository.save(user)
+    }
+
+    private fun calculateProfileBonus(user: com.shareshelf.auth.entity.User): Double {
+        var bonus = 0.0
+        if (user.isEmailVerified) bonus += 0.2
+        if (user.isIdVerified) bonus += 0.3
+        val hasCompleteProfile = !user.bio.isNullOrBlank() &&
+            !user.avatarUrl.isNullOrBlank() &&
+            !user.community.isNullOrBlank() &&
+            !user.phone.isNullOrBlank()
+        if (hasCompleteProfile) bonus += 0.2
+        return bonus
     }
 
     fun addTrustScoreBonus(userId: Long, bonus: Double) {

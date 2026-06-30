@@ -8,6 +8,7 @@ export interface User {
   name: string;
   email: string;
   trustScore: number;
+  profileBonus: number;
   community?: string;
   avatarUrl?: string;
   bio?: string;
@@ -91,6 +92,7 @@ export interface AuthResponse {
   name: string;
   email: string;
   trustScore: number;
+  profileBonus: number;
   community?: string;
   avatarUrl?: string;
   bio?: string;

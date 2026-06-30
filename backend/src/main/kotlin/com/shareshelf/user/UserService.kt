@@ -2,6 +2,7 @@ package com.shareshelf.user
 
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.auth.entity.User
+import com.shareshelf.review.ReviewService
 import com.shareshelf.storage.FileStorageService
 import jakarta.persistence.EntityNotFoundException
 import com.shareshelf.user.dto.UpdateProfileRequest
@@ -12,7 +13,8 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val fileStorageService: FileStorageService
+    private val fileStorageService: FileStorageService,
+    private val reviewService: ReviewService
 ) {
     @Transactional
     fun updateProfile(userId: Long, request: UpdateProfileRequest): User {
@@ -29,7 +31,9 @@ class UserService(
         request.socialLink?.let { user.socialLink = it }
         request.community?.let { user.community = it }
 
-        return userRepository.save(user)
+        val saved = userRepository.save(user)
+        reviewService.updateTrustScore(userId)
+        return saved
     }
 
     @Transactional
@@ -46,6 +50,8 @@ class UserService(
 
         val imageUrl = fileStorageService.store(file, "avatars")
         user.avatarUrl = imageUrl
-        return userRepository.save(user)
+        val saved = userRepository.save(user)
+        reviewService.updateTrustScore(userId)
+        return saved
     }
 }

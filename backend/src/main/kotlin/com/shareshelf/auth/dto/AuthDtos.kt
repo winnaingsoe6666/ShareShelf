@@ -43,6 +43,7 @@ data class AuthResponse(
     val name: String,
     val email: String,
     val trustScore: Double,
+    val profileBonus: Double,
     val community: String?,
     val avatarUrl: String?,
     val bio: String?,

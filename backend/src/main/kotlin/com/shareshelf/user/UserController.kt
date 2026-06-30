@@ -41,6 +41,7 @@ class UserController(
     }
 
     private fun toAuthResponse(user: com.shareshelf.auth.entity.User): AuthResponse {
+        val profileBonus = calculateProfileBonus(user)
         return AuthResponse(
             token = "",
             refreshToken = "",
@@ -48,6 +49,7 @@ class UserController(
             name = user.name,
             email = user.email,
             trustScore = user.trustScore.toDouble(),
+            profileBonus = profileBonus,
             community = user.community,
             avatarUrl = user.avatarUrl,
             bio = user.bio,
@@ -59,5 +61,17 @@ class UserController(
             zipCode = user.zipCode,
             socialLink = user.socialLink
         )
+    }
+
+    private fun calculateProfileBonus(user: com.shareshelf.auth.entity.User): Double {
+        var bonus = 0.0
+        if (user.isEmailVerified) bonus += 0.2
+        if (user.isIdVerified) bonus += 0.3
+        val hasCompleteProfile = !user.bio.isNullOrBlank() &&
+            !user.avatarUrl.isNullOrBlank() &&
+            !user.community.isNullOrBlank() &&
+            !user.phone.isNullOrBlank()
+        if (hasCompleteProfile) bonus += 0.2
+        return bonus
     }
 }

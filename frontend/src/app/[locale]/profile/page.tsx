@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Package, Star, MessageSquare, MapPin, BadgeCheck, Globe } from "lucide-react";
+import { Package, Star, MessageSquare, MapPin, BadgeCheck, Globe, Mail, User as UserIcon, CheckCircle, XCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Skeleton from "@/components/ui/Skeleton";
@@ -104,6 +104,64 @@ export default function ProfilePage() {
             <p className="text-xs text-stone-500 mt-0.5">{t("profilePage.reviews")}</p>
           </Card>
         </div>
+
+        {/* Trust & Verification */}
+        <Card className="p-6 mb-6">
+          <h2 className="font-heading text-lg font-semibold text-purple-900 mb-4">Trust & Verification</h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-stone-500" />
+                <span className="text-sm text-stone-700">Email Verified</span>
+              </div>
+              <span className="flex items-center gap-1 text-sm font-medium">
+                <span>+0.2</span>
+                {user.email ? (
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-stone-300" />
+                )}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4 text-stone-500" />
+                <span className="text-sm text-stone-700">ID Verified</span>
+              </div>
+              <span className="flex items-center gap-1 text-sm font-medium">
+                <span>+0.3</span>
+                {user.isIdVerified ? (
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-stone-300" />
+                )}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserIcon className="h-4 w-4 text-stone-500" />
+                <span className="text-sm text-stone-700">Profile Complete</span>
+              </div>
+              <span className="flex items-center gap-1 text-sm font-medium">
+                <span>+0.2</span>
+                {(user.bio && user.avatarUrl && user.community) ? (
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-stone-300" />
+                )}
+              </span>
+            </div>
+            <div className="pt-2 border-t border-stone-200">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-stone-700">Profile Bonus</span>
+                <span className="text-sm font-bold text-purple-900">+{(user.profileBonus ?? 0).toFixed(1)}</span>
+              </div>
+              <p className="mt-1 text-xs text-stone-500">
+                Complete your profile and verify your identity to increase your trust score.
+              </p>
+            </div>
+          </div>
+        </Card>
 
         {/* Profile */}
         <Card className="p-6">

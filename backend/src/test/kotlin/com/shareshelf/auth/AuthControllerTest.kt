@@ -57,6 +57,7 @@ class AuthControllerTest {
             name = "Test",
             email = "test@example.com",
             trustScore = 5.0,
+            profileBonus = 0.0,
             community = null,
             avatarUrl = null,
             bio = null,

@@ -7,7 +7,7 @@ const mockPush = vi.fn();
 vi.mock("@/lib/api", () => ({ default: { get: vi.fn() } }));
 vi.mock("@/lib/auth", () => ({
   isAuthenticated: vi.fn(() => true),
-  getUser: vi.fn(() => ({ id: 1, name: "Test User", email: "t@t.com", trustScore: 4.5, community: "Downtown" })),
+  getUser: vi.fn(() => ({ id: 1, name: "Test User", email: "t@t.com", trustScore: 4.5, profileBonus: 0.2, community: "Downtown" })),
   saveAuth: vi.fn(),
   clearAuth: vi.fn(),
   getToken: vi.fn(() => "mock-token"),

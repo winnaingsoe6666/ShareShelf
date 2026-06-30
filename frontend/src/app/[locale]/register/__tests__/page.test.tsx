@@ -75,7 +75,7 @@ describe("RegisterPage", () => {
   it("calls saveAuth and navigates on success", async () => {
     const user = userEvent.setup();
     (api.post as ReturnType<typeof vi.fn>).mockResolvedValue({
-      data: { success: true, data: { token: "t", userId: 1, name: "T", email: "t@t", trustScore: 4 } },
+      data: { success: true, data: { token: "t", userId: 1, name: "T", email: "t@t", trustScore: 4, profileBonus: 0 } },
     });
     render(<RegisterPage />);
     await user.type(screen.getByLabelText("Name"), "Test User");

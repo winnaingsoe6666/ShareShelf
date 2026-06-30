@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
 // Mock data
-const mockUser = { id: 5, name: "Test User", email: "test@test.com", trustScore: 4.5 };
+const mockUser = { id: 5, name: "Test User", email: "test@test.com", trustScore: 4.5, profileBonus: 0.2 };
 
 const mockRequests = [
   {
