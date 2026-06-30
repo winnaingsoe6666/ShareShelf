@@ -66,7 +66,7 @@ class BorrowService(
         notificationService.create(
             userId = item.ownerId,
             type = NotificationType.borrow_requested,
-            message = "$borrowerName wants to borrow $item.title",
+            message = "$borrowerName wants to borrow ${item.title}",
             relatedItemId = item.id,
             relatedBorrowId = saved.id
         )
