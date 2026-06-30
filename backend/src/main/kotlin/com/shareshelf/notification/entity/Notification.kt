@@ -8,6 +8,7 @@ enum class NotificationType {
     borrow_approved,
     borrow_rejected,
     borrow_returned,
+    borrow_cancelled,
     review_received
 }
 

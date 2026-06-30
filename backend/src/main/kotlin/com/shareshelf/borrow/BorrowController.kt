@@ -63,4 +63,13 @@ class BorrowController(
         val result = borrowService.markReturned(id, principal.getId())
         return ResponseEntity.ok(ApiResponse.success(result))
     }
+
+    @PutMapping("/{id}/cancel")
+    fun cancel(
+        @PathVariable id: Long,
+        @AuthenticationPrincipal principal: UserPrincipal
+    ): ResponseEntity<ApiResponse<BorrowResponse>> {
+        val result = borrowService.cancel(id, principal.getId())
+        return ResponseEntity.ok(ApiResponse.success(result))
+    }
 }

@@ -114,6 +114,7 @@ class BorrowServiceTest {
         )
 
         every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { borrowRepository.findByItemIdAndBorrowerIdAndStatus(1L, 2L, BorrowStatus.pending) } returns emptyList()
         val savedBorrow = testBorrow(id = 1L).copy(
             message = "Need this for the weekend",
             startDate = LocalDate.now(),
@@ -241,6 +242,7 @@ class BorrowServiceTest {
 
         every { borrowRepository.findById(1L) } returns Optional.of(borrow)
         every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { borrowRepository.findByItemId(1L) } returns listOf(borrow)
         every { itemRepository.save(any()) } answers { firstArg() }
         every { borrowRepository.save(any()) } answers { firstArg() }
         // toResponse lookups
@@ -327,6 +329,61 @@ class BorrowServiceTest {
         assertThrows(AccessDeniedException::class.java) {
             borrowService.markReturned(1L, userId = 3L)
         }
+    }
+
+    // --- cancel ---
+
+    @Test
+    fun `cancel transitions pending borrow to CANCELLED`() {
+        val borrow = testBorrow(status = BorrowStatus.pending)
+
+        every { borrowRepository.findById(1L) } returns Optional.of(borrow)
+        every { borrowRepository.save(any()) } answers { firstArg() }
+        every { userRepository.findById(2L) } returns Optional.of(borrower)
+        every { userRepository.findById(1L) } returns Optional.of(owner)
+        every { itemRepository.findById(1L) } returns Optional.of(testItem())
+
+        val result = borrowService.cancel(1L, borrowerId = 2L)
+
+        assertEquals(BorrowStatus.cancelled, result.status)
+        verify(exactly = 1) { borrowRepository.save(any()) }
+    }
+
+    @Test
+    fun `cancel throws AccessDeniedException when caller is not the borrower`() {
+        val borrow = testBorrow(status = BorrowStatus.pending, borrowerId = 2L)
+
+        every { borrowRepository.findById(1L) } returns Optional.of(borrow)
+
+        assertThrows(AccessDeniedException::class.java) {
+            borrowService.cancel(1L, borrowerId = 3L)
+        }
+    }
+
+    @Test
+    fun `cancel throws when borrow is not pending`() {
+        val borrow = testBorrow(status = BorrowStatus.approved)
+
+        every { borrowRepository.findById(1L) } returns Optional.of(borrow)
+
+        assertThrows(IllegalStateException::class.java) {
+            borrowService.cancel(1L, borrowerId = 2L)
+        }
+    }
+
+    @Test
+    fun `create throws when duplicate pending request exists`() {
+        val item = testItem(id = 1L, ownerId = 1L, status = ItemStatus.available)
+        val request = CreateBorrowRequest(itemId = 1L)
+
+        every { itemRepository.findById(1L) } returns Optional.of(item)
+        every { borrowRepository.findByItemIdAndBorrowerIdAndStatus(1L, 2L, BorrowStatus.pending) } returns listOf(testBorrow())
+
+        assertThrows(IllegalStateException::class.java) {
+            borrowService.create(request, borrowerId = 2L)
+        }
+
+        verify(exactly = 0) { borrowRepository.save(any()) }
     }
 
     // --- findByUser ---

@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Package, User, Calendar, Clock, Inbox, CheckCircle2, MessageSquare } from "lucide-react";
+import { Package, User, Calendar, Clock, Inbox, CheckCircle2, MessageSquare, Star } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Skeleton from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
 import api from "@/lib/api";
 import { useTranslations } from "next-intl";
 import { getUser } from "@/lib/auth";
@@ -31,6 +32,12 @@ export default function BorrowPage() {
   const [error, setError] = useState<string>("");
   const [actionError, setActionError] = useState<string>("");
   const [confirmedAction, setConfirmedAction] = useState<number | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ id: number; action: string; label: string } | null>(null);
+  const [reviewModal, setReviewModal] = useState<{ borrowId: number; revieweeName: string } | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState("");
   const t = useTranslations();
 
   useEffect(() => {
@@ -56,16 +63,17 @@ export default function BorrowPage() {
     }
   }, [confirmedAction]);
 
-  const handleAction = async (id: number, action: "approve" | "reject" | "return") => {
+  const handleAction = async (id: number, action: "approve" | "reject" | "return" | "cancel") => {
     try {
       await api.put(`/borrow/${id}/${action}`);
       setRequests((prev) =>
         prev.map((r) => {
           if (r.id !== id) return r;
-          const newStatus: Record<string, "approved" | "rejected" | "returned"> = {
+          const newStatus: Record<string, "approved" | "rejected" | "returned" | "cancelled"> = {
             approve: "approved",
             reject: "rejected",
             return: "returned",
+            cancel: "cancelled",
           };
           return { ...r, status: newStatus[action] ?? r.status };
         })
@@ -73,6 +81,42 @@ export default function BorrowPage() {
       setConfirmedAction(id);
     } catch {
       setActionError(`Failed to ${action} request. Please try again.`);
+    }
+  };
+
+  const requestConfirm = (id: number, action: string) => {
+    const labels: Record<string, string> = {
+      approve: t("borrow.approve"),
+      reject: t("borrow.reject"),
+      return: t("borrow.markReturned"),
+      cancel: "Cancel Request",
+    };
+    setConfirmDialog({ id, action, label: labels[action] || action });
+  };
+
+  const handleConfirmedAction = () => {
+    if (!confirmDialog) return;
+    handleAction(confirmDialog.id, confirmDialog.action as "approve" | "reject" | "return" | "cancel");
+    setConfirmDialog(null);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewModal) return;
+    setReviewSubmitting(true);
+    setReviewError("");
+    try {
+      await api.post("/reviews", {
+        borrowRequestId: reviewModal.borrowId,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      });
+      setReviewModal(null);
+      setReviewRating(5);
+      setReviewComment("");
+    } catch {
+      setReviewError("Failed to submit review. You may have already reviewed this transaction.");
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -192,12 +236,28 @@ export default function BorrowPage() {
                       <>
                         {tab === "lent" && req.status === "pending" && (
                           <>
-                            <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "approve")}>{t("borrow.approve")}</Button>
-                            <Button size="sm" variant="danger" onClick={() => handleAction(req.id, "reject")}>{t("borrow.reject")}</Button>
+                            <Button size="sm" variant="primary" onClick={() => requestConfirm(req.id, "approve")}>{t("borrow.approve")}</Button>
+                            <Button size="sm" variant="danger" onClick={() => requestConfirm(req.id, "reject")}>{t("borrow.reject")}</Button>
                           </>
                         )}
                         {tab === "lent" && req.status === "approved" && (
-                          <Button size="sm" variant="primary" onClick={() => handleAction(req.id, "return")}>{t("borrow.markReturned")}</Button>
+                          <Button size="sm" variant="primary" onClick={() => requestConfirm(req.id, "return")}>{t("borrow.markReturned")}</Button>
+                        )}
+                        {tab === "borrowed" && req.status === "pending" && (
+                          <Button size="sm" variant="danger" onClick={() => requestConfirm(req.id, "cancel")}>Cancel</Button>
+                        )}
+                        {req.status === "returned" && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                              const revieweeName = tab === "borrowed" ? req.ownerName : req.borrowerName;
+                              setReviewModal({ borrowId: req.id, revieweeName });
+                            }}
+                          >
+                            <Star className="h-3.5 w-3.5 mr-1" />
+                            Review
+                          </Button>
                         )}
                       </>
                     )}
@@ -208,6 +268,54 @@ export default function BorrowPage() {
           )}
         </div>
       </main>
+
+      {/* Confirm action dialog */}
+      <Modal open={!!confirmDialog} onClose={() => setConfirmDialog(null)} title="Confirm Action">
+        <div className="space-y-4">
+          <p className="text-sm text-stone-600">
+            Are you sure you want to <strong>{confirmDialog?.label}</strong> this request?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <Button variant="secondary" onClick={() => setConfirmDialog(null)}>Cancel</Button>
+            <Button variant="primary" onClick={handleConfirmedAction}>Confirm</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Review modal */}
+      <Modal open={!!reviewModal} onClose={() => { setReviewModal(null); setReviewError(""); }} title={`Review ${reviewModal?.revieweeName}`}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-2">Rating</label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setReviewRating(star)}
+                  className="cursor-pointer"
+                >
+                  <Star className={`h-7 w-7 ${star <= reviewRating ? "text-amber-500 fill-amber-500" : "text-stone-300"}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Comment (optional)</label>
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              rows={3}
+              className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              placeholder="Share your experience..."
+            />
+          </div>
+          {reviewError && <p className="text-sm text-red-600">{reviewError}</p>}
+          <Button className="w-full" loading={reviewSubmitting} onClick={handleSubmitReview}>
+            Submit Review
+          </Button>
+        </div>
+      </Modal>
     </>
     </AuthGuard>
   );

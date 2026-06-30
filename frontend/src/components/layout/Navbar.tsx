@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star, MessageSquare } from "lucide-react";
+import { Menu, Share2, X, Bell, Package, CheckCircle2, XCircle, RotateCcw, Star, MessageSquare, Ban } from "lucide-react";
 import { getUser, clearAuth, isAuthenticated } from "@/lib/auth";
 import api from "@/lib/api";
 import { getUnreadCount } from "@/lib/chat";
@@ -16,6 +16,7 @@ const notificationIcons: Record<string, React.ReactNode> = {
   borrow_approved: <CheckCircle2 className="h-4 w-4 text-green-600" />,
   borrow_rejected: <XCircle className="h-4 w-4 text-red-500" />,
   borrow_returned: <RotateCcw className="h-4 w-4 text-blue-500" />,
+  borrow_cancelled: <Ban className="h-4 w-4 text-stone-500" />,
   review_received: <Star className="h-4 w-4 text-amber-500" />,
 };
 
