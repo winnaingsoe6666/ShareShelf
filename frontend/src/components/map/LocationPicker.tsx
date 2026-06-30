@@ -2,9 +2,17 @@
 
 import { useCallback } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
 import { MapPin, MapPinOff } from "lucide-react";
 import type { LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+const pinIcon = L.divIcon({
+  html: '<div style="width:28px;height:28px;border-radius:50%;background:#7C3AED;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>',
+  className: "",
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+});
 
 interface LocationPickerProps {
   latitude?: number | null;
@@ -79,6 +87,7 @@ export default function LocationPicker({
             {hasPin && (
               <Marker
                 position={[latitude!, longitude!]}
+                icon={pinIcon}
                 draggable={!disabled}
                 eventHandlers={{ dragend: handleMarkerDrag }}
               />
