@@ -10,6 +10,7 @@ import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.Item
 import com.shareshelf.item.entity.ItemStatus
 import com.shareshelf.notification.NotificationService
+import com.shareshelf.review.ReviewService
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -30,13 +31,15 @@ class BorrowServiceTest {
     private val userRepository = mockk<UserRepository>()
     private val notificationService = mockk<NotificationService>(relaxed = true)
     private val objectMapper = ObjectMapper()
+    private val reviewService = mockk<ReviewService>(relaxed = true)
 
     private val borrowService = BorrowService(
         borrowRepository = borrowRepository,
         itemRepository = itemRepository,
         userRepository = userRepository,
         notificationService = notificationService,
-        objectMapper = objectMapper
+        objectMapper = objectMapper,
+        reviewService = reviewService
     )
 
     private val owner = User(
@@ -287,6 +290,7 @@ class BorrowServiceTest {
         every { itemRepository.findById(1L) } returns Optional.of(item)
         every { itemRepository.save(any()) } answers { firstArg() }
         every { borrowRepository.save(any()) } answers { firstArg() }
+        every { reviewService.addTrustScoreBonus(any(), any()) } just Runs
         // toResponse lookups
         every { userRepository.findById(2L) } returns Optional.of(borrower)
         every { userRepository.findById(1L) } returns Optional.of(owner)
@@ -299,6 +303,8 @@ class BorrowServiceTest {
         verify(exactly = 1) { borrowRepository.findById(1L) }
         verify(exactly = 1) { itemRepository.save(any()) }
         verify(exactly = 1) { borrowRepository.save(any()) }
+        verify(exactly = 1) { reviewService.addTrustScoreBonus(2L, 0.1) }
+        verify(exactly = 1) { reviewService.addTrustScoreBonus(1L, 0.1) }
     }
 
     @Test

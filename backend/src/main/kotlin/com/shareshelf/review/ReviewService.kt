@@ -86,6 +86,14 @@ class ReviewService(
         }
     }
 
+    fun addTrustScoreBonus(userId: Long, bonus: Double) {
+        val user = userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("User not found") }
+        val newScore = user.trustScore.toDouble() + bonus
+        user.trustScore = java.math.BigDecimal.valueOf(newScore.coerceAtMost(5.0))
+        userRepository.save(user)
+    }
+
     private fun toResponse(review: Review): ReviewResponse {
         val reviewer = userRepository.findById(review.reviewerId)
         val reviewee = userRepository.findById(review.revieweeId)

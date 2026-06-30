@@ -11,6 +11,7 @@ import com.shareshelf.item.ItemRepository
 import com.shareshelf.item.entity.ItemStatus
 import com.shareshelf.notification.NotificationService
 import com.shareshelf.notification.entity.NotificationType
+import com.shareshelf.review.ReviewService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -23,7 +24,8 @@ class BorrowService(
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository,
     private val notificationService: NotificationService,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val reviewService: ReviewService
 ) {
 
     @Transactional
@@ -193,6 +195,10 @@ class BorrowService(
             relatedItemId = borrow.itemId,
             relatedBorrowId = saved.id
         )
+
+        // Award trust score bonus to both parties for successful transaction
+        reviewService.addTrustScoreBonus(borrow.borrowerId, 0.1)
+        reviewService.addTrustScoreBonus(borrow.ownerId, 0.1)
 
         return toResponse(saved)
     }
