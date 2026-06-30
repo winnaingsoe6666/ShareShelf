@@ -8,7 +8,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import api from "@/lib/api";
-import { getUser, updateUserSession } from "@/lib/auth";
+import { getUser, updateUserSession, authResponseToUser } from "@/lib/auth";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { User } from "@/types";
 
@@ -62,7 +62,7 @@ export default function EditProfilePage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setAvatarUrl(res.data.data.avatarUrl);
-      updateUserSession(res.data.data);
+      updateUserSession(authResponseToUser(res.data.data));
     } catch {
       alert("Failed to upload avatar");
     } finally {
@@ -77,7 +77,7 @@ export default function EditProfilePage() {
       const response = await api.put("/users/profile", formData);
       if (response.data.success) {
         // Update user session data
-        const updatedUser = response.data.data;
+        const updatedUser = authResponseToUser(response.data.data);
         updateUserSession(updatedUser);
         alert("Profile updated successfully!");
         router.push("/profile");
