@@ -13,6 +13,7 @@ describe("auth", () => {
     name: "John Doe",
     email: "john@example.com",
     trustScore: 4.5,
+    profileBonus: 0.2,
     community: "Downtown",
     avatarUrl: undefined as string | undefined,
     isIdVerified: true,

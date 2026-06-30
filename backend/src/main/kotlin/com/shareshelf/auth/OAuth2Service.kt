@@ -58,6 +58,7 @@ class OAuth2Service(
     fun generateOAuthResponse(user: User): AuthResponse {
         val token = jwtTokenProvider.generateToken(user.id!!, user.email)
         val refreshToken = createRefreshToken(user.id!!)
+        val profileBonus = calculateProfileBonus(user)
 
         return AuthResponse(
             token = token,
@@ -66,6 +67,7 @@ class OAuth2Service(
             name = user.name,
             email = user.email,
             trustScore = user.trustScore.toDouble(),
+            profileBonus = profileBonus,
             community = user.community,
             avatarUrl = user.avatarUrl,
             bio = user.bio,
@@ -77,6 +79,18 @@ class OAuth2Service(
             zipCode = user.zipCode,
             socialLink = user.socialLink
         )
+    }
+
+    private fun calculateProfileBonus(user: User): Double {
+        var bonus = 0.0
+        if (user.isEmailVerified) bonus += 0.2
+        if (user.isIdVerified) bonus += 0.3
+        val hasCompleteProfile = !user.bio.isNullOrBlank() &&
+            !user.avatarUrl.isNullOrBlank() &&
+            !user.community.isNullOrBlank() &&
+            !user.phone.isNullOrBlank()
+        if (hasCompleteProfile) bonus += 0.2
+        return bonus
     }
 
     private fun createRefreshToken(userId: Long): String {

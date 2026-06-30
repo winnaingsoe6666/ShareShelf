@@ -216,22 +216,38 @@ class AuthService(
             .joinToString("") { "%02x".format(it) }
     }
 
-    private fun toAuthResponse(user: User, token: String, refreshToken: String) = AuthResponse(
-        token = token,
-        refreshToken = refreshToken,
-        userId = user.id!!,
-        name = user.name,
-        email = user.email,
-        trustScore = user.trustScore.toDouble(),
-        community = user.community,
-        avatarUrl = user.avatarUrl,
-        bio = user.bio,
-        isIdVerified = user.isIdVerified,
-        addressLine1 = user.addressLine1,
-        addressLine2 = user.addressLine2,
-        city = user.city,
-        state = user.state,
-        zipCode = user.zipCode,
-        socialLink = user.socialLink
-    )
+    private fun toAuthResponse(user: User, token: String, refreshToken: String): AuthResponse {
+        val profileBonus = calculateProfileBonus(user)
+        return AuthResponse(
+            token = token,
+            refreshToken = refreshToken,
+            userId = user.id!!,
+            name = user.name,
+            email = user.email,
+            trustScore = user.trustScore.toDouble(),
+            profileBonus = profileBonus,
+            community = user.community,
+            avatarUrl = user.avatarUrl,
+            bio = user.bio,
+            isIdVerified = user.isIdVerified,
+            addressLine1 = user.addressLine1,
+            addressLine2 = user.addressLine2,
+            city = user.city,
+            state = user.state,
+            zipCode = user.zipCode,
+            socialLink = user.socialLink
+        )
+    }
+
+    private fun calculateProfileBonus(user: User): Double {
+        var bonus = 0.0
+        if (user.isEmailVerified) bonus += 0.2
+        if (user.isIdVerified) bonus += 0.3
+        val hasCompleteProfile = !user.bio.isNullOrBlank() &&
+            !user.avatarUrl.isNullOrBlank() &&
+            !user.community.isNullOrBlank() &&
+            !user.phone.isNullOrBlank()
+        if (hasCompleteProfile) bonus += 0.2
+        return bonus
+    }
 }
