@@ -128,6 +128,7 @@ export interface Conversation {
   itemImageUrl: string | null;
   otherUserId: number;
   otherUserName: string;
+  otherUserAvatarUrl: string | null;
   lastMessage: string;
   lastMessageAt: string;
   unreadCount: number;
@@ -139,6 +140,7 @@ export interface ConversationDetail {
   itemImageUrl: string | null;
   otherUserId: number;
   otherUserName: string;
+  otherUserAvatarUrl: string | null;
   messages: ChatMessage[];
 }
 

@@ -42,6 +42,7 @@ class ChatService(
                 itemImageUrl = item?.let { parseJsonArray(it.imageUrls).firstOrNull() },
                 otherUserId = otherUserId,
                 otherUserName = otherUser?.name ?: "Unknown User",
+                otherUserAvatarUrl = otherUser?.avatarUrl,
                 lastMessage = msg.message,
                 lastMessageAt = msg.createdAt,
                 unreadCount = unreadCount
@@ -72,6 +73,7 @@ class ChatService(
             itemImageUrl = item?.let { parseJsonArray(it.imageUrls).firstOrNull() },
             otherUserId = otherUserId,
             otherUserName = otherUser?.name ?: "Unknown User",
+            otherUserAvatarUrl = otherUser?.avatarUrl,
             messages = messages.map { toMessageResponse(it) }
         )
     }

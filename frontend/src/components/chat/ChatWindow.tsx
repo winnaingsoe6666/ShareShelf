@@ -13,6 +13,7 @@ interface ChatWindowProps {
   otherUserName: string;
   itemTitle: string;
   itemImageUrl: string | null;
+  otherUserAvatarUrl?: string | null;
   onBack?: () => void;
   sendMessage: (payload: { itemId: number; receiverId: number; message: string }) => void;
 }
@@ -23,6 +24,7 @@ export default function ChatWindow({
   otherUserName,
   itemTitle,
   itemImageUrl,
+  otherUserAvatarUrl = null,
   onBack,
   sendMessage,
 }: ChatWindowProps) {
@@ -131,18 +133,18 @@ export default function ChatWindow({
             <ArrowLeft className="h-5 w-5" />
           </button>
         )}
-        {itemImageUrl ? (
-          <img src={itemImageUrl} alt={itemTitle} className="h-8 w-8 rounded object-cover" />
+        {otherUserAvatarUrl ? (
+          <img src={otherUserAvatarUrl} alt={otherUserName} className="h-8 w-8 rounded-full object-cover" />
         ) : (
-          <div className="h-8 w-8 rounded bg-purple-100 flex items-center justify-center">
-            <span className="text-xs text-purple-400">📦</span>
+          <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+            <span className="text-xs font-medium text-purple-600">{otherUserName.charAt(0).toUpperCase()}</span>
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <a href={`/items/${itemId}`} className="text-sm font-semibold text-stone-900 hover:text-emerald-600 truncate block">
+          <p className="text-sm font-semibold text-stone-900">{otherUserName}</p>
+          <a href={`/items/${itemId}`} className="text-xs text-stone-500 hover:text-emerald-600 truncate block">
             {itemTitle}
           </a>
-          <p className="text-xs text-stone-500">{otherUserName}</p>
         </div>
       </div>
 

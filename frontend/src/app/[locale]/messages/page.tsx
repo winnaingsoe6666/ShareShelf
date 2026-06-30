@@ -21,6 +21,7 @@ export default function MessagesPage() {
   const [selectedUserName, setSelectedUserName] = useState("");
   const [selectedItemTitle, setSelectedItemTitle] = useState("");
   const [selectedItemImageUrl, setSelectedItemImageUrl] = useState<string | null>(null);
+  const [selectedOtherUserAvatarUrl, setSelectedOtherUserAvatarUrl] = useState<string | null>(null);
 
   // Handle query params for deep linking (e.g., from borrow page)
   useEffect(() => {
@@ -57,13 +58,15 @@ export default function MessagesPage() {
     otherUserId: number,
     otherUserName: string,
     itemTitle: string,
-    itemImageUrl: string | null
+    itemImageUrl: string | null,
+    otherUserAvatarUrl: string | null
   ) => {
     setSelectedItemId(itemId);
     setSelectedOtherUserId(otherUserId);
     setSelectedUserName(otherUserName);
     setSelectedItemTitle(itemTitle);
     setSelectedItemImageUrl(itemImageUrl);
+    setSelectedOtherUserAvatarUrl(otherUserAvatarUrl);
   };
 
   const handleBack = () => {
@@ -108,6 +111,7 @@ export default function MessagesPage() {
                 otherUserName={selectedUserName}
                 itemTitle={selectedItemTitle}
                 itemImageUrl={selectedItemImageUrl}
+                otherUserAvatarUrl={selectedOtherUserAvatarUrl}
                 onBack={handleBack}
                 sendMessage={sendMessage}
               />

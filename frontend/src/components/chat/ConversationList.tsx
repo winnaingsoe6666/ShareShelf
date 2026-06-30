@@ -5,7 +5,7 @@ import { getConversations } from "@/lib/chat";
 import type { Conversation } from "@/types";
 
 interface ConversationListProps {
-  onSelect: (itemId: number, otherUserId: number, otherUserName: string, itemTitle: string, itemImageUrl: string | null) => void;
+  onSelect: (itemId: number, otherUserId: number, otherUserName: string, itemTitle: string, itemImageUrl: string | null, otherUserAvatarUrl: string | null) => void;
   selectedItemId?: number;
   selectedUserId?: number;
 }
@@ -60,20 +60,20 @@ export default function ConversationList({ onSelect, selectedItemId, selectedUse
         return (
           <button
             key={`${conv.itemId}-${conv.otherUserId}`}
-            onClick={() => onSelect(conv.itemId, conv.otherUserId, conv.otherUserName, conv.itemTitle, conv.itemImageUrl)}
+            onClick={() => onSelect(conv.itemId, conv.otherUserId, conv.otherUserName, conv.itemTitle, conv.itemImageUrl, conv.otherUserAvatarUrl)}
             className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer ${
               isSelected ? "bg-stone-100" : "hover:bg-stone-50"
             }`}
           >
-            {conv.itemImageUrl ? (
+            {conv.otherUserAvatarUrl ? (
               <img
-                src={conv.itemImageUrl}
-                alt={conv.itemTitle}
-                className="h-10 w-10 rounded object-cover shrink-0"
+                src={conv.otherUserAvatarUrl}
+                alt={conv.otherUserName}
+                className="h-10 w-10 rounded-full object-cover shrink-0"
               />
             ) : (
-              <div className="h-10 w-10 rounded bg-purple-100 flex items-center justify-center shrink-0">
-                <span className="text-xs text-purple-400">📦</span>
+              <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                <span className="text-sm font-medium text-purple-600">{conv.otherUserName.charAt(0).toUpperCase()}</span>
               </div>
             )}
             <div className="min-w-0 flex-1">

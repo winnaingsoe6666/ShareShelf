@@ -29,6 +29,7 @@ data class ConversationResponse(
     val itemImageUrl: String?,
     val otherUserId: Long,
     val otherUserName: String,
+    val otherUserAvatarUrl: String?,
     val lastMessage: String,
     val lastMessageAt: LocalDateTime,
     val unreadCount: Long
@@ -40,6 +41,7 @@ data class ConversationDetailResponse(
     val itemImageUrl: String?,
     val otherUserId: Long,
     val otherUserName: String,
+    val otherUserAvatarUrl: String?,
     val messages: List<MessageResponse>
 )
 

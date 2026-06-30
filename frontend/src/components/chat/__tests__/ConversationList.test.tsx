@@ -17,6 +17,7 @@ const mockConversations = [
     itemImageUrl: null,
     otherUserId: 2,
     otherUserName: "Alice",
+    otherUserAvatarUrl: null,
     lastMessage: "Is this available?",
     lastMessageAt: new Date().toISOString(),
     unreadCount: 3,
@@ -27,6 +28,7 @@ const mockConversations = [
     itemImageUrl: "/uploads/hammer.jpg",
     otherUserId: 3,
     otherUserName: "Bob",
+    otherUserAvatarUrl: null,
     lastMessage: "Thanks!",
     lastMessageAt: new Date(Date.now() - 3600000).toISOString(),
     unreadCount: 0,
@@ -105,7 +107,7 @@ describe("ConversationList", () => {
 
     fireEvent.click(screen.getByText("Power Drill").closest("button")!);
 
-    expect(onSelect).toHaveBeenCalledWith(1, 2, "Alice", "Power Drill", null);
+    expect(onSelect).toHaveBeenCalledWith(1, 2, "Alice", "Power Drill", null, null);
   });
 
   it("calls onSelect with itemImageUrl when available", async () => {
@@ -118,7 +120,7 @@ describe("ConversationList", () => {
 
     fireEvent.click(screen.getByText("Hammer").closest("button")!);
 
-    expect(onSelect).toHaveBeenCalledWith(2, 3, "Bob", "Hammer", "/uploads/hammer.jpg");
+    expect(onSelect).toHaveBeenCalledWith(2, 3, "Bob", "Hammer", "/uploads/hammer.jpg", null);
   });
 
   it("shows loading state initially", () => {
