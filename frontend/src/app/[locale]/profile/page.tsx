@@ -109,8 +109,12 @@ export default function ProfilePage() {
         <Card className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 text-xl font-bold text-purple-700">
-                {user.name.charAt(0).toUpperCase()}
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 text-xl font-bold text-purple-700 overflow-hidden">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
               </div>
               <div>
                 <h1 className="font-heading text-2xl font-bold text-purple-900 flex items-center gap-2">
