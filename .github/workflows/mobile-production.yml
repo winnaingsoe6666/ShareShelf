@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node 22
+      - name: Setup Node 22.12
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "22.12.0"
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
@@ -34,7 +34,5 @@ jobs:
       - name: Build production
         working-directory: mobile
         run: npx eas-cli build --profile production --platform all --non-interactive
-        env:
-          NODE_OPTIONS: "--no-experimental-strip-types"
         env:
           NODE_OPTIONS: "--no-experimental-strip-types"
