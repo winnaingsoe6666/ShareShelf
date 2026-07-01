@@ -23,7 +23,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install dependencies
+      - name: Install shared package dependencies
+        working-directory: packages/shared
+        run: npm install
+
+      - name: Install mobile dependencies
         working-directory: mobile
         run: npm install --legacy-peer-deps
 

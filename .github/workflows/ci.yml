@@ -56,9 +56,6 @@ jobs:
   mobile-check:
     name: Mobile Lint + Type Check
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: mobile
     steps:
       - uses: actions/checkout@v4
 
@@ -69,14 +66,21 @@ jobs:
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
-      - name: Install dependencies
+      - name: Install shared package dependencies
+        run: npm install
+        working-directory: packages/shared
+
+      - name: Install mobile dependencies
         run: npm install --legacy-peer-deps
+        working-directory: mobile
 
       - name: Lint
         run: npm run lint
+        working-directory: mobile
 
       - name: Type check
         run: npx tsc --noEmit
+        working-directory: mobile
 
   docker-build:
     name: Docker Build
