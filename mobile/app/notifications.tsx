@@ -8,7 +8,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Bell, Check, CheckCheck } from "lucide-react-native";
+import { Bell, CheckCheck } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
 import { timeAgo } from "@shareshelf/shared";

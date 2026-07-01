@@ -4,7 +4,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
-import { getToken } from "@/lib/auth";
+
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);

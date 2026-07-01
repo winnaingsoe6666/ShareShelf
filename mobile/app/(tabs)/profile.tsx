@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 import { Settings, Star, Shield, Package, LogOut } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { isAuthenticated, getUser, clearAuth } from "@/lib/auth";
-import { formatPrice } from "@shareshelf/shared";
+
 import type { User, Item, Review } from "@shareshelf/shared";
 
 export default function ProfileScreen() {
