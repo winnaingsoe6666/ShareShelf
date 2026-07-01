@@ -10,10 +10,11 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 ### Constraints
 
 - **Tech Stack**: Spring Boot 3.4.x / Kotlin / Next.js 15 / PostgreSQL — locked
-- **Deployment**: Railway (backend) + Vercel (frontend) — infrastructure decided
+- **Deployment**: Railway (backend) + Vercel (frontend) + EAS Build (mobile) — infrastructure decided
+- **Language**: Backend code in Kotlin, frontend in TypeScript, mobile in TypeScript (shared types via `@shareshelf/shared`)
 - **Auth Model**: JWT-based stateless auth — not changing
 - **Language**: Backend code in Kotlin, frontend in TypeScript
-- **Testing**: JUnit 5 + MockK (backend), Vitest + RTL (frontend), Playwright (E2E)
+- **Testing**: JUnit 5 + MockK (backend), Vitest + RTL (frontend), Playwright (E2E), Jest (mobile - TBD)
 <!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:codebase/STACK.md -->
@@ -28,10 +29,13 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 - **Node.js** (via Vercel) — Frontend is built statically or server-side rendered by Next.js.
 - **Gradle 8.12** — Kotlin DSL (`settings.gradle.kts`, `build.gradle.kts`). Wrapper configured in `backend/gradle/wrapper/gradle-wrapper.properties`.
 - **npm** — `frontend/package.json` present, no lockfile committed (neither `package-lock.json` nor `yarn.lock` or `pnpm-lock.yaml` detected). Dependency versions are semver-ranged.
+- **Expo SDK 52** — Mobile app runtime (React Native 0.76). Located in `mobile/`.
 ## Frameworks
 - **Spring Boot 3.4.3** — Java/Kotlin web framework. Application entry point at `backend/src/main/kotlin/com/shareshelf/ShareShelfApplication.kt`.
 - **Next.js 15 (App Router)** — React meta-framework. Configuration at `frontend/next.config.ts`. All pages are client components under `frontend/src/app/`.
 - **React 19** — UI component library. Client components only (no Server Components used in pages found).
+- **Expo Router v4** — File-based routing for React Native. Entry at `mobile/app/`. Tab layout with 6 screens + stack screens.
+- **NativeWind v4** — Tailwind CSS for React Native. Config at `mobile/tailwind.config.js`.
 - **JUnit 5** (via `spring-boot-starter-test`) — Test runner.
 - **MockK 1.13.14** — Kotlin-native mocking library.
 - **SpringMockK 4.0.2** — Spring Boot integration for MockK.
@@ -46,6 +50,11 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 - **Axios 1.7.9** — HTTP client for frontend API calls. Singleton instance at `frontend/src/lib/api.ts` with request/response interceptors for JWT injection and 401 handling.
 - **Flyway** (`flyway-core`, `flyway-database-postgresql`) — Database migrations. Migrations at `backend/src/main/resources/db/migration/V1`-`V5`. `ddl-auto: validate` ensures schema matches migrations.
 - **PostgreSQL JDBC Driver** (`org.postgresql:postgresql`) — Database connectivity. Runtime scope.
+- **@stomp/stompjs** — STOMP WebSocket client for mobile real-time chat. Connects to backend `/ws` endpoint.
+- **expo-image-picker** — Image selection from camera/gallery for mobile item photos and avatars.
+- **react-native-maps** — Native map view with markers for location-based item browsing on mobile.
+- **i18next + react-i18next** — Internationalization framework for mobile. English translations in `mobile/src/locales/en.json`.
+- **@shareshelf/shared** — Local workspace package (`packages/shared`) providing types, API client, and utils to both web and mobile frontends.
 ## Configuration
 - Backend uses Spring profiles: `default` (dev at `application.yml` + `application-dev.yml` active by default?), and `railway` (`application-railway.yml` activated in Docker by `SPRING_PROFILES_ACTIVE=railway`).
 - Frontend uses `NEXT_PUBLIC_API_URL` environment variable (defaults to `/api` proxy in `frontend/src/lib/api.ts`).
@@ -67,6 +76,7 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 - Gradle 8.12 wrapper (auto-downloaded).
 - Railway (backend): Docker container with JDK 21 runtime.
 - Vercel (frontend): Node.js runtime, Next.js build output.
+- EAS Build (mobile): Expo SDK 52, React Native 0.76, builds for iOS/Android.
 - PostgreSQL: Managed by Railway add-on.
 <!-- GSD:stack-end -->
 
@@ -213,9 +223,14 @@ ShareShelf is a community-powered tool library web application that lets neighbo
 | HealthController | Liveness check at `/api/health` | `backend/.../common/HealthController.kt` |
 | Axios api client | HTTP client with JWT interceptor and 401 auto-logout | `frontend/src/lib/api.ts` |
 | auth.ts lib | localStorage helpers for token and user persistence | `frontend/src/lib/auth.ts` |
+| Mobile API client | Axios-based API client using shared package with AsyncStorage adapter | `mobile/src/lib/api.ts` |
+| Mobile WebSocket | STOMP WebSocket client for real-time chat on mobile | `mobile/src/lib/websocket.ts` |
+| Mobile i18n | i18next + expo-localization internationalization setup | `mobile/src/lib/i18n/index.ts` |
 ## Pattern Overview
 - Backend: Package-by-feature organization (`auth/`, `item/`, `borrow/`, `review/`, `category/`, `common/`, `config/`)
-- Frontend: Next.js 14 App Router with page-per-route under `src/app/`
+- Frontend: Next.js 15 App Router with page-per-route under `src/app/`
+- Mobile: Expo Router v4 file-based routing under `mobile/app/` with tab + stack navigation
+- Shared: `@shareshelf/shared` package provides types, API client, and utils to both web and mobile
 - API responses always wrapped in `ApiResponse<T>` for consistency
 - Authentication via JWT Bearer tokens in HTTP headers, stateless sessions
 - Database migrations via Flyway, schema managed in `db/migration/`

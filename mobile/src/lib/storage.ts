@@ -1,0 +1,18 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { StorageAdapter } from "@shareshelf/shared";
+
+/**
+ * AsyncStorage-based storage adapter for React Native.
+ * Implements the StorageAdapter interface from @shareshelf/shared.
+ */
+export const asyncStorageAdapter: StorageAdapter = {
+  async getItem(key: string): Promise<string | null> {
+    return AsyncStorage.getItem(key);
+  },
+  async setItem(key: string, value: string): Promise<void> {
+    await AsyncStorage.setItem(key, value);
+  },
+  async removeItem(key: string): Promise<void> {
+    await AsyncStorage.removeItem(key);
+  },
+};

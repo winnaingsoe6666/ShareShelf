@@ -156,6 +156,34 @@ Plans:
 **Plans**: N/A (completed in main branch)
 **UI hint**: yes
 
+### Phase 11: Mobile App (React Native / Expo)
+**Goal**: Build a cross-platform mobile app for iOS and Android using Expo SDK 52, sharing types and API logic with the web frontend via a shared package
+**Depends on**: Phase 9 (chat), Phase 10 (auth)
+**Requirements**: MOBILE-01 through MOBILE-06
+**Success Criteria** (what must be TRUE):
+  1. App runs on iOS and Android via Expo with file-based routing (Expo Router v4)
+  2. STOMP WebSocket real-time chat works on mobile (connects to existing backend)
+  3. Item image picker integrated in add-item flow (up to 5 photos per item)
+  4. Native map view with markers on iOS/Android (react-native-maps + expo-location)
+  5. i18n infrastructure in place (i18next + expo-localization) with English translations
+  6. EAS Build configured for dev/preview/production profiles with OTA updates
+  7. Shared package (`@shareshelf/shared`) provides types, API client, and utils to both web and mobile
+**Plans**: N/A (completed directly)
+**UI hint**: yes
+
+### Phase 12: Mobile App Polish & Testing
+**Goal**: Polish the mobile app — add Burmese translations, expand test coverage, improve UX, and prepare for store submission
+**Depends on**: Phase 11 (Mobile App)
+**Requirements**: MOBILE-07 through MOBILE-10
+**Success Criteria** (what must be TRUE):
+  1. Burmese (my) translations added alongside English
+  2. Mobile-specific tests for key screens and API integration
+  3. Push notifications configured (expo-notifications)
+  4. App store assets prepared (screenshots, descriptions, privacy policy)
+  5. EAS Submit configured for Apple App Store and Google Play
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -170,3 +198,5 @@ Plans:
 | 8. Photo Upload R2 Migration | 2/2 | Complete | 2026-06-25 |
 | 9. In-App Chat | 4/4 | Complete | 2026-06-26 |
 | 10. Email Service & Auth Simplification | N/A | Complete | 2026-06-27 |
+| 11. Mobile App (React Native / Expo) | N/A | Complete | 2026-07-01 |
+| 12. Mobile App Polish & Testing | 0/TBD | Not started | - |
