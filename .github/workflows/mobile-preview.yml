@@ -31,6 +31,13 @@ jobs:
         working-directory: mobile
         run: npm install --legacy-peer-deps
 
+      - name: Debug node and expo
+        working-directory: mobile
+        run: |
+          node --version
+          which node
+          npx expo config --json 2>&1 || true
+
       - name: Build preview
         working-directory: mobile
         run: npx eas-cli build --profile preview --platform all --non-interactive
