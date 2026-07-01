@@ -33,10 +33,11 @@ jobs:
 
       - name: Debug node and expo
         working-directory: mobile
+        env:
+          NODE_OPTIONS: "--no-experimental-strip-types"
         run: |
           node --version
-          which node
-          npx expo config --json 2>&1 || true
+          npx expo config --json 2>&1 | head -5 || echo "expo config failed with exit $?"
 
       - name: Build preview
         working-directory: mobile
