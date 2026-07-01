@@ -27,8 +27,6 @@ export default function MapScreen() {
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-
   useEffect(() => {
     loadLocation();
   }, []);

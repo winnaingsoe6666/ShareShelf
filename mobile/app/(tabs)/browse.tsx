@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Search, Filter, MapPin } from "lucide-react-native";
+import { Search, MapPin } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { formatPrice, formatDistance } from "@shareshelf/shared";
 import type { Item, Category, ItemQueryParams } from "@shareshelf/shared";

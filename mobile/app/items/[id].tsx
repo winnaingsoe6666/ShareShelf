@@ -8,13 +8,12 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
-  FlatList,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { MapPin, Star, Shield, MessageSquare, ArrowLeft } from "lucide-react-native";
+import { MapPin, Shield, MessageSquare } from "lucide-react-native";
 import { api } from "@/lib/api";
-import { getUser, isAuthenticated } from "@/lib/auth";
-import { formatPrice, formatDate, formatDistance } from "@shareshelf/shared";
+import { getUser } from "@/lib/auth";
+import { formatPrice, formatDistance } from "@shareshelf/shared";
 import type { Item, BorrowRequest, User } from "@shareshelf/shared";
 
 export default function ItemDetailScreen() {

@@ -141,7 +141,7 @@ export default function EditProfileScreen() {
         await updateUserSession(sessionUser);
         await loadUser();
         Alert.alert("Success", "Avatar updated!");
-      } catch (err: any) {
+      } catch {
         Alert.alert("Error", "Failed to upload avatar");
       }
     }

@@ -7,7 +7,6 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Linking,
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
