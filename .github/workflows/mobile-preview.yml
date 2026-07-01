@@ -28,6 +28,10 @@ jobs:
         working-directory: mobile
         run: npm install --legacy-peer-deps
 
+      - name: Debug expo config
+        working-directory: mobile
+        run: node node_modules/expo/bin/cli config 2>&1; echo "EXIT: $?"
+
       - name: Build preview
         working-directory: mobile
         run: eas build --profile preview --platform all --non-interactive
