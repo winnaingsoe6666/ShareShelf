@@ -34,3 +34,5 @@ jobs:
       - name: Build production
         working-directory: mobile
         run: eas build --profile production --platform all --non-interactive
+        env:
+          NODE_OPTIONS: "--no-experimental-strip-types"

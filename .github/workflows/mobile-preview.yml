@@ -31,13 +31,8 @@ jobs:
         working-directory: mobile
         run: npm install --legacy-peer-deps
 
-      - name: Verify Node version
-        run: node --version
-
-      - name: Test expo config
-        working-directory: mobile
-        run: npx expo config 2>&1 || true
-
       - name: Build preview
         working-directory: mobile
         run: eas build --profile preview --platform all --non-interactive
+        env:
+          NODE_OPTIONS: "--no-experimental-strip-types"
