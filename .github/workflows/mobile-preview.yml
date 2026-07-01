@@ -33,6 +33,6 @@ jobs:
 
       - name: Build preview
         working-directory: mobile
-        run: eas build --profile preview --platform all --non-interactive
+        run: npx eas-cli build --profile preview --platform all --non-interactive
         env:
           NODE_OPTIONS: "--no-experimental-strip-types"

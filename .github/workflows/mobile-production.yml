@@ -33,6 +33,8 @@ jobs:
 
       - name: Build production
         working-directory: mobile
-        run: eas build --profile production --platform all --non-interactive
+        run: npx eas-cli build --profile production --platform all --non-interactive
+        env:
+          NODE_OPTIONS: "--no-experimental-strip-types"
         env:
           NODE_OPTIONS: "--no-experimental-strip-types"
