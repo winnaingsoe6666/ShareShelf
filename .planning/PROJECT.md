@@ -59,7 +59,7 @@ Users can discover and borrow tools from neighbors in their community, with a tr
 ### Out of Scope
 
 - **Real-time chat/notifications**: Out of scope for v1; borrow flow works async via the request/approve workflow
-- **Mobile apps (iOS/Android)**: Web-first; responsive design sufficient for initial release
+- **Mobile apps (iOS/Android)**: ✓ Shipped as Expo SDK 52 app (Phase 11) — shared types/API via `@shareshelf/shared`
 - **Payment processing**: Free community sharing model; no payment integration
 - **Admin dashboard**: Community moderation is trust-score based for v1
 - **Credential-based login (email/password)**: Google OAuth is the primary auth method; email/password registration may be re-enabled later if needed
@@ -67,14 +67,15 @@ Users can discover and borrow tools from neighbors in their community, with a tr
 ## Context
 
 **Current codebase state:**
-- Backend: Spring Boot 3.4.3 + Kotlin, complete with 5 domain modules (auth, item, borrow, review, category) + email service (Resend API)
+- Backend: Spring Boot 3.4.3 + Kotlin, complete with 5 domain modules (auth, item, borrow, review, category) + email service (Resend API) + WebSocket/STOMP chat
 - Frontend: Next.js 15 + React 19 + TypeScript, 7 pages, reusable UI component library
-- Database: PostgreSQL with 5 Flyway migrations
-- Deployment: Docker multi-stage build, Railway (backend), Vercel (frontend with API proxy)
+- Mobile: Expo SDK 52 + React Native 0.76 + NativeWind, full feature parity (browse, add, chat, map, profile)
+- Shared: `@shareshelf/shared` package provides types, API client, and utils to both web and mobile
+- Database: PostgreSQL with Flyway migrations
+- Deployment: Docker multi-stage build, Railway (backend), Vercel (frontend), EAS Build (mobile)
 - Code review completed: 13 findings (3 critical, 6 warnings, 4 info) documented in `01-REVIEW.md`
 - Codebase map completed: 7 documents in `.planning/codebase/`
 - **Zero tests** across entire project — testing infrastructure needs to be built from scratch
-- Known gaps: Photo upload feature not implemented, image support in frontend missing
 
 **Ralpha Loop vision:**
 The project will adopt a test-first, spec-driven iterative development cycle where:

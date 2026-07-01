@@ -22,11 +22,14 @@ Instead of buying a \$200 drill for one shelf or a tent for one camping trip, br
 | Layer | Technology |
 |---|---|
 | **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4 |
+| **Mobile** | Expo SDK 52, React Native 0.76, Expo Router v4, NativeWind v4 |
 | **Backend** | Spring Boot 3.4, Kotlin 2.1, Gradle 8.12 (Kotlin DSL) |
 | **Database** | PostgreSQL + Flyway (V1–V10 migrations) |
 | **Auth** | Google OAuth 2.0 + JWT (jjwt 0.12) + email verification (Resend API) + JTI blacklist |
-| **i18n** | next-intl — English + Burmese (မြန်မာ) |
+| **Shared** | `@shareshelf/shared` — types, API client, utils for web + mobile |
+| **i18n** | next-intl (web), i18next + expo-localization (mobile) — English + Burmese (မြန်မာ) |
 | **Testing** | JUnit 5 + MockK (backend), Vitest + React Testing Library (frontend), Playwright (E2E) |
+| **Deployment** | Railway (backend), Vercel (frontend), EAS Build (mobile) |
 
 ---
 
@@ -38,18 +41,38 @@ ShareShelf/
 │   ├── build.gradle.kts
 │   └── src/main/
 │       ├── kotlin/com/shareshelf/ # Auth, Item, Borrow, Review, Category,
-│       │                           # Notification, Community, Storage, Config
+│       │                           # Notification, Community, Storage, Chat, Config
 │       └── resources/db/migration/ # Flyway V1–V10
 ├── frontend/                     # Next.js client (TypeScript)
 │   ├── src/
 │   │   ├── app/[locale]/         # Pages: home, items, community, borrow,
 │   │   │                         #   profile, about, readme, login, register
 │   │   ├── components/           # UI kit + layout (Navbar, Footer, Modal,
-│   │   │                         #   Skeleton, ImageUpload, ItemCard, etc.)
+│   │   │                         #   Skeleton, ImageUpload, ItemCard, ChatWindow, etc.)
 │   │   ├── lib/                  # API client, auth helpers, design tokens
 │   │   ├── i18n/                 # next-intl routing & navigation
 │   │   └── test/                 # Test setup & mocks
 │   └── messages/                 # en.json, my.json translation files
+├── mobile/                       # Expo React Native app (iOS + Android)
+│   ├── app/                      # Expo Router file-based routes
+│   │   ├── (tabs)/               # Bottom tab screens (Home, Browse, Map, Add, Borrows, Profile)
+│   │   ├── items/                # Item detail, new item redirect
+│   │   ├── messages/             # Chat screen (STOMP WebSocket)
+│   │   ├── profile/              # Edit profile
+│   │   └── auth/                 # OAuth callback
+│   ├── src/lib/                  # API client, auth, WebSocket, i18n
+│   ├── src/locales/              # Translation files (en.json)
+│   ├── assets/                   # App icons, splash screen
+│   ├── app.json                  # Expo config
+│   ├── eas.json                  # EAS Build profiles
+│   └── package.json              # Dependencies
+├── packages/
+│   └── shared/                   # Shared types, API client, utils (web + mobile)
+│       └── src/
+│           ├── types/            # TypeScript interfaces (User, Item, BorrowRequest, etc.)
+│           ├── api/              # Axios client + endpoint factories
+│           ├── auth/             # Session management (StorageAdapter pattern)
+│           └── utils/            # formatDate, formatPrice, cn, etc.
 ├── slides/                       # PechaKucha deck (Marp)
 ├── proposal/                     # Project proposal
 ├── scripts/                      # DB start & seed helper scripts
@@ -67,6 +90,8 @@ ShareShelf/
 - **Java 21+** — `java --version`
 - **Node.js 18+** — `node --version`
 - **PostgreSQL 16+** — `psql --version`
+- **Expo CLI** (for mobile) — `npm install -g expo-cli`
+- **EAS CLI** (for mobile builds) — `npm install -g eas-cli`
 
 ### 1. Database
 
@@ -90,7 +115,40 @@ npm install
 npm run dev                         # http://localhost:3000
 ```
 
-### 4. Seed Demo Data (optional)
+### 4. Mobile (optional)
+
+```bash
+# Install shared package dependencies first
+cd packages/shared
+npm install
+npm run build
+
+# Then set up mobile
+cd ../../mobile
+npm install
+npx expo start                      # Scan QR with Expo Go app
+```
+
+> **Note:** Mobile app requires the backend to be running. Set `EXPO_PUBLIC_API_URL` in `mobile/.env` if not using localhost.
+
+#### Mobile Environment Variables
+
+Create `mobile/.env`:
+
+```env
+EXPO_PUBLIC_API_URL=http://localhost:8080/api
+```
+
+#### EAS Build (production builds)
+
+```bash
+cd mobile
+eas login                            # Login to Expo account
+eas build --profile preview          # Internal testing build (APK)
+eas build --profile production       # Store-ready build (AAB/IPA)
+```
+
+### 5. Seed Demo Data (optional)
 
 ```bash
 ./scripts/seed.sh                   # Or: curl http://localhost:8080/api/dev/seed
@@ -111,10 +169,12 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 - [x] **Search & Discovery** — Search by name, filter by category, status, and minimum rating
 - [x] **In-App Notifications** — Real-time bell with unread count, mark read, mark all read
 - [x] **Community Dashboard** — Animated counters (items shared, members, successful borrows), top sharers
+- [x] **Real-Time Chat** — WebSocket + STOMP messaging between borrowers and owners (web + mobile)
 - [x] **Internationalization** — English + Burmese (မြန်မာ) with language switcher
 - [x] **Rate Limiting** — API protection against abuse
-- [x] **File Storage** — Photo upload with preview and removal
-- [x] **Deployment** — Railway (backend Docker) + Vercel (frontend), CI/CD configured
+- [x] **File Storage** — Photo upload with preview and removal (Cloudflare R2)
+- [x] **Mobile App** — Cross-platform iOS/Android app with Expo SDK 52 (native maps, image picker, real-time chat)
+- [x] **Deployment** — Railway (backend Docker) + Vercel (frontend) + EAS Build (mobile), CI/CD configured
 - [x] **Testing** — Unit, integration, and E2E tests across backend and frontend
 - [x] **AI-Assisted Development** — MCP servers, Claude Skills & Agents documented in CLAUDE.md
 
@@ -153,6 +213,7 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | GET | `/api/community/stats` | No | Platform statistics |
 | GET | `/api/health` | No | Health check |
 | GET | `/api/dev/seed` | No | Seed demo data |
+| WS | `/ws` | Yes | WebSocket (STOMP) endpoint for real-time chat |
 
 ---
 
@@ -174,6 +235,12 @@ Demo accounts: `alice@example.com` / `bob@example.com` / `charlie@example.com` (
 | Variable | Default | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8080` | Backend API base URL |
+
+### Mobile
+
+| Variable | Default | Description |
+|---|---|---|
+| `EXPO_PUBLIC_API_URL` | `http://localhost:8080/api` | Backend API base URL |
 
 ---
 

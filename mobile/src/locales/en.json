@@ -1,0 +1,140 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "free": "Free",
+    "day": "day",
+    "kmAway": "{{distance}} km away",
+    "noResults": "No results found"
+  },
+  "tabs": {
+    "home": "Home",
+    "browse": "Browse",
+    "map": "Map",
+    "add": "Add",
+    "borrows": "Borrows",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "ShareShelf",
+    "subtitle": "Share tools with your community",
+    "browseTools": "Browse Tools",
+    "addTool": "Add a Tool",
+    "nearbyTools": "Tools Near You",
+    "recentActivity": "Recent Activity"
+  },
+  "browse": {
+    "title": "Browse Tools",
+    "searchPlaceholder": "Search tools...",
+    "noItems": "No tools found",
+    "tryDifferent": "Try a different search or category"
+  },
+  "map": {
+    "toolsNearYou": "{{count}} tools near you",
+    "locationDenied": "Location permission denied",
+    "couldNotGetLocation": "Could not get location"
+  },
+  "add": {
+    "title": "Add New Tool",
+    "photos": "Photos (up to 5)",
+    "addPhoto": "Add",
+    "titleRequired": "Title is required",
+    "titleLabel": "Title *",
+    "titlePlaceholder": "e.g., Electric Drill",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe your tool...",
+    "categoryLabel": "Category",
+    "dailyPriceLabel": "Daily Price ($)",
+    "dailyPricePlaceholder": "0.00 for free",
+    "depositLabel": "Deposit Amount ($)",
+    "depositPlaceholder": "Optional deposit",
+    "createListing": "Create Listing",
+    "itemCreated": "Item created!",
+    "maxImages": "Maximum 5 images allowed",
+    "failedToCreate": "Failed to create item"
+  },
+  "borrows": {
+    "title": "Borrow Requests",
+    "borrowed": "Borrowed",
+    "lent": "Lent",
+    "noRequests": "No borrow requests",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "returned": "Returned",
+    "overdue": "Overdue"
+  },
+  "messages": {
+    "title": "Messages",
+    "noMessages": "No messages yet",
+    "sayHello": "No messages yet. Say hello!",
+    "typePlaceholder": "Type a message...",
+    "noConversations": "No conversations yet"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "myItems": "My Items",
+    "myReviews": "My Reviews",
+    "settings": "Settings",
+    "logout": "Logout",
+    "logoutConfirm": "Are you sure you want to logout?",
+    "trustScore": "Trust Score",
+    "memberSince": "Member since"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "orContinueWith": "or continue with",
+    "google": "Google",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up"
+  },
+  "register": {
+    "title": "Create Account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "createAccount": "Create Account",
+    "orContinueWith": "or continue with",
+    "google": "Google",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign In"
+  },
+  "item": {
+    "perDay": "/day",
+    "deposit": "Deposit",
+    "owner": "Owner",
+    "category": "Category",
+    "description": "Description",
+    "requestToBorrow": "Request to Borrow",
+    "contactOwner": "Contact Owner",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all read"
+  },
+  "community": {
+    "title": "Community",
+    "members": "Members",
+    "items": "Items",
+    "borrows": "Borrows",
+    "topLenders": "Top Lenders"
+  }
+}

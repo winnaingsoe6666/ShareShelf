@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: context exhaustion at 87% (2026-06-27)
-last_updated: "2026-06-27T19:37:42.974Z"
-last_activity: 2026-06-27
+status: active
+stopped_at: null
+last_updated: "2026-07-01T16:50:00.000Z"
+last_activity: 2026-07-01
 progress:
-  total_phases: 10
-  completed_phases: 3
+  total_phases: 12
+  completed_phases: 4
   total_plans: 24
   completed_plans: 18
-  percent: 30
+  percent: 33
 ---
 
 # Project State
@@ -25,15 +25,16 @@ See: .planning/PROJECT.md (updated 2026-06-13)
 
 ## Current Position
 
-Phase: 10 (Email Service & Auth Simplification) — COMPLETE
-Plan: N/A (completed directly in main)
-Status: Phase verified and marked complete
-Last activity: 2026-06-27
+Phase: 11 (Mobile App) — COMPLETE
+Plan: N/A (completed directly)
+Status: Phase complete — Expo mobile app with STOMP chat, image picker, maps, i18n, EAS Build
+Last activity: 2026-07-01
 
 Progress: [██████████] 100%
 
 ### Next Up
 
+- Phase 12: Mobile App Polish & Testing (not started)
 - Phase 3: E2E Tests & CI/CD Pipeline (not started)
 - Phase 4: Code Quality & Technical Debt (not started)
 
@@ -86,6 +87,12 @@ Recent decisions affecting current work:
 - [Phase 10]: @EnableAsync on ShareShelfApplication — EmailService.sendVerificationEmail() runs on async thread pool
 - [Phase 10]: Re-registration allowed for unverified users — old tokens deleted, user details overwritten
 - [Phase 10]: User.phone changed from val to var for profile update support
+- [Phase 11]: Mobile uses Expo SDK 52 + Expo Router v4 (file-based routing) + NativeWind v4 (Tailwind for RN)
+- [Phase 11]: Shared package `@shareshelf/shared` provides types, API client, utils to both web and mobile
+- [Phase 11]: Mobile STOMP via `@stomp/stompjs` (native WebSocket transport, no SockJS needed on RN)
+- [Phase 11]: i18n via i18next + react-i18next + expo-localization (English first, Burmese deferred)
+- [Phase 11]: EAS Build with 3 profiles: development (simulator/APK), preview (internal), production (store)
+- [Phase 11]: OTA updates via expo-updates with appVersion runtime policy
 
 ### Pending Todos
 
