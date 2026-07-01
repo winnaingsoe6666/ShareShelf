@@ -37,7 +37,7 @@ jobs:
           NODE_OPTIONS: "--no-experimental-strip-types"
         run: |
           node --version
-          npx expo config --json 2>&1 | head -5 || echo "expo config failed with exit $?"
+          node node_modules/expo/bin/cli config --json 2>&1 | head -5 || echo "expo config failed with exit $?"
 
       - name: Build preview
         working-directory: mobile
