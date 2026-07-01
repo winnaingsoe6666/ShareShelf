@@ -1,0 +1,32 @@
+name: Mobile Preview Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ["mobile/**", "packages/shared/**"]
+
+jobs:
+  eas-build:
+    name: EAS Preview Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm install --legacy-peer-deps
+
+      - name: Build preview
+        working-directory: mobile
+        run: eas build --profile preview --platform all --non-interactive
