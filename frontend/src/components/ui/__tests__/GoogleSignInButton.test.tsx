@@ -6,7 +6,7 @@ describe("GoogleSignInButton", () => {
   it("renders Google sign-in link with correct href", () => {
     render(<GoogleSignInButton />);
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "/api/oauth2/authorization/google");
+    expect(link).toHaveAttribute("href", "http://localhost:8080/oauth2/authorization/google");
   });
 
   it("shows default text", () => {
