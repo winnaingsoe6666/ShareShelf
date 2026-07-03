@@ -77,7 +77,8 @@ class OAuth2Service(
             city = user.city,
             state = user.state,
             zipCode = user.zipCode,
-            socialLink = user.socialLink
+            socialLink = user.socialLink,
+            phone = user.phone
         )
     }
 

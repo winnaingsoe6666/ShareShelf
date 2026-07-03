@@ -67,7 +67,8 @@ class AuthControllerTest {
             city = null,
             state = null,
             zipCode = null,
-            socialLink = null
+            socialLink = null,
+            phone = null
         )
 
         every { authService.refresh(refreshToken) } returns authResponse

@@ -13,6 +13,7 @@ export interface User {
   avatarUrl?: string;
   bio?: string;
   isIdVerified: boolean;
+  phone?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -97,6 +98,7 @@ export interface AuthResponse {
   avatarUrl?: string;
   bio?: string;
   isIdVerified: boolean;
+  phone?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -212,6 +214,7 @@ export interface UpdateItemRequestDto {
 export interface UpdateProfileRequestDto {
   name?: string;
   bio?: string;
+  phone?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;

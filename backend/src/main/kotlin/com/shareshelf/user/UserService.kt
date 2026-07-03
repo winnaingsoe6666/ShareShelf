@@ -23,6 +23,7 @@ class UserService(
 
         request.name?.let { user.name = it }
         request.bio?.let { user.bio = it }
+        request.phone?.let { user.phone = it }
         request.addressLine1?.let { user.addressLine1 = it }
         request.addressLine2?.let { user.addressLine2 = it }
         request.city?.let { user.city = it }

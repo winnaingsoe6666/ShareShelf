@@ -7,7 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import api from "@/lib/api";
+import { structuredApi } from "@/lib/api";
 import { getUser, updateUserSession, authResponseToUser } from "@/lib/auth";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { User } from "@/types";
@@ -18,10 +18,12 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatarUrl ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     bio: "",
+    phone: "",
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -36,6 +38,7 @@ export default function EditProfilePage() {
       setFormData({
         name: user.name || "",
         bio: user.bio || "",
+        phone: user.phone || "",
         addressLine1: user.addressLine1 || "",
         addressLine2: user.addressLine2 || "",
         city: user.city || "",
@@ -55,16 +58,16 @@ export default function EditProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingAvatar(true);
+    setErrors([]);
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await api.post("/users/avatar", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setAvatarUrl(res.data.data.avatarUrl);
-      updateUserSession(authResponseToUser(res.data.data));
-    } catch {
-      alert("Failed to upload avatar");
+      const data = await structuredApi.user.uploadAvatar(formData);
+      setAvatarUrl(data.avatarUrl ?? null);
+      updateUserSession(authResponseToUser(data));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to upload avatar";
+      setErrors([message]);
     } finally {
       setUploadingAvatar(false);
     }
@@ -73,18 +76,25 @@ export default function EditProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrors([]);
     try {
-      const response = await api.put("/users/profile", formData);
-      if (response.data.success) {
-        // Update user session data
-        const updatedUser = authResponseToUser(response.data.data);
-        updateUserSession(updatedUser);
-        alert("Profile updated successfully!");
-        router.push("/profile");
+      const data = await structuredApi.user.updateProfile(formData);
+      updateUserSession(authResponseToUser(data));
+      alert("Profile updated successfully!");
+      router.push("/profile");
+    } catch (err: unknown) {
+      // Try to extract field-level errors from ApiResponse
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as { response?: { data?: { errors?: string[]; message?: string } } };
+        const apiErrors = axiosErr.response?.data?.errors;
+        if (apiErrors && apiErrors.length > 0) {
+          setErrors(apiErrors);
+        } else {
+          setErrors([axiosErr.response?.data?.message || "Failed to update profile"]);
+        }
+      } else {
+        setErrors(["Failed to update profile"]);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -99,6 +109,15 @@ export default function EditProfilePage() {
         <main className="mx-auto max-w-2xl px-4 py-8">
           <Card className="p-6">
             <h1 className="font-heading text-2xl font-bold text-purple-900 mb-6">Edit Profile</h1>
+
+            {errors.length > 0 && (
+              <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+                {errors.map((err, i) => (
+                  <p key={i} className="text-sm text-red-700">{err}</p>
+                ))}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
 
               {/* Avatar */}
@@ -181,10 +200,16 @@ export default function EditProfilePage() {
               </div>
 
               <div className="pt-4 mt-4 border-t border-stone-200">
-                <h3 className="font-medium text-purple-900 mb-3">Private Address Info</h3>
+                <h3 className="font-medium text-purple-900 mb-3">Contact & Address Info</h3>
                 <p className="text-xs text-stone-500 mb-4">Your exact address is never shown publicly. It is used to calculate distances for tool sharing.</p>
-                
+
                 <div className="space-y-4">
+                  <Input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone number"
+                  />
                   <Input
                     name="addressLine1"
                     value={formData.addressLine1}
