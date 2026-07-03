@@ -16,6 +16,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@shareshelf/shared": "*",
     "@stomp/stompjs": "^7.3.0",
     "axios": "^1.7.9",
     "leaflet": "^1.9.4",

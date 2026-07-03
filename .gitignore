@@ -34,6 +34,19 @@ backend/out/
 frontend/.vercel
 frontend/dist
 
+# Mobile (Expo)
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/*.jks
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision
+
+# Packages
+packages/*/dist/
+
 # Uploads (dev)
 backend/uploads/
 
