@@ -1,6 +1,7 @@
 package com.shareshelf.config
 
 import com.shareshelf.auth.WebSocketAuthInterceptor
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.ChannelRegistration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
@@ -11,7 +12,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 class WebSocketConfig(
-    private val webSocketAuthInterceptor: WebSocketAuthInterceptor
+    private val webSocketAuthInterceptor: WebSocketAuthInterceptor,
+    @Value("\${app.cors.allowed-origins:http://localhost:3000}") private val allowedOrigins: String
 ) : WebSocketMessageBrokerConfigurer {
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
@@ -20,7 +22,7 @@ class WebSocketConfig(
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        val origins = (System.getenv("CORS_ORIGINS") ?: "http://localhost:3000")
+        val origins = allowedOrigins
             .split(",")
             .map { it.trim() }
             .toTypedArray()

@@ -32,8 +32,13 @@ export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSock
     const token = getToken();
     if (!token) return;
 
+    // Build WebSocket URL: strip /api suffix from backend URL, append /ws
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    const wsBase = apiUrl.replace(/\/api\/?$/, "");
+    const wsUrl = wsBase ? `${wsBase}/ws` : "/ws";
+
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_API_URL || ""}/ws`),
+      webSocketFactory: () => new SockJS(wsUrl),
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
