@@ -13,6 +13,11 @@ interface UseChatSocketOptions {
 
 export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSocketOptions) {
   const clientRef = useRef<Client | null>(null);
+  // Stabilize callbacks with refs so the effect doesn't re-run on every render
+  const onMessageRef = useRef(onMessage);
+  const onUnreadUpdateRef = useRef(onUnreadUpdate);
+  onMessageRef.current = onMessage;
+  onUnreadUpdateRef.current = onUnreadUpdate;
 
   const sendMessage = useCallback(
     (payload: { itemId: number; receiverId: number; message: string }) => {
@@ -32,10 +37,10 @@ export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSock
     const token = getToken();
     if (!token) return;
 
-    // Build WebSocket URL: strip /api suffix from backend URL, append /ws
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const wsBase = apiUrl.replace(/\/api\/?$/, "");
-    const wsUrl = wsBase ? `${wsBase}/ws` : "/ws";
+    // WebSocket URL: use dedicated env var, or derive from API URL, or fall back to /ws
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL
+      || (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "") + "/ws"
+      || "/ws";
 
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
@@ -46,8 +51,8 @@ export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSock
       onConnect: () => {
         client.subscribe(`/topic/chat/${userId}`, (message) => {
           const parsed: ChatMessage = JSON.parse(message.body);
-          onMessage(parsed);
-          onUnreadUpdate?.();
+          onMessageRef.current(parsed);
+          onUnreadUpdateRef.current?.();
         });
       },
       onStompError: (frame) => {
@@ -62,7 +67,9 @@ export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSock
       client.deactivate();
       clientRef.current = null;
     };
-  }, [userId, onMessage, onUnreadUpdate]);
+  // Only re-run when userId changes — callbacks are read via refs
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   return { sendMessage, isConnected: clientRef.current?.connected ?? false };
 }
