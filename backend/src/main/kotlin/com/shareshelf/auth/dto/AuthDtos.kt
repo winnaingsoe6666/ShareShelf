@@ -53,7 +53,8 @@ data class AuthResponse(
     val city: String?,
     val state: String?,
     val zipCode: String?,
-    val socialLink: String?
+    val socialLink: String?,
+    val phone: String?
 )
 
 data class RefreshRequest(

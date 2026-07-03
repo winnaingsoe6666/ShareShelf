@@ -235,7 +235,8 @@ class AuthService(
             city = user.city,
             state = user.state,
             zipCode = user.zipCode,
-            socialLink = user.socialLink
+            socialLink = user.socialLink,
+            phone = user.phone
         )
     }
 
