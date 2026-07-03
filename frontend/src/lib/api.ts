@@ -1,116 +1,26 @@
-import axios from "axios";
+import { createApiClient, createApi } from "@shareshelf/shared";
+import { localStorageAdapter } from "./storage";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
-  headers: { "Content-Type": "application/json" },
-});
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-// Request interceptor — inject JWT token from localStorage
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("shareshelf_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
+// Raw axios instance with JWT injection + refresh token logic from shared package
+const api = createApiClient({ baseURL, storage: localStorageAdapter });
 
-// Prevent infinite refresh loops
-let isRefreshing = false;
-let failedQueue: Array<{ resolve: (value: unknown) => void; reject: (reason?: unknown) => void }> = [];
-
-function processQueue(error: unknown, token: string | null) {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(token);
-    }
-  });
-  failedQueue = [];
-}
-
-// Response interceptor — handle 401 with refresh token flow
+// On 401 failure (after refresh failed), redirect to login
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (typeof window === "undefined") return Promise.reject(error);
-
-    // Try refresh on 401 (exclude auth endpoints to avoid loops)
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.startsWith("/auth/")
-    ) {
-      if (isRefreshing) {
-        // Queue this request until refresh completes
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      const refreshToken = localStorage.getItem("shareshelf_refresh_token");
-      if (refreshToken) {
-        try {
-          const { data } = await axios.post(
-            `${api.defaults.baseURL}/auth/refresh`,
-            { refreshToken }
-          );
-          if (data.success && data.data) {
-            const newToken = data.data.token;
-            const newRefreshToken = data.data.refreshToken;
-            localStorage.setItem("shareshelf_token", newToken);
-            localStorage.setItem("shareshelf_refresh_token", newRefreshToken);
-            // Update stored user info
-            localStorage.setItem("shareshelf_user", JSON.stringify({
-              id: data.data.userId,
-              name: data.data.name,
-              email: data.data.email,
-              trustScore: data.data.trustScore,
-              community: data.data.community,
-              avatarUrl: data.data.avatarUrl,
-              bio: data.data.bio,
-              isIdVerified: data.data.isIdVerified,
-              addressLine1: data.data.addressLine1,
-              addressLine2: data.data.addressLine2,
-              city: data.data.city,
-              state: data.data.state,
-              zipCode: data.data.zipCode,
-              socialLink: data.data.socialLink,
-            }));
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            processQueue(null, newToken);
-            return api(originalRequest);
-          }
-        } catch {
-          // Refresh failed — fall through to clear auth
-        }
-      }
-
-      isRefreshing = false;
-      processQueue(new Error("Refresh failed"), null);
-    }
-
-    // On 401 (auth endpoint or refresh failed), clear session and redirect
-    if (error.response?.status === 401) {
-      localStorage.removeItem("shareshelf_token");
-      localStorage.removeItem("shareshelf_refresh_token");
-      localStorage.removeItem("shareshelf_user");
+  (error) => {
+    if (typeof window !== "undefined" && error.response?.status === 401) {
       if (!window.location.pathname.startsWith("/login")) {
         window.location.href = "/login";
       }
     }
-
     return Promise.reject(error);
   }
 );
 
+// Structured API facade (api.auth.login, api.items.getItems, etc.)
+const structuredApi = createApi(api);
+
 export default api;
+export { structuredApi };
