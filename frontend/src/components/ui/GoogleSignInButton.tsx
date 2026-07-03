@@ -15,11 +15,9 @@ export default function GoogleSignInButton({
 
   const getAuthUrl = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-    // Use the apiUrl directly without stripping it, appending the oauth2 path
-    const base = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
-    
-    // If they said /api/oauth2/authorization/google is correct, then this will evaluate to that
-    // assuming apiUrl is /api or http://localhost:8080/api
+    // Strip /api suffix — Spring Security OAuth endpoint is at root level
+    let base = apiUrl.replace(/\/api\/?$/, "");
+    base = base.endsWith("/") ? base.slice(0, -1) : base;
     return `${base}/oauth2/authorization/google`;
   };
 
