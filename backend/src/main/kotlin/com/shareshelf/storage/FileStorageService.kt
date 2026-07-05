@@ -38,7 +38,7 @@ class FileStorageService(
         }
 
         val contentType = file.contentType?.lowercase() ?: ""
-        val allowedContentTypes = setOf("image/jpeg", "image/png", "image/gif", "image/webp")
+        val allowedContentTypes = setOf("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp")
         if (contentType.isNotEmpty() && contentType !in allowedContentTypes) {
             throw IllegalArgumentException("Unsupported content type: $contentType")
         }
