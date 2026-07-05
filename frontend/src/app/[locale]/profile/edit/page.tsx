@@ -49,7 +49,7 @@ export default function EditProfilePage() {
         community: user.community || "",
       });
     }
-  }, [user]);
+  }, [user?.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
