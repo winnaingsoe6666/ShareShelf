@@ -1,7 +1,9 @@
 import { createApiClient, createApi } from "@shareshelf/shared";
 import { localStorageAdapter } from "./storage";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api";
+// Ensure baseURL always ends with /api — env var may or may not include it
+const rawBase = process.env.NEXT_PUBLIC_API_URL || "/api";
+const baseURL = rawBase.endsWith("/api") ? rawBase : `${rawBase.replace(/\/+$/, "")}/api`;
 
 // Raw axios instance with JWT injection + refresh token logic from shared package
 const api = createApiClient({ baseURL, storage: localStorageAdapter });
