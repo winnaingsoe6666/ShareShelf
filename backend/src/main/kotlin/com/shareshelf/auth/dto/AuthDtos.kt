@@ -48,6 +48,7 @@ data class AuthResponse(
     val avatarUrl: String?,
     val bio: String?,
     val isIdVerified: Boolean,
+    val isEmailVerified: Boolean,
     val addressLine1: String?,
     val addressLine2: String?,
     val city: String?,

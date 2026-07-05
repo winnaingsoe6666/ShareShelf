@@ -116,7 +116,7 @@ export default function ProfilePage() {
               </div>
               <span className="flex items-center gap-1 text-sm font-medium">
                 <span>+0.2</span>
-                {user.email ? (
+                {user.isEmailVerified ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500" />
                 ) : (
                   <XCircle className="h-4 w-4 text-stone-300" />
