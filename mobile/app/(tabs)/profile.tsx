@@ -26,9 +26,12 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     isAuthenticated().then((auth) => {
-      if (!auth) router.replace("/login");
+      if (!auth) {
+        router.replace("/login");
+      } else {
+        loadProfile();
+      }
     });
-    loadProfile();
   }, [router]);
 
   const loadProfile = useCallback(async () => {

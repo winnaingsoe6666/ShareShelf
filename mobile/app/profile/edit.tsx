@@ -83,6 +83,7 @@ export default function EditProfileScreen() {
         avatarUrl: updatedUser.avatarUrl,
         bio: updatedUser.bio,
         isIdVerified: updatedUser.isIdVerified,
+        phone: updatedUser.phone,
         addressLine1: updatedUser.addressLine1,
         addressLine2: updatedUser.addressLine2,
         city: updatedUser.city,
@@ -115,8 +116,8 @@ export default function EditProfileScreen() {
       const formData = new FormData();
       formData.append("file", {
         uri: asset.uri,
-        type: "image/jpeg",
-        name: "avatar.jpg",
+        type: asset.mimeType || "image/jpeg",
+        name: asset.fileName || "avatar.jpg",
       } as any);
 
       try {
@@ -131,6 +132,7 @@ export default function EditProfileScreen() {
           avatarUrl: updatedUser.avatarUrl,
           bio: updatedUser.bio,
           isIdVerified: updatedUser.isIdVerified,
+          phone: updatedUser.phone,
           addressLine1: updatedUser.addressLine1,
           addressLine2: updatedUser.addressLine2,
           city: updatedUser.city,
