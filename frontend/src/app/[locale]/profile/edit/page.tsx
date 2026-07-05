@@ -19,6 +19,7 @@ export default function EditProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatarUrl ?? null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -48,7 +49,7 @@ export default function EditProfilePage() {
         community: user.community || "",
       });
     }
-  }, [user]);
+  }, [user?.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,6 +58,19 @@ export default function EditProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Client-side validation
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (file.size > MAX_SIZE) {
+      setErrors(['File too large. Maximum size is 5MB.']);
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setErrors(['Invalid file type. Allowed: JPG, PNG, GIF, WebP']);
+      return;
+    }
+
     setUploadingAvatar(true);
     setErrors([]);
     try {
@@ -77,11 +91,11 @@ export default function EditProfilePage() {
     e.preventDefault();
     setLoading(true);
     setErrors([]);
+    setSuccess(null);
     try {
       const data = await structuredApi.user.updateProfile(formData);
       updateUserSession(authResponseToUser(data));
-      alert("Profile updated successfully!");
-      router.push("/profile");
+      setSuccess("Profile updated successfully!");
     } catch (err: unknown) {
       // Try to extract field-level errors from ApiResponse
       if (err && typeof err === "object" && "response" in err) {
@@ -100,7 +114,10 @@ export default function EditProfilePage() {
     }
   };
 
-  if (!user) return null;
+  if (!user) {
+    router.push("/profile");
+    return null;
+  }
 
   return (
     <AuthGuard>
@@ -109,6 +126,12 @@ export default function EditProfilePage() {
         <main className="mx-auto max-w-2xl px-4 py-8">
           <Card className="p-6">
             <h1 className="font-heading text-2xl font-bold text-purple-900 mb-6">Edit Profile</h1>
+
+            {success && (
+              <div className="mb-4 rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+                <p className="text-sm text-emerald-700">{success}</p>
+              </div>
+            )}
 
             {errors.length > 0 && (
               <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">

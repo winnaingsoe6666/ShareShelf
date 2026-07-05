@@ -21,6 +21,7 @@ export function authResponseToUser(auth: AuthResponse): User {
     avatarUrl: auth.avatarUrl,
     bio: auth.bio,
     isIdVerified: auth.isIdVerified,
+    isEmailVerified: auth.isEmailVerified,
     phone: auth.phone,
     addressLine1: auth.addressLine1,
     addressLine2: auth.addressLine2,

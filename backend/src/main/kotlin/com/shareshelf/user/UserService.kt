@@ -2,10 +2,10 @@ package com.shareshelf.user
 
 import com.shareshelf.auth.entity.UserRepository
 import com.shareshelf.auth.entity.User
-import com.shareshelf.review.ReviewService
 import com.shareshelf.storage.FileStorageService
 import jakarta.persistence.EntityNotFoundException
 import com.shareshelf.user.dto.UpdateProfileRequest
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -13,27 +13,28 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val fileStorageService: FileStorageService,
-    private val reviewService: ReviewService
+    private val fileStorageService: FileStorageService
 ) {
+    private val logger = LoggerFactory.getLogger(UserService::class.java)
+
     @Transactional
     fun updateProfile(userId: Long, request: UpdateProfileRequest): User {
         val user = userRepository.findById(userId)
             .orElseThrow { EntityNotFoundException("User not found") }
 
-        request.name?.let { user.name = it }
-        request.bio?.let { user.bio = it }
-        request.phone?.let { user.phone = it }
-        request.addressLine1?.let { user.addressLine1 = it }
-        request.addressLine2?.let { user.addressLine2 = it }
-        request.city?.let { user.city = it }
-        request.state?.let { user.state = it }
-        request.zipCode?.let { user.zipCode = it }
-        request.socialLink?.let { user.socialLink = it }
-        request.community?.let { user.community = it }
+        // Use explicit assignment to allow clearing fields (null = clear)
+        user.name = request.name ?: user.name
+        user.bio = request.bio
+        user.phone = request.phone
+        user.addressLine1 = request.addressLine1
+        user.addressLine2 = request.addressLine2
+        user.city = request.city
+        user.state = request.state
+        user.zipCode = request.zipCode
+        user.socialLink = request.socialLink
+        user.community = request.community
 
         val saved = userRepository.save(user)
-        reviewService.updateTrustScore(userId)
         return saved
     }
 
@@ -46,13 +47,14 @@ class UserService(
         user.avatarUrl?.let { oldUrl ->
             try {
                 fileStorageService.delete(oldUrl)
-            } catch (_: Exception) { /* ignore cleanup failures */ }
+            } catch (e: Exception) {
+                logger.warn("Failed to delete old avatar: {}", e.message)
+            }
         }
 
         val imageUrl = fileStorageService.store(file, "avatars")
         user.avatarUrl = imageUrl
         val saved = userRepository.save(user)
-        reviewService.updateTrustScore(userId)
         return saved
     }
 }

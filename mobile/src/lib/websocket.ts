@@ -16,7 +16,7 @@ export function connectStomp(
   }
 
   stompClient = new Client({
-    brokerURL: `${WS_URL}/ws`,
+    brokerURL: `${WS_URL}/chat-ws`,
     connectHeaders: {},
     reconnectDelay: 5000,
     heartbeatIncoming: 10000,

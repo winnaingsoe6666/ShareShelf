@@ -13,6 +13,7 @@ export interface User {
   avatarUrl?: string;
   bio?: string;
   isIdVerified: boolean;
+  isEmailVerified?: boolean;
   phone?: string;
   addressLine1?: string;
   addressLine2?: string;
@@ -98,6 +99,7 @@ export interface AuthResponse {
   avatarUrl?: string;
   bio?: string;
   isIdVerified: boolean;
+  isEmailVerified?: boolean;
   phone?: string;
   addressLine1?: string;
   addressLine2?: string;

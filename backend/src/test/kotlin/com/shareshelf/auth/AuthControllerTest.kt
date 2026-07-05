@@ -62,6 +62,7 @@ class AuthControllerTest {
             avatarUrl = null,
             bio = null,
             isIdVerified = false,
+            isEmailVerified = false,
             addressLine1 = null,
             addressLine2 = null,
             city = null,

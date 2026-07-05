@@ -54,6 +54,7 @@ class UserController(
             avatarUrl = user.avatarUrl,
             bio = user.bio,
             isIdVerified = user.isIdVerified,
+            isEmailVerified = user.isEmailVerified,
             addressLine1 = user.addressLine1,
             addressLine2 = user.addressLine2,
             city = user.city,

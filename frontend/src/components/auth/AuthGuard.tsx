@@ -18,14 +18,25 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!isAuthenticated()) {
       router.replace(`/login?returnUrl=${encodeURIComponent(pathname)}`);
     } else {
       setAuthorized(true);
     }
   }, [router, pathname]);
+
+  // Prevent hydration mismatch by showing loading until mounted on client
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-purple-50">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
 
   if (!authorized) {
     return (
