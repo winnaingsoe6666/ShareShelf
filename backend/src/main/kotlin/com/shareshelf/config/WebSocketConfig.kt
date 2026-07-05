@@ -27,7 +27,7 @@ class WebSocketConfig(
             .map { it.trim() }
             .toTypedArray()
 
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/chat-ws")
             .setAllowedOrigins(*origins)
             .withSockJS()
     }

@@ -105,7 +105,7 @@ export default function BorrowPage() {
     setReviewSubmitting(true);
     setReviewError("");
     try {
-      await api.post("/reviews", {
+      await api.post("/review", {
         borrowRequestId: reviewModal.borrowId,
         rating: reviewRating,
         comment: reviewComment || undefined,

@@ -45,7 +45,7 @@ class SecurityConfig(
                         "/v3/api-docs/**",
                         "/oauth2/**",
                         "/login/oauth2/**",
-                        "/ws/**"
+                        "/chat-ws/**"
                     ).permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**", "/api/categories", "/api/community/stats", "/api/review/user/**").permitAll()
                     .requestMatchers("/api/**").authenticated()

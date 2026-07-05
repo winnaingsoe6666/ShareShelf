@@ -41,8 +41,8 @@ const nextConfig: NextConfig = {
         destination: "http://localhost:8080/api/:path*",
       },
       {
-        source: "/ws/:path*",
-        destination: "http://localhost:8080/ws/:path*",
+        source: "/chat-ws/:path*",
+        destination: "http://localhost:8080/chat-ws/:path*",
       },
     ];
   },

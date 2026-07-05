@@ -37,10 +37,10 @@ export function useChatSocket({ userId, onMessage, onUnreadUpdate }: UseChatSock
     const token = getToken();
     if (!token) return;
 
-    // WebSocket URL: use dedicated env var, or derive from API URL, or fall back to /ws
+    // WebSocket URL: use dedicated env var, or derive from API URL, or fall back to /chat-ws
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL
-      || (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "") + "/ws"
-      || "/ws";
+      || (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "") + "/chat-ws"
+      || "/chat-ws";
 
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
