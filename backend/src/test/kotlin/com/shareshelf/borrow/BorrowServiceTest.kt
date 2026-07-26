@@ -305,7 +305,7 @@ class BorrowServiceTest {
         verify(exactly = 1) { borrowRepository.findById(1L) }
         verify(exactly = 1) { itemRepository.save(any()) }
         verify(exactly = 1) { borrowRepository.save(any()) }
-        verify(exactly = 1) { reviewService.addTrustScoreBonus(2L, 0.1) }
+        verify(exactly = 1) { reviewService.addTrustScoreBonus(2L, 0.5) }
         verify(exactly = 1) { reviewService.addTrustScoreBonus(1L, 0.1) }
     }
 
