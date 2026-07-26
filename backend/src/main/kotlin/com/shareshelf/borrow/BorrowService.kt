@@ -208,8 +208,27 @@ class BorrowService(
             relatedBorrowId = saved.id
         )
 
-        // Award trust score bonus to both parties for successful transaction
-        reviewService.addTrustScoreBonus(borrow.borrowerId, 0.1)
+        // Score borrower reliability based on on-time return
+        val today = java.time.LocalDate.now()
+        if (borrow.endDate != null) {
+            if (!today.isAfter(borrow.endDate)) {
+                // Returned on time or early: good reliability bonus
+                reviewService.addTrustScoreBonus(borrow.borrowerId, 0.5)
+            } else {
+                // Returned late: penalty based on how late
+                val daysLate = java.time.temporal.ChronoUnit.DAYS.between(borrow.endDate, today)
+                if (daysLate <= 3) {
+                    reviewService.addTrustScoreBonus(borrow.borrowerId, -0.2)
+                } else {
+                    reviewService.addTrustScoreBonus(borrow.borrowerId, -0.5)
+                }
+            }
+        } else {
+             // No end date specified, default small bonus
+             reviewService.addTrustScoreBonus(borrow.borrowerId, 0.1)
+        }
+
+        // Owner gets a default bonus for a successful transaction
         reviewService.addTrustScoreBonus(borrow.ownerId, 0.1)
 
         return toResponse(saved)
