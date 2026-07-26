@@ -1,12 +1,20 @@
 # ShareShelf — Community Tool Library
 
-🌐 **Live Demo:** [https://share-shelf-ashen.vercel.app](https://share-shelf-ashen.vercel.app)
+<div align="center">
+  <img src="frontend/public/uploads/sharing_tool.jpg" alt="ShareShelf Banner" width="100%" />
+</div>
 
-**ShareShelf** is a community-powered tool library that lets neighbors borrow, lend, and share rarely used tools and equipment within their neighborhood, university, or local community.
-
-Instead of buying a \$200 drill for one shelf or a tent for one camping trip, browse what your neighbors are already sharing — or list your own idle gear and build trust in your community.
+<p align="center">
+  <br />
+  <a href="https://share-shelf-ashen.vercel.app"><b>Live Demo</b></a> • 
+  <a href="#quick-start"><b>Quick Start</b></a> • 
+  <a href="#tech-stack"><b>Tech Stack</b></a>
+  <br />
+</p>
 
 ---
+
+**ShareShelf** is a community-powered tool library that lets neighbors borrow, lend, and share rarely used tools and equipment within their neighborhood, university, or local community. Instead of buying a $200 drill for one shelf or a tent for one camping trip, browse what your neighbors are already sharing — or list your own idle gear and build trust in your community.
 
 ### Why ShareShelf?
 
