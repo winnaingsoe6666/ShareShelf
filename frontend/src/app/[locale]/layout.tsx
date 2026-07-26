@@ -45,6 +45,9 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
+      <head>
+        <script defer data-domain="shareshelf.vercel.app" src="https://plausible.io/js/script.js"></script>
+      </head>
       <body className="min-h-screen bg-purple-50 text-stone-900 antialiased font-[family-name:var(--font-body)]">
         <NextIntlClientProvider messages={messages}>
           {children}
